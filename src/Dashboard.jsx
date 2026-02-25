@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const C = {
   bg: "#f0f4f8", panel: "#ffffff", border: "#d1dce8",
@@ -146,16 +146,21 @@ const volWindows = [
   { session: "Weekend", time: "Pá 17:00–Ne 17:00", vol: 10, pairs: "⚠ GAP riziko" },
 ];
 
-function computeCurrencyTotals() {
+function computeCurrencyTotals(list) {
   const totals = {};
-  CURRENCIES.forEach(c => { totals[c] = 0; });
-  mockScenarios.forEach(s => {
-    CURRENCIES.forEach(c => {
-      if (s.currencyImpact[c]) totals[c] += s.currencyImpact[c].score;
+  CURRENCIES.forEach((c) => { totals[c] = 0; });
+
+  (list || []).forEach((s) => {
+    CURRENCIES.forEach((c) => {
+      if (s.currencyImpact && s.currencyImpact[c]) {
+        totals[c] += (s.currencyImpact[c].score || 0);
+      }
     });
   });
-  const max = Math.max(...Object.values(totals).map(Math.abs));
-  CURRENCIES.forEach(c => { totals[c] = Math.round((totals[c] / max) * 100); });
+
+  const max = Math.max(1, ...Object.values(totals).map((v) => Math.abs(v)));
+  CURRENCIES.forEach((c) => { totals[c] = Math.round((totals[c] / max) * 100); });
+
   return totals;
 }
 
@@ -233,13 +238,45 @@ function SectionLabel({ children, center }) {
 }
 
 export default function Dashboard() {
+  const [backendStatus, setBackendStatus] = useState("checking...");
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/health")
+      .then((r) => r.json())
+      .then((data) => setBackendStatus(data.status))
+      .catch(() => setBackendStatus("OFFLINE"));
+  }, []);
+const API = "http://127.0.0.1:8000";
+
+const [scenarios, setScenarios] = useState([]);
+const [events, setEvents] = useState([]);
+const [sentiment, setSentiment] = useState({ total_score: 0, label: "NEUTRAL" });
+
+useEffect(() => {
+  Promise.all([
+    fetch(`${API}/api/scenarios`).then((r) => r.json()),
+    fetch(`${API}/api/events`).then((r) => r.json()),
+    fetch(`${API}/api/sentiment`).then((r) => r.json()),
+  ])
+    .then(([sc, ev, se]) => {
+      setScenarios(sc || []);
+      setEvents(ev || []);
+      setSentiment(se || { total_score: 0, label: "NEUTRAL" });
+    })
+    .catch(() => {
+      // když backend spadne, necháme prázdné
+      setScenarios([]);
+      setEvents([]);
+      setSentiment({ total_score: 0, label: "NEUTRAL" });
+    });
+}, []);
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("status");
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [totalScore] = useState(-18);
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("14:38:22");
-  const currencyTotals = computeCurrencyTotals();
+  const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : mockScenarios);
 
   const runScan = () => {
     setScanning(true);
@@ -268,6 +305,9 @@ export default function Dashboard() {
         <div>
           <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent }}>◈ MARKET PULSE</div>
           <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 2 }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
+          <div style={{ fontSize: 9, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, marginTop: 4 }}>
+            Backend: <b>{backendStatus}</b>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <div style={{ textAlign: "right" }}>
@@ -409,9 +449,10 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scénář pro detail dopadu ▼</div>
-                {mockScenarios.map(s => {
+                {scenarios.map(s => {
                   const isExp = expandedScenario === s.id;
-                  const sc = s.riskScore > 0 ? C.green : C.red;
+                  const sc = (s.riskScore || s.risk_score || 0) > 0 ? C.green : C.red;
+                  const rScore = s.riskScore || s.risk_score || 0;
                   return (
                     <div key={s.id} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${sc}`, borderRadius: 6, background: `${sc}06`, overflow: "hidden" }}>
                       <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: "10px 12px", cursor: "pointer" }}>
@@ -461,7 +502,7 @@ export default function Dashboard() {
             {/* CALENDAR */}
             {centerTab === "calendar" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {upcomingEvents.map((ev, i) => {
+                {events.map((ev, i) => {
                   const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
                   return (
                     <div key={i} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6, padding: "10px 12px" }}>
@@ -471,7 +512,7 @@ export default function Dashboard() {
                           <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
                           <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
                         </div>
-                        <span style={{ fontSize: 10, color: C.accent }}>{ev.date}</span>
+                        <span style={{ fontSize: 10, color: C.accent }}>{ev.date || ev.event_time}</span>
                       </div>
                       <div style={{ fontSize: 9, color: C.textDim }}>{ev.note}</div>
                     </div>
