@@ -82,16 +82,6 @@ const upcomingEvents = [
   { name: "BoJ Outlook Report", date: "Po 00:30 EST", impact: "MED", note: "JPY páry — gap risk v asijské session." },
 ];
 
-const cotData = [
-  { currency: "USD", net: +42500, change: +3200, sentiment: "bullish" },
-  { currency: "EUR", net: -18200, change: -1500, sentiment: "bearish" },
-  { currency: "JPY", net: +61000, change: +8900, sentiment: "bullish" },
-  { currency: "GBP", net: +12400, change: +800, sentiment: "bullish" },
-  { currency: "AUD", net: -34600, change: -2100, sentiment: "bearish" },
-  { currency: "CHF", net: +28900, change: +1200, sentiment: "bullish" },
-  { currency: "CAD", net: -9800, change: +400, sentiment: "bearish" },
-  { currency: "NZD", net: -15200, change: -900, sentiment: "bearish" },
-];
 
 const centralBanks = [
   { bank: "Fed", currency: "USD", rate: "4.50%", nextMeeting: "19. Mar", bias: "neutral", lastChange: "-25bp Dec'25" },
@@ -251,6 +241,21 @@ const API = "https://market-pulse-fdgb.onrender.com";
 const [scenarios, setScenarios] = useState([]);
 const [events, setEvents] = useState([]);
 const [sentiment, setSentiment] = useState({ total_score: 0, label: "NEUTRAL" });
+const [cotData, setCotData] = useState([]);
+useEffect(() => {
+  fetch(`${API}/api/cot`)
+    .then(r => r.json())
+    .then(data => {
+      const mapped = data.map(c => ({
+        currency: c.currency,
+        net: c.net,
+        change: 0,
+        sentiment: c.net > 0 ? "bullish" : "bearish"
+      }));
+      setCotData(mapped);
+    })
+    .catch(() => {});
+}, []);
 
 useEffect(() => {
   Promise.all([
