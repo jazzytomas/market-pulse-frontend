@@ -246,7 +246,7 @@ export default function Dashboard() {
       .then((data) => setBackendStatus(data.status))
       .catch(() => setBackendStatus("OFFLINE"));
   }, []);
-const API = "http://127.0.0.1:8000";
+const API = "https://market-pulse-fdgb.onrender.com";
 
 const [scenarios, setScenarios] = useState([]);
 const [events, setEvents] = useState([]);
@@ -476,7 +476,8 @@ useEffect(() => {
                           <SectionLabel>DOPAD NA MĚNY</SectionLabel>
                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 20px" }}>
                             {CURRENCIES.map(curr => {
-                              const imp = s.currencyImpact[curr];
+                              const impact = typeof s.currency_impact === 'string' ? JSON.parse(s.currency_impact) : (s.currency_impact || s.currencyImpact || {});
+                              const imp = impact[curr];
                               if (!imp) return null;
                               const col = imp.score > NEUTRAL_THRESHOLD ? C.green : imp.score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
                               return (
