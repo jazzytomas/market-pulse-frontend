@@ -83,7 +83,7 @@ const upcomingEvents = [
 ];
 
 
-const centralBanks = [
+const [centralBanks, setCentralBanks] = useState([]);
   { bank: "Fed", currency: "USD", rate: "4.50%", nextMeeting: "19. Mar", bias: "neutral", lastChange: "-25bp Dec'25" },
   { bank: "ECB", currency: "EUR", rate: "2.50%", nextMeeting: "6. Mar", bias: "neutral", lastChange: "-25bp Dec'25" },
   { bank: "BoJ", currency: "JPY", rate: "0.50%", nextMeeting: "19. Mar", bias: "hawkish", lastChange: "+25bp Jan'26" },
@@ -231,6 +231,12 @@ export default function Dashboard() {
   const [backendStatus, setBackendStatus] = useState("checking...");
 
   useEffect(() => {
+    useEffect(() => {
+  fetch(`${API}/api/central_banks`)
+    .then(r => r.json())
+    .then(data => setCentralBanks(data))
+    .catch(() => {});
+}, []);
     fetch("https://market-pulse-fdgb.onrender.com/api/health")
       .then((r) => r.json())
       .then((data) => setBackendStatus(data.status))
