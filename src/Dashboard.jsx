@@ -142,8 +142,8 @@ function computeCurrencyTotals(list) {
 
   (list || []).forEach((s) => {
     CURRENCIES.forEach((c) => {
-      if (s.currencyImpact && s.currencyImpact[c]) {
-        totals[c] += (s.currencyImpact[c].score || 0);
+      if ((s.currency_impact || s.currencyImpact) && (s.currency_impact || s.currencyImpact)[c]) {
+        totals[c] += ((s.currency_impact || s.currencyImpact)[c].score || 0);
       }
     });
   });
