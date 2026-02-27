@@ -231,7 +231,7 @@ export default function Dashboard() {
   const [backendStatus, setBackendStatus] = useState("checking...");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/health")
+    fetch("https://market-pulse-fdgb.onrender.com/api/health")
       .then((r) => r.json())
       .then((data) => setBackendStatus(data.status))
       .catch(() => setBackendStatus("OFFLINE"));
