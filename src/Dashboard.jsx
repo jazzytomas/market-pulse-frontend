@@ -278,9 +278,9 @@ useEffect(() => {
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("status");
   const [expandedScenario, setExpandedScenario] = useState(null);
-  const [totalScore] = useState(-18);
+  const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [scanning, setScanning] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState("14:38:22");
+  const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : mockScenarios);
 
   const runScan = () => {
@@ -292,8 +292,8 @@ useEffect(() => {
     }, 1800);
   };
 
-  const riskColor = totalScore > NEUTRAL_THRESHOLD ? C.green : totalScore < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
-  const riskLabel = totalScore > NEUTRAL_THRESHOLD ? "RISK ON" : totalScore < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
+  const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+  const riskLabel = sentiment.total_score > NEUTRAL_THRESHOLD ? "RISK ON" : sentiment.total_score < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
 
   const corrColor = (val) => {
     if (val >= 0.7) return C.green;
@@ -336,14 +336,14 @@ useEffect(() => {
           {/* Gauge panel */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
-            <RiskMeter score={totalScore} />
+            <RiskMeter score={sentiment.total_score} />
 
             {/* Měnový přehled pod gaugeom */}
             <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
               <SectionLabel>MĚNOVÝ PŘEHLED</SectionLabel>
               {(() => {
-                const isRiskOn = totalScore > NEUTRAL_THRESHOLD;
-                const isRiskOff = totalScore < -NEUTRAL_THRESHOLD;
+                const isRiskOn = sentiment.total_score > NEUTRAL_THRESHOLD;
+                const isRiskOff = sentiment.total_score < -NEUTRAL_THRESHOLD;
                 const groups = isRiskOff ? [
                   { label: "🟢 Bullish", currencies: ["JPY", "CHF", "USD"], color: C.green },
                   { label: "🟡 Neutral", currencies: ["EUR", "GBP"], color: C.yellow },
@@ -743,8 +743,8 @@ useEffect(() => {
                     <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 8 }}>CURRENT STATE</div>
                     <div style={{ fontSize: 18, fontWeight: 900, color: riskColor, letterSpacing: 3 }}>{riskLabel}</div>
                     <div style={{ fontSize: 9, color: C.textDim, marginTop: 8, lineHeight: 1.6 }}>
-                      {totalScore > NEUTRAL_THRESHOLD ? "Trh preferuje risk assets. AUD, NZD supported."
-                        : totalScore < -NEUTRAL_THRESHOLD ? "Risk aversion. JPY, CHF, Gold outperformují."
+                      {sentiment.total_score > NEUTRAL_THRESHOLD ? "Trh preferuje risk assets. AUD, NZD supported."
+                        : sentiment.total_score < -NEUTRAL_THRESHOLD ? "Risk aversion. JPY, CHF, Gold outperformují."
                         : "Smíšené signály. Čekej na potvrzení."}
                     </div>
                   </div>
