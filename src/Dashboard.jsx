@@ -278,7 +278,6 @@ useEffect(() => {
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("status");
   const [expandedScenario, setExpandedScenario] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : mockScenarios);
