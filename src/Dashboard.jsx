@@ -456,7 +456,7 @@ useEffect(() => {
                 {scenarios.map(s => {
                   const isExp = expandedScenario === s.id;
                   const sc = (s.riskScore || s.risk_score || 0) > 0 ? C.green : C.red;
-                  const rScore = s.riskScore || s.risk_score || 0;
+                  const s.risk_score = s.riskScore || s.risk_score || 0;
                   return (
                     <div key={s.id} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${sc}`, borderRadius: 6, background: `${sc}06`, overflow: "hidden" }}>
                       <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: "10px 12px", cursor: "pointer" }}>
