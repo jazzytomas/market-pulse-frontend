@@ -237,7 +237,7 @@ export default function Dashboard() {
       .catch(() => setBackendStatus("OFFLINE"));
   }, []);
 const API = "https://market-pulse-fdgb.onrender.com";
-
+const [showAllScenarios, setShowAllScenarios] = useState(false);
 const [scenarios, setScenarios] = useState([]);
 const [events, setEvents] = useState([]);
 const [sentiment, setSentiment] = useState({ total_score: 0, label: "NEUTRAL" });
@@ -450,10 +450,17 @@ useEffect(() => {
             </div>
 
             {/* SCENARIOS */}
-            {centerTab === "scenarios" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scénář pro detail dopadu ▼</div>
-                {scenarios.map(s => {
+{centerTab === "scenarios" && (
+  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scénář pro detail dopadu ▼</div>
+    {[...scenarios]
+      .sort((a, b) => {
+        const w = {HIGH: 3, MED: 2, LOW: 1};
+        if (w[b.weight] !== w[a.weight]) return w[b.weight] - w[a.weight];
+        return Math.abs(b.risk_score) - Math.abs(a.risk_score);
+      })
+      .slice(0, showAllScenarios ? scenarios.length : 4)
+      .map(s => {
                   const isExp = expandedScenario === s.id;
                   const sc = (s.riskScore || s.risk_score || 0) > 0 ? C.green : C.red;
                   const rScore = s.risk_score || 0;
@@ -501,6 +508,11 @@ useEffect(() => {
                     </div>
                   );
                 })}
+                {scenarios.length > 4 && (
+                  <div onClick={() => setShowAllScenarios(!showAllScenarios)} style={{textAlign:"center", padding:8, cursor:"pointer", color:C.textDim, fontSize:10}}>
+                    {showAllScenarios ? "▲ Skrýt" : `▼ Zobrazit více (${scenarios.length - 4})`}
+                  </div>
+                )}
               </div>
             )}
 
