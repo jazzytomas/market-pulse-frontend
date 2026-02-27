@@ -469,7 +469,7 @@ useEffect(() => {
                           </div>
                         </div>
                         <div style={{ fontSize: 10, color: C.textDim, marginBottom: 5 }}>{s.summary}</div>
-                        <ScoreBar score={s.risk_Score} />
+                        <ScoreBar score={rScore} />
                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
                           <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
                           <span style={{ fontSize: 8, color: C.muted }}>{s.time}</span>
