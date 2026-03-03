@@ -287,7 +287,6 @@ useEffect(() => {
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : mockScenarios);
-
   const runScan = () => {
     setScanning(true);
     fetch(`${API}/api/rescan`)
