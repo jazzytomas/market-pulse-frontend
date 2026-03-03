@@ -290,11 +290,22 @@ useEffect(() => {
 
   const runScan = () => {
     setScanning(true);
-    setTimeout(() => {
-      const now = new Date();
-      setLastUpdate(`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`);
-      setScanning(false);
-    }, 1800);
+    fetch(`${API}/api/rescan`)
+      .then(() => {
+        setTimeout(() => {
+          const now = new Date();
+          setLastUpdate(`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`);
+          Promise.all([
+            fetch(`${API}/api/scenarios`).then(r => r.json()),
+            fetch(`${API}/api/sentiment`).then(r => r.json()),
+          ]).then(([sc, se]) => {
+            setScenarios(sc || []);
+            setSentiment(se || { total_score: 0, label: "NEUTRAL" });
+            setScanning(false);
+          });
+        }, 30000);
+      })
+      .catch(() => setScanning(false));
   };
 
   const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
