@@ -385,21 +385,22 @@ export default function Dashboard() {
                   .slice(0, showAllScenarios ? scenarios.length : 4)
                   .map(s => {
                     const isExp = expandedScenario === s.id;
+                    const isMed = s.weight === "MED";
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
                     const rScore = s.risk_score || 0;
                     return (
-                      <div key={s.id} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${sc}`, borderRadius: 6, background: `${sc}06`, overflow: "hidden" }}>
-                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: "10px 12px", cursor: "pointer" }}>
+                      <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? C.muted : sc}`, borderRadius: 6, background: isMed ? "transparent" : `${sc}06`, overflow: "hidden", opacity: isMed ? 0.6 : 1 }}>
+                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "6px 10px" : "10px 12px", cursor: "pointer" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
+                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 400 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 8, color: C.textDim, background: C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
-                              <span style={{ fontSize: 13, fontWeight: 900, color: sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
+                              <span style={{ fontSize: 8, color: C.muted, background: C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
                               <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
                           </div>
-                          <div style={{ fontSize: 10, color: C.textDim, marginBottom: 5 }}>{s.summary}</div>
-                          <ScoreBar score={rScore} />
+                          <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{s.summary}</div>
+                          {!isMed && <ScoreBar score={rScore} />}
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
                             <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
                           </div>
