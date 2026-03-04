@@ -152,6 +152,7 @@ export default function Dashboard() {
   const [commodities, setCommodities] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const [watchlistData, setWatchlistData] = useState([]);
+  const [seasonalLive, setSeasonalLive] = useState([]);
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -185,6 +186,13 @@ export default function Dashboard() {
     fetch(`${API}/api/watchlist`)
       .then(r => r.json())
       .then(data => setWatchlistData(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/seasonal`)
+      .then(r => r.json())
+      .then(data => setSeasonalLive(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
 
@@ -541,17 +549,65 @@ export default function Dashboard() {
 
             {centerTab === "seasonal" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>Historicke sezonni vzory (prumer poslednich 10 let)</div>
-                <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100 }}>
-                  {seasonalData.map((m) => (
-                    <div key={m.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                      {[{ val: m.USD, col: C.accent }, { val: m.EUR, col: C.green }, { val: m.JPY, col: C.yellow }, { val: m.AUD, col: C.orange }].map((item, i) => (
-                        <div key={i} style={{ width: "100%", height: Math.abs(item.val) * 6, background: item.col, opacity: 0.7, borderRadius: 2, marginBottom: 1 }} />
-                      ))}
-                      <div style={{ fontSize: 8, color: C.muted, marginTop: 4 }}>{m.month}</div>
-                    </div>
-                  ))}
+                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 10 }}>
+                  Průměrný měsíční výnos za posledních 10 let (%, live z yfinance)
                 </div>
+                {seasonalLive.length === 0 ? (
+                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>Načítám historická data...</div>
+                ) : (() => {
+                  const currencies = ["EUR", "GBP", "AUD", "NZD", "JPY", "CHF", "CAD"];
+                  const curColors = { EUR: "#4a9eff", GBP: "#9b59b6", AUD: "#e67e22", NZD: "#1abc9c", JPY: "#e74c3c", CHF: "#95a5a6", CAD: "#f39c12" };
+                  return (
+                    <div style={{ overflowX: "auto" }}>
+                      {/* Legend */}
+                      <div style={{ display: "flex", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+                        {currencies.map(cur => (
+                          <div key={cur} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: 2, background: curColors[cur] }} />
+                            <span style={{ fontSize: 8, color: C.textDim }}>{cur}</span>
+                          </div>
+                        ))}
+                        <span style={{ fontSize: 8, color: C.muted, marginLeft: 6 }}>🟢 bullish · 🔴 bearish</span>
+                      </div>
+                      {/* Heatmap grid */}
+                      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 2, fontSize: 8 }}>
+                        <thead>
+                          <tr>
+                            <td style={{ width: 28, color: C.muted, paddingBottom: 4 }}></td>
+                            {seasonalLive.map(m => (
+                              <td key={m.month} style={{ textAlign: "center", color: C.textDim, paddingBottom: 4, fontWeight: 600 }}>{m.month}</td>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {currencies.map(cur => (
+                            <tr key={cur}>
+                              <td style={{ color: curColors[cur], fontWeight: 700, paddingRight: 6, fontSize: 9 }}>{cur}</td>
+                              {seasonalLive.map(m => {
+                                const val = m[cur];
+                                if (val === undefined) return <td key={m.month} style={{ textAlign: "center", color: C.muted }}>—</td>;
+                                const intensity = Math.min(1, Math.abs(val) / 1.5);
+                                const bg = val > 0
+                                  ? `rgba(0,145,77,${0.12 + intensity * 0.55})`
+                                  : `rgba(217,48,37,${0.12 + intensity * 0.55})`;
+                                const textCol = val > 0 ? C.green : C.red;
+                                return (
+                                  <td key={m.month} style={{
+                                    textAlign: "center", background: bg, borderRadius: 3,
+                                    padding: "4px 2px", color: textCol, fontWeight: Math.abs(val) > 0.5 ? 700 : 400
+                                  }}>
+                                    {val > 0 ? "+" : ""}{val.toFixed(1)}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>* hodnoty v %, průměr 10 let · zdroj: yfinance</div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
