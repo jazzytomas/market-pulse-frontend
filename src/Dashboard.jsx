@@ -389,10 +389,10 @@ export default function Dashboard() {
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
                     const rScore = s.risk_score || 0;
                     return (
-                      <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? C.muted : sc}`, borderRadius: 6, background: isMed ? "transparent" : `${sc}06`, overflow: "hidden", opacity: isMed ? 0.6 : 1 }}>
-                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "6px 10px" : "10px 12px", cursor: "pointer" }}>
+                      <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
+                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "7px 10px" : "10px 12px", cursor: "pointer" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 400 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
+                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
                               <span style={{ fontSize: 8, color: C.muted, background: C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
