@@ -337,8 +337,8 @@ export default function Dashboard() {
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
             ) : commodities.map(c => {
               const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
-              const signal = c.change > 0.5 ? "risk on" : c.change < -0.5 ? "risk off" : "neutral";
-              const sigCol = c.change > 0.5 ? C.green : c.change < -0.5 ? C.red : C.yellow;
+              const signal = c.signal || "neutral";
+              const sigCol = signal === "risk on" ? C.green : signal === "risk off" ? C.red : C.yellow;
               return (
                 <div key={c.name} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${C.border}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
