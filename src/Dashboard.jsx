@@ -193,7 +193,8 @@ export default function Dashboard() {
       .then(r => r.json())
       .then(data => {
         setCotData(data.map(c => ({
-          currency: c.currency, net: c.net, change: 0,
+          currency: c.currency, net: c.net,
+          long: c.long, short: c.short, date: c.date,
           sentiment: c.net > 0 ? "bullish" : "bearish"
         })));
       })
@@ -453,26 +454,56 @@ export default function Dashboard() {
 
             {centerTab === "cot" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>CFTC Commitments of Traders — pozice velkych hracu (update kazdy patek)</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {cotData.map(c => {
-                    const col = c.sentiment === "bullish" ? C.green : C.red;
-                    return (
-                      <div key={c.currency} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: `${col}08`, border: `1px solid ${col}22`, borderRadius: 6 }}>
-                        <span style={{ width: 30, fontSize: 11, fontWeight: 700, color: col }}>{c.currency}</span>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                            <span style={{ fontSize: 9, color: C.textDim }}>Net positions</span>
-                            <span style={{ fontSize: 9, color: col }}>{c.net > 0 ? "+" : ""}{c.net.toLocaleString()}</span>
+                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>CFTC Commitments of Traders — Leveraged Money pozice (update kazdy patek)</div>
+                {(() => {
+                  const maxVal = Math.max(1, ...cotData.map(c => Math.max(c.long || 0, c.short || 0)));
+                  return (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {cotData.map(c => {
+                        const col = c.sentiment === "bullish" ? C.green : C.red;
+                        const longPct = Math.round(((c.long || 0) / maxVal) * 100);
+                        const shortPct = Math.round(((c.short || 0) / maxVal) * 100);
+                        const dateStr = c.date ? c.date.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3.$2") : "";
+                        return (
+                          <div key={c.currency} style={{ padding: "10px 12px", background: `${col}08`, border: `1px solid ${col}33`, borderRadius: 6 }}>
+                            {/* Header */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                <span style={{ fontSize: 13, fontWeight: 900, color: col }}>{c.currency}</span>
+                                <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{c.sentiment}</span>
+                              </div>
+                              <span style={{ fontSize: 8, color: C.muted }}>{dateStr}</span>
+                            </div>
+                            {/* Long bar */}
+                            <div style={{ marginBottom: 5 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                                <span style={{ fontSize: 8, color: C.green }}>LONG</span>
+                                <span style={{ fontSize: 8, color: C.green }}>{((c.long || 0) / 1000).toFixed(0)}K</span>
+                              </div>
+                              <div style={{ width: "100%", height: 5, background: C.border, borderRadius: 3 }}>
+                                <div style={{ width: `${longPct}%`, height: "100%", background: C.green, borderRadius: 3 }} />
+                              </div>
+                            </div>
+                            {/* Short bar */}
+                            <div style={{ marginBottom: 7 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                                <span style={{ fontSize: 8, color: C.red }}>SHORT</span>
+                                <span style={{ fontSize: 8, color: C.red }}>{((c.short || 0) / 1000).toFixed(0)}K</span>
+                              </div>
+                              <div style={{ width: "100%", height: 5, background: C.border, borderRadius: 3 }}>
+                                <div style={{ width: `${shortPct}%`, height: "100%", background: C.red, borderRadius: 3 }} />
+                              </div>
+                            </div>
+                            {/* Net */}
+                            <div style={{ fontSize: 9, fontWeight: 700, color: col, textAlign: "center", borderTop: `1px solid ${C.border}`, paddingTop: 5 }}>
+                              NET {c.net > 0 ? "+" : ""}{(c.net || 0).toLocaleString()}
+                            </div>
                           </div>
-                          <div style={{ width: "100%", height: 4, background: C.border, borderRadius: 3 }}>
-                            <div style={{ width: `${Math.min(100, Math.abs(c.net) / 800)}%`, height: "100%", background: col, borderRadius: 3 }} />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
