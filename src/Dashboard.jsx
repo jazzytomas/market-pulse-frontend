@@ -143,7 +143,6 @@ export default function Dashboard() {
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
-  const [showAllScenarios, setShowAllScenarios] = useState(false);
   const [commodities, setCommodities] = useState([]);
   const [historyData, setHistoryData] = useState([]);
 
@@ -375,13 +374,13 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scenar pro detail dopadu ▼</div>
+                <div style={{ overflowY: "auto", maxHeight: 420, display: "flex", flexDirection: "column", gap: 8, paddingRight: 4 }}>
                 {[...scenarios]
                   .sort((a, b) => {
                     const w = { HIGH: 3, MED: 2, LOW: 1 };
                     if (w[b.weight] !== w[a.weight]) return w[b.weight] - w[a.weight];
                     return Math.abs(b.risk_score) - Math.abs(a.risk_score);
                   })
-                  .slice(0, showAllScenarios ? scenarios.length : 4)
                   .map(s => {
                     const isExp = expandedScenario === s.id;
                     const isMed = s.weight === "MED";
@@ -430,11 +429,7 @@ export default function Dashboard() {
                       </div>
                     );
                   })}
-                {scenarios.length > 4 && (
-                  <div onClick={() => setShowAllScenarios(!showAllScenarios)} style={{ textAlign: "center", padding: 8, cursor: "pointer", color: C.textDim, fontSize: 10 }}>
-                    {showAllScenarios ? "▲ Skryt" : `▼ Zobrazit vice (${scenarios.length - 4})`}
-                  </div>
-                )}
+                </div>
               </div>
             )}
 
