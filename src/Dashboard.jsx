@@ -329,7 +329,7 @@ export default function Dashboard() {
           </div>
 
           {/* Commodities */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1 }}>
             <SectionLabel>KOMODITY</SectionLabel>
             {commodities.length === 0 ? (
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
