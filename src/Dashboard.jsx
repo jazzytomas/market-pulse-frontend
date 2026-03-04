@@ -177,7 +177,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetch(`${API}/api/watchlist`)
       .then(r => r.json())
-      .then(data => setWatchlistData(data || []))
+      .then(data => setWatchlistData(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
 
