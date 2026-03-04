@@ -295,37 +295,6 @@ export default function Dashboard() {
               })()}
             </div>
 
-            {/* Sub-kategorie */}
-            <div style={{ marginTop: 12 }}>
-              {[
-                { label: "News Sentiment", val: -18 },
-                { label: "Macro Conditions", val: +22 },
-                { label: "Geopolitical", val: -35 },
-                { label: "Central Banks", val: +10 },
-              ].map(item => (
-                <div key={item.label} style={{ marginBottom: 7 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                    <span style={{ fontSize: 9, color: C.textDim }}>{item.label}</span>
-                    <span style={{ fontSize: 9, color: item.val > 0 ? C.green : item.val < 0 ? C.red : C.yellow }}>
-                      {item.val > 0 ? "+" : ""}{item.val}
-                    </span>
-                  </div>
-                  <ScoreBar score={item.val} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Gap Risk */}
-          <div style={{ background: `${C.orange}12`, border: `1px solid ${C.orange}44`, borderRadius: 8, padding: "10px 12px" }}>
-            <div style={{ fontSize: 9, letterSpacing: 2, color: C.orange, marginBottom: 6 }}>⚠ GAP RISK</div>
-            <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.6 }}>
-              Sentiment: <span style={{ color: riskColor }}>{sentiment.total_score} ({riskLabel})</span><br />
-              Vikend close: Pa 17:00 EST<br />
-              <span style={{ color: C.orange }}>
-                {sentiment.total_score < -20 ? "Vysoke riziko gap v pondeli." : sentiment.total_score > 20 ? "Nizke riziko gap." : "Stredni riziko gap v pondeli."}
-              </span>
-            </div>
           </div>
 
           {/* Commodities */}
