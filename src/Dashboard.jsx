@@ -32,15 +32,6 @@ const seasonalData = [
   { month: "Jun", USD: +3, EUR: -2, JPY: -2, AUD: +3 },
 ];
 
-const historyData = [
-  { date: "24.2", score: -22, label: "RISK OFF", events: "PCE data miss" },
-  { date: "23.2", score: +15, label: "NEUTRAL", events: "FOMC neutral" },
-  { date: "22.2", score: +42, label: "RISK ON", events: "China PMI beat" },
-  { date: "21.2", score: -38, label: "RISK OFF", events: "Geopolitical" },
-  { date: "20.2", score: -18, label: "NEUTRAL", events: "Mixed data" },
-  { date: "19.2", score: +55, label: "RISK ON", events: "NFP beat" },
-  { date: "18.2", score: +30, label: "RISK ON", events: "Risk appetite" },
-];
 
 const watchlistPairs = ["EURUSD", "GBPJPY", "AUDUSD", "USDJPY", "XAUUSD"];
 
@@ -154,6 +145,7 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [showAllScenarios, setShowAllScenarios] = useState(false);
   const [commodities, setCommodities] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -173,6 +165,13 @@ export default function Dashboard() {
     fetch(`${API}/api/commodities`)
       .then(r => r.json())
       .then(data => setCommodities(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/history`)
+      .then(r => r.json())
+      .then(data => setHistoryData(data || []))
       .catch(() => {});
   }, []);
 
@@ -548,19 +547,23 @@ export default function Dashboard() {
             {centerTab === "history" && (
               <div>
                 <SectionLabel>POSLEDNICH 7 DNI</SectionLabel>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {historyData.map((h, i) => {
-                    const col = h.score > 15 ? C.green : h.score < -15 ? C.red : C.yellow;
-                    return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: `${col}08`, border: `1px solid ${C.border}`, borderRadius: 6 }}>
-                        <span style={{ fontSize: 10, color: C.textDim, width: 36 }}>{h.date}</span>
-                        <span style={{ fontSize: 11, fontWeight: 900, color: col, width: 36 }}>{h.score > 0 ? "+" : ""}{h.score}</span>
-                        <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3, width: 58, textAlign: "center" }}>{h.label}</span>
-                        <span style={{ fontSize: 9, color: C.textDim, flex: 1 }}>{h.events}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+                {historyData.length === 0 ? (
+                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>Žádná data — data se hromadí postupně</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {historyData.map((h, i) => {
+                      const col = h.score > 15 ? C.green : h.score < -15 ? C.red : C.yellow;
+                      return (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: `${col}08`, border: `1px solid ${C.border}`, borderRadius: 6 }}>
+                          <span style={{ fontSize: 10, color: C.textDim, width: 36 }}>{h.date}</span>
+                          <span style={{ fontSize: 11, fontWeight: 900, color: col, width: 36 }}>{h.score > 0 ? "+" : ""}{h.score}</span>
+                          <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3, width: 58, textAlign: "center" }}>{h.label}</span>
+                          <span style={{ fontSize: 9, color: C.muted, flex: 1 }}>{h.count} scénářů</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
