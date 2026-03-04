@@ -45,16 +45,23 @@ const volWindows = [
 
 function computeCurrencyTotals(list) {
   const totals = {};
-  CURRENCIES.forEach((c) => { totals[c] = 0; });
+  const counts = {};
+  CURRENCIES.forEach((c) => { totals[c] = 0; counts[c] = 0; });
   (list || []).forEach((s) => {
     CURRENCIES.forEach((c) => {
       const ci = s.currency_impact || s.currencyImpact;
-      if (ci && ci[c]) totals[c] += (ci[c].score || 0);
+      if (ci && ci[c]) {
+        const score = ci[c].score || 0;
+        if (score !== 0) { totals[c] += score; counts[c]++; }
+      }
     });
   });
-  const max = Math.max(1, ...Object.values(totals).map((v) => Math.abs(v)));
-  CURRENCIES.forEach((c) => { totals[c] = Math.round((totals[c] / max) * 100); });
-  return totals;
+  // Průměr místo součtu — víc zpráv o USD nezvyšuje skóre umělě
+  const result = {};
+  CURRENCIES.forEach((c) => {
+    result[c] = counts[c] > 0 ? Math.round(totals[c] / counts[c]) : 0;
+  });
+  return result;
 }
 
 function ScoreBar({ score, height = 6 }) {
