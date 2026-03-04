@@ -237,10 +237,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "monospace", padding: 14, boxSizing: "border-box" }}>
+    <div style={{ background: C.bg, height: "100vh", color: C.text, fontFamily: "monospace", padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent }}>◈ MARKET PULSE</div>
           <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 2 }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
@@ -261,10 +261,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: 12, flex: 1, minHeight: 0 }}>
 
         {/* LEFT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
 
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
@@ -329,7 +329,7 @@ export default function Dashboard() {
           </div>
 
           {/* Commodities */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
             <SectionLabel>KOMODITY</SectionLabel>
             {commodities.length === 0 ? (
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
@@ -358,11 +358,11 @@ export default function Dashboard() {
         </div>
 
         {/* RIGHT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
-            <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="⚡ Scenarios" active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label="📅 Events" active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
               <TabBtn label="📊 COT" active={centerTab === "cot"} onClick={() => setCenterTab("cot")} />
@@ -371,10 +371,12 @@ export default function Dashboard() {
               <TabBtn label="🕐 Historie" active={centerTab === "history"} onClick={() => setCenterTab("history")} />
             </div>
 
+            <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scenar pro detail dopadu ▼</div>
-                <div style={{ overflowY: "auto", maxHeight: 420, display: "flex", flexDirection: "column", gap: 8, paddingRight: 4 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[...scenarios]
                   .sort((a, b) => {
                     const w = { HIGH: 3, MED: 2, LOW: 1 };
@@ -561,10 +563,12 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+
+            </div>{/* /content wrapper */}
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
               <TabBtn label="Meny" active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
@@ -573,7 +577,7 @@ export default function Dashboard() {
               <TabBtn label="Watchlist" active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
 
-            <div style={{ padding: 14 }}>
+            <div style={{ padding: 14, maxHeight: 260, overflowY: "auto" }}>
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -729,7 +733,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between" }}>
+      <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
         <span>⚡ AI scanning: ForexLive · FXStreet · ForexFactory · CFTC</span>
         <span>NOT FINANCIAL ADVICE — INFORMATIONAL ONLY</span>
       </div>
