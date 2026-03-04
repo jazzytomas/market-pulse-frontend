@@ -261,10 +261,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gridTemplateRows: "1fr auto", gap: 12, flex: 1, minHeight: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: 12, flex: 1, minHeight: 0 }}>
 
-        {/* LEFT — spans oba řádky gridu */}
-        <div style={{ gridRow: "1 / 3", display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* LEFT */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
 
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
@@ -329,7 +329,7 @@ export default function Dashboard() {
           </div>
 
           {/* Commodities */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
             <SectionLabel>KOMODITY</SectionLabel>
             {commodities.length === 0 ? (
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
@@ -357,8 +357,11 @@ export default function Dashboard() {
 
         </div>
 
+        {/* RIGHT */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="⚡ Scenarios" active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label="📅 Events" active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -565,7 +568,7 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
               <TabBtn label="Meny" active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
@@ -727,6 +730,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+        </div>
       </div>
 
       <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
