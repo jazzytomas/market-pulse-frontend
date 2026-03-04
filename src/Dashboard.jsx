@@ -33,7 +33,6 @@ const seasonalData = [
 ];
 
 
-const watchlistPairs = ["EURUSD", "GBPJPY", "AUDUSD", "USDJPY", "XAUUSD"];
 
 const volWindows = [
   { session: "Tokyo", time: "00:00-09:00", vol: 35, pairs: "JPY, AUD, NZD" },
@@ -145,6 +144,7 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [commodities, setCommodities] = useState([]);
   const [historyData, setHistoryData] = useState([]);
+  const [watchlistData, setWatchlistData] = useState([]);
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -171,6 +171,13 @@ export default function Dashboard() {
     fetch(`${API}/api/history`)
       .then(r => r.json())
       .then(data => setHistoryData(data || []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/watchlist`)
+      .then(r => r.json())
+      .then(data => setWatchlistData(data || []))
       .catch(() => {});
   }, []);
 
@@ -678,21 +685,27 @@ export default function Dashboard() {
 
               {rightTab === "watchlist" && (
                 <div>
-                  <SectionLabel>WATCHLIST</SectionLabel>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    {watchlistPairs.map((pair, i) => {
-                      const mockChange = [-0.32, +0.45, +0.18, -0.67, +1.24][i];
-                      const col = mockChange > 0 ? C.green : C.red;
-                      return (
-                        <div key={pair} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: `${col}08`, border: `1px solid ${C.border}`, borderRadius: 6 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 10, color: col }}>{mockChange > 0 ? "▲" : "▼"} {Math.abs(mockChange)}%</div>
+                  <SectionLabel>WATCHLIST — LIVE PRICES</SectionLabel>
+                  {watchlistData.length === 0 ? (
+                    <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
+                  ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {watchlistData.map((pair) => {
+                        const col = pair.change > 0 ? C.green : pair.change < 0 ? C.red : C.yellow;
+                        return (
+                          <div key={pair.name} style={{ padding: "8px 10px", background: `${col}08`, border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair.name}</span>
+                              <span style={{ fontSize: 10, color: col, fontWeight: 700 }}>
+                                {pair.change > 0 ? "▲" : pair.change < 0 ? "▼" : "—"} {Math.abs(pair.change).toFixed(3)}%
+                              </span>
+                            </div>
+                            <div style={{ fontSize: 10, color: C.textDim, fontFamily: "monospace" }}>{pair.price}</div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
