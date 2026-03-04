@@ -264,7 +264,7 @@ export default function Dashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: 12, flex: 1, minHeight: 0 }}>
 
         {/* LEFT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0, height: "100%" }}>
 
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
@@ -358,7 +358,7 @@ export default function Dashboard() {
         </div>
 
         {/* RIGHT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0, height: "100%", overflow: "hidden" }}>
 
           {/* CENTER tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
