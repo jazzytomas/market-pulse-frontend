@@ -153,6 +153,7 @@ export default function Dashboard() {
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [showAllScenarios, setShowAllScenarios] = useState(false);
+  const [commodities, setCommodities] = useState([]);
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -165,6 +166,13 @@ export default function Dashboard() {
     fetch(`${API}/api/central_banks`)
       .then(r => r.json())
       .then(data => setCentralBanks(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/commodities`)
+      .then(r => r.json())
+      .then(data => setCommodities(data))
       .catch(() => {});
   }, []);
 
@@ -325,12 +333,12 @@ export default function Dashboard() {
           {/* Commodities */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px" }}>
             <SectionLabel>KOMODITY</SectionLabel>
-            {[
-              { name: "Ropa (WTI)", price: "$78.42", change: +1.2, signal: "risk on", currencies: "CAD ↑", color: C.green },
-              { name: "Zlato (XAU)", price: "$2,024", change: +0.8, signal: "risk off", currencies: "AUD ↑ / safe haven", color: C.red },
-              { name: "Med", price: "$3.84", change: -0.4, signal: "neutral", currencies: "AUD, NZD", color: C.yellow },
-            ].map(c => {
+            {commodities.length === 0 ? (
+              <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
+            ) : commodities.map(c => {
               const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
+              const signal = c.change > 0.5 ? "risk on" : c.change < -0.5 ? "risk off" : "neutral";
+              const sigCol = c.change > 0.5 ? C.green : c.change < -0.5 ? C.red : C.yellow;
               return (
                 <div key={c.name} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${C.border}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
@@ -342,12 +350,11 @@ export default function Dashboard() {
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
-                    <span style={{ fontSize: 8, color: c.color, border: `1px solid ${c.color}44`, padding: "1px 5px", borderRadius: 3 }}>{c.signal}</span>
+                    <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
                   </div>
                 </div>
               );
             })}
-            <div style={{ fontSize: 8, color: C.muted, marginTop: 2 }}>Mock data — v produkci live feed</div>
           </div>
 
         </div>
