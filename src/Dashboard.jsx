@@ -555,8 +555,8 @@ export default function Dashboard() {
                 {seasonalLive.length === 0 ? (
                   <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>Načítám historická data...</div>
                 ) : (() => {
-                  const currencies = ["EUR", "GBP", "AUD", "NZD", "JPY", "CHF", "CAD"];
-                  const curColors = { EUR: "#4a9eff", GBP: "#9b59b6", AUD: "#e67e22", NZD: "#1abc9c", JPY: "#e74c3c", CHF: "#95a5a6", CAD: "#f39c12" };
+                  const currencies = ["USD", "EUR", "GBP", "AUD", "NZD", "JPY", "CHF", "CAD"];
+                  const curColors = { USD: "#0077cc", EUR: "#4a9eff", GBP: "#9b59b6", AUD: "#e67e22", NZD: "#1abc9c", JPY: "#e74c3c", CHF: "#95a5a6", CAD: "#f39c12" };
                   return (
                     <div style={{ overflowX: "auto" }}>
                       {/* Legend */}
