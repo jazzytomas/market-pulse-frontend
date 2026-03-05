@@ -84,21 +84,22 @@ function RiskMeter({ score }) {
   const clamp = Math.max(-100, Math.min(100, score));
   const angle = (clamp / 100) * 90;
   const label = clamp > NEUTRAL_THRESHOLD ? "RISK ON" : clamp < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
-  const G = "#c9a227";
-  const GD = "#7a5c10";
-  const GB = "#f0c93a";
+  const isDark = C.bg === "#0a0a12";
+  const G = isDark ? "#c9a227" : (clamp > NEUTRAL_THRESHOLD ? C.green : clamp < -NEUTRAL_THRESHOLD ? C.red : C.yellow);
+  const GD = isDark ? "#7a5c10" : C.muted;
+  const GB = isDark ? "#f0c93a" : G;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
       <svg width="190" height="118" viewBox="0 0 190 118">
         <defs>
-          <linearGradient id="goldArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={GD} stopOpacity="0.7" />
             <stop offset="50%" stopColor={GB} stopOpacity="1" />
             <stop offset="100%" stopColor={GD} stopOpacity="0.7" />
           </linearGradient>
         </defs>
         <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke={C.border} strokeWidth="9" strokeLinecap="round" />
-        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke="url(#goldArcGrad)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke="url(#arcGrad)" strokeWidth="9" strokeLinecap="round" />
         <g transform={`rotate(${angle}, 95, 100)`}>
           <line x1="95" y1="100" x2="95" y2="24" stroke={GB} strokeWidth="2.5" strokeLinecap="round" />
           <circle cx="95" cy="100" r="5" fill={GB} />
