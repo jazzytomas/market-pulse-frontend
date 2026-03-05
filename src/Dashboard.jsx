@@ -314,11 +314,10 @@ export default function Dashboard() {
             <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
               <SectionLabel>MENOVY PREHLED</SectionLabel>
               {(() => {
-                const sorted = [...CURRENCIES].sort((a, b) => currencyTotals[b] - currencyTotals[a]);
                 const groups = [
-                  { label: "Risk ON",  currencies: sorted.filter(c => currencyTotals[c] > NEUTRAL_THRESHOLD) },
-                  { label: "Neutral",  currencies: sorted.filter(c => currencyTotals[c] >= -NEUTRAL_THRESHOLD && currencyTotals[c] <= NEUTRAL_THRESHOLD) },
-                  { label: "Risk OFF", currencies: sorted.filter(c => currencyTotals[c] < -NEUTRAL_THRESHOLD) },
+                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD", "GBP"] },
+                  { label: "Neutral",  currencies: ["USD", "EUR"] },
+                  { label: "Risk OFF", currencies: ["JPY", "CHF"] },
                 ];
                 return groups.map(group => (
                   <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
