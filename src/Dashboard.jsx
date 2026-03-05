@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
 
-const C = {
+const LIGHT = {
   bg: "#f0f4f8", panel: "#ffffff", border: "#d1dce8",
   accent: "#0077cc", green: "#00914d", red: "#d93025",
   yellow: "#c17f00", orange: "#c85a00", muted: "#9ab0c4",
   text: "#1a2733", textDim: "#5a7a94",
 };
+
+const DARK = {
+  bg: "#0a0a12", panel: "#11111f", border: "#2e2060",
+  accent: "#c9a227", green: "#00d49e", red: "#ff4d6a",
+  yellow: "#c9a227", orange: "#ff8c42", muted: "#6b5fa0",
+  text: "#ede6ff", textDim: "#a094cc",
+};
+
+const ThemeContext = React.createContext(LIGHT);
 
 const NEUTRAL_THRESHOLD = 20;
 const CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD", "NZD"];
@@ -54,6 +63,7 @@ function computeCurrencyTotals(list) {
 }
 
 function ScoreBar({ score, height = 6 }) {
+  const C = React.useContext(ThemeContext);
   const pct = ((score + 100) / 200) * 100;
   const color = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   return (
@@ -70,6 +80,7 @@ function ScoreBar({ score, height = 6 }) {
 }
 
 function RiskMeter({ score }) {
+  const C = React.useContext(ThemeContext);
   const clamp = Math.max(-100, Math.min(100, score));
   const angle = (clamp / 100) * 90;
   const color = clamp > NEUTRAL_THRESHOLD ? C.green : clamp < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
@@ -111,6 +122,7 @@ function RiskMeter({ score }) {
 }
 
 function TabBtn({ label, active, onClick }) {
+  const C = React.useContext(ThemeContext);
   return (
     <button onClick={onClick} style={{
       background: "none", border: "none",
@@ -123,6 +135,7 @@ function TabBtn({ label, active, onClick }) {
 }
 
 function SectionLabel({ children, center }) {
+  const C = React.useContext(ThemeContext);
   return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left" }}>{children}</div>;
 }
 
@@ -143,6 +156,9 @@ export default function Dashboard() {
   const [watchlistData, setWatchlistData] = useState([]);
   const [seasonalLive, setSeasonalLive] = useState([]);
   const [correlationData, setCorrelationData] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const C = darkMode ? DARK : LIGHT;
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -257,6 +273,7 @@ export default function Dashboard() {
   };
 
   return (
+    <ThemeContext.Provider value={C}>
     <div style={{ background: C.bg, height: "100vh", color: C.text, fontFamily: "monospace", padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
       {/* Header */}
@@ -278,6 +295,11 @@ export default function Dashboard() {
             color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
             letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
           }}>{scanning ? "◌ SCANNING..." : "⟳ RESCAN"}</button>
+          <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{
+            background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
+            color: C.textDim, padding: "6px 9px", fontSize: 14,
+            cursor: "pointer", borderRadius: 4, lineHeight: 1,
+          }}>{darkMode ? "☀️" : "🌙"}</button>
         </div>
       </div>
 
@@ -825,5 +847,6 @@ export default function Dashboard() {
         <span>NOT FINANCIAL ADVICE — INFORMATIONAL ONLY</span>
       </div>
     </div>
+    </ThemeContext.Provider>
   );
 }
