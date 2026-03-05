@@ -325,7 +325,10 @@ export default function Dashboard() {
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                       {group.currencies.length > 0 ? group.currencies.map(c => {
                         const score = currencyTotals[c] || 0;
-                        const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                        const isDark = C.bg === "#0a0a12";
+                        const col = isDark
+                          ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow)
+                          : C.text;
                         return (
                           <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
                         );
