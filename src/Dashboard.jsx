@@ -159,10 +159,10 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API}/api/commodities`)
-      .then(r => r.json())
-      .then(data => setCommodities(data))
-      .catch(() => {});
+    const fetchCommodities = () => fetch(`${API}/api/commodities`).then(r => r.json()).then(data => setCommodities(data)).catch(() => {});
+    fetchCommodities();
+    const id = setInterval(fetchCommodities, 300000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -173,10 +173,10 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API}/api/watchlist`)
-      .then(r => r.json())
-      .then(data => setWatchlistData(Array.isArray(data) ? data : []))
-      .catch(() => {});
+    const fetchWatchlist = () => fetch(`${API}/api/watchlist`).then(r => r.json()).then(data => setWatchlistData(Array.isArray(data) ? data : [])).catch(() => {});
+    fetchWatchlist();
+    const id = setInterval(fetchWatchlist, 300000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
