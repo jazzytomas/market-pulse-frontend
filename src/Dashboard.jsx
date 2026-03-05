@@ -310,25 +310,27 @@ export default function Dashboard() {
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
             <RiskMeter score={sentiment.total_score} />
 
-            {/* Menovy prehled - live z currencyTotals */}
+            {/* Menovy prehled - risk ON / risk OFF klasifikace */}
             <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
               <SectionLabel>MENOVY PREHLED</SectionLabel>
               {(() => {
-                const sorted = [...CURRENCIES].sort((a, b) => currencyTotals[b] - currencyTotals[a]);
-                const bullish = sorted.filter(c => currencyTotals[c] > NEUTRAL_THRESHOLD);
-                const neutral = sorted.filter(c => currencyTotals[c] >= -NEUTRAL_THRESHOLD && currencyTotals[c] <= NEUTRAL_THRESHOLD);
-                const bearish = sorted.filter(c => currencyTotals[c] < -NEUTRAL_THRESHOLD);
-                return [
-                  { label: "🟢 Bullish", currencies: bullish, color: C.green },
-                  { label: "🟡 Neutral", currencies: neutral, color: C.yellow },
-                  { label: "🔴 Bearish", currencies: bearish, color: C.red },
-                ].map(group => (
-                  <div key={group.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <span style={{ fontSize: 9, color: group.color, width: 66 }}>{group.label}</span>
+                const groups = [
+                  { label: "Risk OFF", currencies: ["JPY", "CHF", "USD"], color: C.red },
+                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD", "GBP", "EUR"], color: C.green },
+                ];
+                return groups.map(group => (
+                  <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
+                    <span style={{ fontSize: 9, color: group.color, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                      {group.currencies.length > 0 ? group.currencies.map(c => (
-                        <span key={c} style={{ fontSize: 9, color: group.color, border: `1px solid ${group.color}55`, background: `${group.color}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
-                      )) : <span style={{ fontSize: 9, color: C.muted }}>—</span>}
+                      {group.currencies.map(c => {
+                        const score = currencyTotals[c] || 0;
+                        const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                        return (
+                          <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>
+                            {c} {score > 0 ? "+" : ""}{score !== 0 ? score : ""}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 ));
