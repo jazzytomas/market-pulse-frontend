@@ -250,9 +250,13 @@ export default function Dashboard() {
           Promise.all([
             fetch(`${API}/api/scenarios`).then(r => r.json()),
             fetch(`${API}/api/sentiment`).then(r => r.json()),
-          ]).then(([sc, se]) => {
+            fetch(`${API}/api/events`).then(r => r.json()),
+            fetch(`${API}/api/history`).then(r => r.json()),
+          ]).then(([sc, se, ev, hi]) => {
             setScenarios(sc || []);
             setSentiment(se || { total_score: 0, label: "NEUTRAL" });
+            setEvents(ev || []);
+            setHistoryData(hi || []);
             setScanning(false);
           });
         }, 30000);
