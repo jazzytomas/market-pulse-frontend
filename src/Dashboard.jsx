@@ -84,10 +84,9 @@ function RiskMeter({ score }) {
   const clamp = Math.max(-100, Math.min(100, score));
   const angle = (clamp / 100) * 90;
   const label = clamp > NEUTRAL_THRESHOLD ? "RISK ON" : clamp < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
-  const isDark = C.bg === "#0a0a12";
-  const G = isDark ? "#c9a227" : (clamp > NEUTRAL_THRESHOLD ? C.green : clamp < -NEUTRAL_THRESHOLD ? C.red : C.yellow);
-  const GD = isDark ? "#7a5c10" : C.muted;
-  const GB = isDark ? "#f0c93a" : G;
+  const G = "#c9a227";
+  const GD = "#7a5c10";
+  const GB = "#f0c93a";
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
       <svg width="190" height="118" viewBox="0 0 190 118">
