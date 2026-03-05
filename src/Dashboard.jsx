@@ -11,17 +11,6 @@ const NEUTRAL_THRESHOLD = 20;
 const CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD", "NZD"];
 const API = "https://market-pulse-fdgb.onrender.com";
 
-const correlationData = {
-  pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCHF", "USDCAD"],
-  matrix: [
-    [1.00, 0.87, 0.72, -0.65, -0.81, -0.58],
-    [0.87, 1.00, 0.68, -0.71, -0.76, -0.52],
-    [0.72, 0.68, 1.00, -0.59, -0.63, -0.44],
-    [-0.65, -0.71, -0.59, 1.00, 0.70, 0.61],
-    [-0.81, -0.76, -0.63, 0.70, 1.00, 0.55],
-    [-0.58, -0.52, -0.44, 0.61, 0.55, 1.00],
-  ],
-};
 
 const seasonalData = [
   { month: "Jan", USD: +2, EUR: -1, JPY: +3, AUD: -2 },
@@ -153,6 +142,7 @@ export default function Dashboard() {
   const [historyData, setHistoryData] = useState([]);
   const [watchlistData, setWatchlistData] = useState([]);
   const [seasonalLive, setSeasonalLive] = useState([]);
+  const [correlationData, setCorrelationData] = useState(null);
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -193,6 +183,13 @@ export default function Dashboard() {
     fetch(`${API}/api/seasonal`)
       .then(r => r.json())
       .then(data => setSeasonalLive(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/correlation`)
+      .then(r => r.json())
+      .then(data => setCorrelationData(data))
       .catch(() => {});
   }, []);
 
@@ -517,33 +514,47 @@ export default function Dashboard() {
 
             {centerTab === "corr" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>Korelacni matice menovych paru (30D rolling)</div>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
-                    <thead>
-                      <tr>
-                        <td style={{ padding: "4px 6px", color: C.muted }}></td>
-                        {correlationData.pairs.map(p => (
-                          <td key={p} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 8 }}>{p.replace("USD", "")}</td>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {correlationData.pairs.map((pair, i) => (
-                        <tr key={pair}>
-                          <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 8 }}>{pair.replace("USD", "")}</td>
-                          {correlationData.matrix[i].map((val, j) => (
-                            <td key={j} style={{
-                              padding: "4px 6px", textAlign: "center",
-                              background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
-                              color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
-                            }}>{val.toFixed(2)}</td>
+                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>
+                  Korelacni matice menovych paru (30D rolling)
+                  {correlationData && correlationData.date && (
+                    <span style={{ marginLeft: 8, color: C.muted }}>
+                      · {correlationData.days}D · aktuální k {correlationData.date}
+                    </span>
+                  )}
+                  {correlationData && !correlationData.date && (
+                    <span style={{ marginLeft: 8, color: C.yellow }}> · fallback data</span>
+                  )}
+                </div>
+                {!correlationData ? (
+                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>Načítám korelační data...</div>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+                      <thead>
+                        <tr>
+                          <td style={{ padding: "4px 6px", color: C.muted }}></td>
+                          {correlationData.pairs.map(p => (
+                            <td key={p} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 8 }}>{p.replace("USD", "")}</td>
                           ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {correlationData.pairs.map((pair, i) => (
+                          <tr key={pair}>
+                            <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 8 }}>{pair.replace("USD", "")}</td>
+                            {correlationData.matrix[i].map((val, j) => (
+                              <td key={j} style={{
+                                padding: "4px 6px", textAlign: "center",
+                                background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
+                                color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
+                              }}>{val.toFixed(2)}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
 
