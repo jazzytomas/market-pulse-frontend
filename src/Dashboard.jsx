@@ -314,23 +314,23 @@ export default function Dashboard() {
             <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
               <SectionLabel>MENOVY PREHLED</SectionLabel>
               {(() => {
+                const sorted = [...CURRENCIES].sort((a, b) => currencyTotals[b] - currencyTotals[a]);
                 const groups = [
-                  { label: "Risk OFF", currencies: ["JPY", "CHF", "USD"], color: C.red },
-                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD", "GBP", "EUR"], color: C.green },
+                  { label: "Risk ON",  currencies: sorted.filter(c => currencyTotals[c] > NEUTRAL_THRESHOLD) },
+                  { label: "Neutral",  currencies: sorted.filter(c => currencyTotals[c] >= -NEUTRAL_THRESHOLD && currencyTotals[c] <= NEUTRAL_THRESHOLD) },
+                  { label: "Risk OFF", currencies: sorted.filter(c => currencyTotals[c] < -NEUTRAL_THRESHOLD) },
                 ];
                 return groups.map(group => (
                   <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
-                    <span style={{ fontSize: 9, color: group.color, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
+                    <span style={{ fontSize: 9, color: C.textDim, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                      {group.currencies.map(c => {
+                      {group.currencies.length > 0 ? group.currencies.map(c => {
                         const score = currencyTotals[c] || 0;
                         const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
                         return (
-                          <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>
-                            {c} {score > 0 ? "+" : ""}{score !== 0 ? score : ""}
-                          </span>
+                          <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
                         );
-                      })}
+                      }) : <span style={{ fontSize: 9, color: C.muted }}>—</span>}
                     </div>
                   </div>
                 ));
