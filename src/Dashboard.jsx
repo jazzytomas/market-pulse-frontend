@@ -145,7 +145,7 @@ export default function Dashboard() {
   const [sentiment, setSentiment] = useState({ total_score: 0, label: "NEUTRAL" });
   const [cotData, setCotData] = useState([]);
   const [centerTab, setCenterTab] = useState("scenarios");
-  const [rightTab, setRightTab] = useState("status");
+  const [rightTab, setRightTab] = useState("pairs");
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
@@ -675,9 +675,9 @@ export default function Dashboard() {
           {/* BOTTOM tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
+              <TabBtn label="Pary" active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
               <TabBtn label="Meny" active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
-              <TabBtn label="Pary" active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label="CB Sazby" active={rightTab === "cb"} onClick={() => setRightTab("cb")} />
               <TabBtn label="Watchlist" active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
