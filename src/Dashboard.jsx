@@ -83,39 +83,37 @@ function RiskMeter({ score }) {
   const C = React.useContext(ThemeContext);
   const clamp = Math.max(-100, Math.min(100, score));
   const angle = (clamp / 100) * 90;
-  const color = clamp > NEUTRAL_THRESHOLD ? C.green : clamp < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   const label = clamp > NEUTRAL_THRESHOLD ? "RISK ON" : clamp < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
+  const G = "#c9a227";
+  const GD = "#7a5c10";
+  const GB = "#f0c93a";
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
       <svg width="190" height="118" viewBox="0 0 190 118">
         <defs>
-          <linearGradient id="riskOffGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={C.red} stopOpacity="0.9" />
-            <stop offset="100%" stopColor={C.yellow} stopOpacity="0.3" />
-          </linearGradient>
-          <linearGradient id="riskOnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={C.yellow} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={C.green} stopOpacity="0.9" />
+          <linearGradient id="goldArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={GD} stopOpacity="0.7" />
+            <stop offset="50%" stopColor={GB} stopOpacity="1" />
+            <stop offset="100%" stopColor={GD} stopOpacity="0.7" />
           </linearGradient>
         </defs>
         <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke={C.border} strokeWidth="9" strokeLinecap="round" />
-        <path d="M 12 100 A 82 82 0 0 1 95 18" fill="none" stroke="url(#riskOffGrad)" strokeWidth="9" strokeLinecap="round" />
-        <path d="M 95 18 A 82 82 0 0 1 178 100" fill="none" stroke="url(#riskOnGrad)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke="url(#goldArcGrad)" strokeWidth="9" strokeLinecap="round" />
         <g transform={`rotate(${angle}, 95, 100)`}>
-          <line x1="95" y1="100" x2="95" y2="24" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
-          <circle cx="95" cy="100" r="5" fill={color} />
+          <line x1="95" y1="100" x2="95" y2="24" stroke={GB} strokeWidth="2.5" strokeLinecap="round" />
+          <circle cx="95" cy="100" r="5" fill={GB} />
         </g>
-        <text x="38" y="98" fill={C.red} fontSize="8" fontFamily="monospace" textAnchor="middle">-100</text>
-        <text x="38" y="108" fill={C.red} fontSize="7" fontFamily="monospace" textAnchor="middle">risk off</text>
-        <text x="95" y="12" fill={C.yellow} fontSize="8" fontFamily="monospace" textAnchor="middle">0</text>
-        <text x="152" y="98" fill={C.green} fontSize="8" fontFamily="monospace" textAnchor="middle">+100</text>
-        <text x="152" y="108" fill={C.green} fontSize="7" fontFamily="monospace" textAnchor="middle">risk on</text>
+        <text x="38" y="98" fill={GD} fontSize="8" fontFamily="monospace" textAnchor="middle">-100</text>
+        <text x="38" y="108" fill={GD} fontSize="7" fontFamily="monospace" textAnchor="middle">risk off</text>
+        <text x="95" y="12" fill={G} fontSize="8" fontFamily="monospace" textAnchor="middle">0</text>
+        <text x="152" y="98" fill={GD} fontSize="8" fontFamily="monospace" textAnchor="middle">+100</text>
+        <text x="152" y="108" fill={GD} fontSize="7" fontFamily="monospace" textAnchor="middle">risk on</text>
       </svg>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 26, fontWeight: 900, color, fontFamily: "monospace", filter: `drop-shadow(0 0 8px ${color})` }}>
+        <div style={{ fontSize: 26, fontWeight: 900, color: G, fontFamily: "monospace", filter: `drop-shadow(0 0 8px ${G})` }}>
           {clamp > 0 ? "+" : ""}{clamp}
         </div>
-        <div style={{ fontSize: 10, letterSpacing: 4, color }}>{label}</div>
+        <div style={{ fontSize: 10, letterSpacing: 4, color: G }}>{label}</div>
       </div>
     </div>
   );
