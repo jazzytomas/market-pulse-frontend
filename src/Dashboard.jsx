@@ -163,6 +163,7 @@ export default function Dashboard() {
   const [seasonalLive, setSeasonalLive] = useState([]);
   const [seasonalYears, setSeasonalYears] = useState(10);
   const [correlationData, setCorrelationData] = useState(null);
+  const [backtestData, setBacktestData] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
   const C = darkMode ? DARK : LIGHT;
@@ -214,6 +215,13 @@ export default function Dashboard() {
     fetch(`${API}/api/correlation`)
       .then(r => r.json())
       .then(data => setCorrelationData(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/backtest`)
+      .then(r => r.json())
+      .then(data => setBacktestData(data))
       .catch(() => {});
   }, []);
 
@@ -407,6 +415,7 @@ export default function Dashboard() {
               <TabBtn label="🔗 Korelace" active={centerTab === "corr"} onClick={() => setCenterTab("corr")} />
               <TabBtn label="📈 Sezona" active={centerTab === "seasonal"} onClick={() => setCenterTab("seasonal")} />
               <TabBtn label="🕐 Historie" active={centerTab === "history"} onClick={() => setCenterTab("history")} />
+              <TabBtn label="🎯 Backtest" active={centerTab === "backtest"} onClick={() => setCenterTab("backtest")} />
               <TabBtn label="📖 Průvodce" active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
 
@@ -711,6 +720,78 @@ export default function Dashboard() {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {centerTab === "backtest" && (
+              <div>
+                {!backtestData || backtestData.total === 0 ? (
+                  <div style={{ fontSize: 9, color: C.muted, padding: "30px 0", textAlign: "center" }}>
+                    <div style={{ fontSize: 20, marginBottom: 8 }}>⏳</div>
+                    Data se hromadí – backtest potřebuje min. 24h na první výsledky.<br/>
+                    <span style={{ fontSize: 8 }}>Každou hodinu se ukládají vstupní ceny, po 24h se vyhodnocuje přesnost.</span>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {/* Overall stats */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                      {[
+                        { label: "CELKOVÁ PŘESNOST", value: `${backtestData.accuracy}%`, color: backtestData.accuracy >= 55 ? C.green : backtestData.accuracy >= 45 ? C.yellow : C.red },
+                        { label: "SPRÁVNĚ", value: `${backtestData.correct} / ${backtestData.total}`, color: C.text },
+                        { label: "VYHODNOCENO", value: `${backtestData.total} predikcí`, color: C.textDim },
+                      ].map(s => (
+                        <div key={s.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 12px", textAlign: "center" }}>
+                          <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 2, marginBottom: 4 }}>{s.label}</div>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: s.color }}>{s.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Per currency */}
+                    {backtestData.per_currency && backtestData.per_currency.length > 0 && (
+                      <div>
+                        <SectionLabel>PŘESNOST PER MĚNA</SectionLabel>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                          {backtestData.per_currency.map(c => {
+                            const acc = c.total > 0 ? Math.round(c.correct / c.total * 100) : 0;
+                            const col = acc >= 55 ? C.green : acc >= 45 ? C.yellow : C.red;
+                            return (
+                              <div key={c.currency} style={{ background: `${col}0a`, border: `1px solid ${col}33`, borderRadius: 6, padding: "8px", textAlign: "center" }}>
+                                <div style={{ fontSize: 11, fontWeight: 900, color: col }}>{c.currency}</div>
+                                <div style={{ fontSize: 14, fontWeight: 900, color: col }}>{acc}%</div>
+                                <div style={{ fontSize: 8, color: C.muted }}>{c.correct}/{c.total} · ø{c.avg_move}%</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {/* Recent predictions */}
+                    {backtestData.recent && backtestData.recent.length > 0 && (
+                      <div>
+                        <SectionLabel>POSLEDNÍ PREDIKCE</SectionLabel>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          {backtestData.recent.slice(0, 15).map((r, i) => {
+                            const aiCol = r.ai_score > 0 ? C.green : C.red;
+                            const resCol = r.correct === 1 ? C.green : C.red;
+                            const resEmoji = r.correct === 1 ? "✅" : "❌";
+                            return (
+                              <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", background: `${resCol}06`, border: `1px solid ${C.border}`, borderRadius: 5 }}>
+                                <span style={{ fontSize: 11 }}>{resEmoji}</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: C.text, width: 28 }}>{r.currency}</span>
+                                <span style={{ fontSize: 9, color: aiCol, width: 32 }}>AI {r.ai_score > 0 ? "+" : ""}{r.ai_score}</span>
+                                <span style={{ fontSize: 9, color: r.actual_pct > 0 ? C.green : C.red, width: 44 }}>
+                                  trh {r.actual_pct > 0 ? "+" : ""}{r.actual_pct?.toFixed(2)}%
+                                </span>
+                                <span style={{ fontSize: 8, color: C.muted, flex: 1 }} title={r.title}>{r.title?.slice(0, 45)}{r.title?.length > 45 ? "…" : ""}</span>
+                                <span style={{ fontSize: 8, color: C.textDim, flexShrink: 0 }}>{r.weight}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
