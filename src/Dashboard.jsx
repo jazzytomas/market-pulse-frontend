@@ -746,30 +746,28 @@ export default function Dashboard() {
                 );
                 const col = fgColor(data.value);
                 const pct = data.value;
-                // SVG arc gauge
-                const r = 52, cx = 70, cy = 68, sw = 12;
-                const toRad = (deg) => (deg - 180) * Math.PI / 180;
-                const startDeg = 0, endDeg = 180;
-                const valueDeg = startDeg + (pct / 100) * endDeg;
-                const x1 = cx + r * Math.cos(toRad(startDeg)), y1 = cy + r * Math.sin(toRad(startDeg));
-                const x2 = cx + r * Math.cos(toRad(valueDeg)), y2 = cy + r * Math.sin(toRad(valueDeg));
-                const large = valueDeg - startDeg > 90 ? 1 : 0;
+                // SVG arc gauge – polooblouk, 0% vlevo, 100% vpravo, oblouk nahoře
+                const r = 52, cx = 70, cy = 70, sw = 12;
+                // Převod procent na endpoint: úhel π (vlevo) → 0 (vpravo)
+                const angle = Math.PI * (1 - pct / 100);
+                const ex = cx + r * Math.cos(angle);
+                const ey = cy - r * Math.sin(angle); // SVG y je dolů, proto minus
                 return (
                   <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
                     <div style={{ fontSize: 9, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
-                    <svg width="140" height="80" viewBox="0 0 140 80" style={{ overflow: "visible" }}>
-                      {/* Background arc */}
+                    <svg width="140" height="82" viewBox="0 0 140 82" style={{ overflow: "visible" }}>
+                      {/* Background arc: vlevo → vpravo, po směru hodinových ručiček = nahoře */}
                       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
                         fill="none" stroke={C.border} strokeWidth={sw} strokeLinecap="round" />
-                      {/* Value arc */}
-                      <path d={`M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`}
-                        fill="none" stroke={col} strokeWidth={sw} strokeLinecap="round" />
+                      {/* Value arc: vždy large=0, sweep=1 (po hodinových ručičkách = nahoru) */}
+                      {pct > 0 && <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${ex.toFixed(2)} ${ey.toFixed(2)}`}
+                        fill="none" stroke={col} strokeWidth={sw} strokeLinecap="round" />}
                       {/* Value text */}
-                      <text x={cx} y={cy - 4} textAnchor="middle" fill={col} fontSize="22" fontWeight="900" fontFamily="monospace">{pct}</text>
+                      <text x={cx} y={cy - 6} textAnchor="middle" fill={col} fontSize="22" fontWeight="900" fontFamily="monospace">{pct}</text>
                       {/* Labels */}
-                      <text x={cx - r - 4} y={cy + 16} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
-                      <text x={cx + r + 4} y={cy + 16} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
+                      <text x={cx - r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
+                      <text x={cx + r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
                     </svg>
                     <div style={{ fontSize: 12, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
                     {data.vix && <div style={{ fontSize: 8, color: C.muted, marginTop: 4 }}>VIX {data.vix}</div>}
