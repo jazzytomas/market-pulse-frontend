@@ -319,9 +319,9 @@ export default function Dashboard() {
               <SectionLabel>MENOVY PREHLED</SectionLabel>
               {(() => {
                 const groups = [
-                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD", "GBP"] },
-                  { label: "Neutral",  currencies: ["USD", "EUR"] },
-                  { label: "Risk OFF", currencies: ["JPY", "CHF"] },
+                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
+                  { label: "Neutral",  currencies: ["GBP", "EUR"] },
+                  { label: "Risk OFF", currencies: ["USD", "JPY", "CHF"] },
                 ];
                 return groups.map(group => (
                   <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
@@ -766,7 +766,7 @@ export default function Dashboard() {
                       { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
                       { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
                     ].map(({ pair, base, quote }) => {
-                      const score = Math.round((currencyTotals[base] - currencyTotals[quote]) / 2);
+                      const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
                       const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
                       const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
                       return (
