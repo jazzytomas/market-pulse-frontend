@@ -407,6 +407,7 @@ export default function Dashboard() {
               <TabBtn label="🔗 Korelace" active={centerTab === "corr"} onClick={() => setCenterTab("corr")} />
               <TabBtn label="📈 Sezona" active={centerTab === "seasonal"} onClick={() => setCenterTab("seasonal")} />
               <TabBtn label="🕐 Historie" active={centerTab === "history"} onClick={() => setCenterTab("history")} />
+              <TabBtn label="📖 Průvodce" active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
@@ -714,6 +715,91 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+
+            {centerTab === "guide" && (() => {
+              const Section = ({ emoji, title, children }) => (
+                <div style={{ marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 10 }}>{emoji} {title}</div>
+                  {children}
+                </div>
+              );
+              const Row = ({ label, desc }) => (
+                <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: C.text, minWidth: 110, flexShrink: 0 }}>{label}</span>
+                  <span style={{ fontSize: 9, color: C.textDim, lineHeight: 1.5 }}>{desc}</span>
+                </div>
+              );
+              return (
+                <div style={{ fontSize: 9, lineHeight: 1.6 }}>
+
+                  <Section emoji="🌡️" title="RISK SENTIMENT">
+                    <Row label="Co to je" desc="Celkové nálada trhu vůči riziku. Vypočítává se jako vážený průměr AI skóre zpráv + VIX index." />
+                    <Row label="Škála" desc="+100 = maximální Risk ON (trhy rostou, investoři kupují riziková aktiva). −100 = maximální Risk OFF (strach, útěk do bezpečí)." />
+                    <Row label="VIX" desc="Index strachu. VIX nad 25 = strach na trhu (Risk OFF). VIX pod 15 = klid (Risk ON). Váha 2× HIGH zpráva." />
+                    <Row label="Jak použít" desc="Risk ON → sleduj AUD, NZD, CAD. Risk OFF → sleduj USD, JPY, CHF. Neutral → čekej na potvrzení." />
+                  </Section>
+
+                  <Section emoji="⚡" title="SCÉNÁŘE">
+                    <Row label="Co to jsou" desc="AI (Claude Haiku) ohodnotí každou forex-relevantní zprávu skóre a dopadem na každou měnu." />
+                    <Row label="Risk score" desc="−100 až +100. Kladné = pozitivní pro trhy (Risk ON). Záporné = negativní (Risk OFF)." />
+                    <Row label="HIGH váha" desc="Market-moving zprávy: NFP, rozhodnutí CB, geopolitické šoky. Počítají se 3× do sentimentu." />
+                    <Row label="MED váha" desc="Důležité ale ne market-moving: komentáře CB, regionální data. Počítají se 1× do sentimentu." />
+                    <Row label="LOW váha" desc="Pozadí a kontext. Do risk sentimentu se nezapočítávají." />
+                    <Row label="Filtr" desc="Tlačítka ALL / HIGH / MED filtrují seznam. Kliknutím na zprávu zobrazíš dopad na každou měnu." />
+                  </Section>
+
+                  <Section emoji="📅" title="EVENTS (EKONOMICKÝ KALENDÁŘ">
+                    <Row label="Co to je" desc="Ekonomické události z ForexFactory pro aktuální týden. Aktualizuje se každou hodinu." />
+                    <Row label="🔴 HIGH" desc="Silně market-moving: NFP, CPI, rozhodnutí Fedu/ECB/BOJ, HDP. Očekávej velké pohyby (50+ pips)." />
+                    <Row label="🟡 MED" desc="Střední dopad: PMI, obchodní bilance, výroky bankéřů. Pohyby 10–30 pips." />
+                    <Row label="Volatilita oken" desc="Typická volatilita podle obchodní seance (Tokio, Londýn, NY). Nejsilnější = overlap Londýn+NY (13–17h CET)." />
+                  </Section>
+
+                  <Section emoji="📊" title="COT (COMMITMENTS OF TRADERS)">
+                    <Row label="Co to je" desc="Týdenní report CFTC o pozicích velkých hráčů (hedge fondy = Leveraged Money) na futures trzích." />
+                    <Row label="Datum" desc="Datum = úterý reportovacího týdne (kdy se data uzavřou). CFTC publikuje v pátek, stahujeme automaticky." />
+                    <Row label="LONG" desc="Počet long kontraktů (sázka na posílení měny)." />
+                    <Row label="SHORT" desc="Počet short kontraktů (sázka na oslabení měny)." />
+                    <Row label="NET" desc="Long − Short. Kladný NET = trh sází na posílení. Záporný = slabost. Extrémní hodnoty = možný obrat." />
+                    <Row label="Jak použít" desc="Sleduj trend NET pozic. Extrémy (velmi high/low) signalizují přeprodanost. USD je syntetický (inverzní součet ostatních)." />
+                  </Section>
+
+                  <Section emoji="🔗" title="KORELACE">
+                    <Row label="Co to je" desc="30denní Pearsonova korelace mezi 6 hlavními páry. Live data z yfinance." />
+                    <Row label="+1.0" desc="Páry se pohybují identicky. Přidáním obou otevíráš dvojnásobné riziko." />
+                    <Row label="−1.0" desc="Páry jdou přesně opačně. Hedge: long jeden, short druhý = minimální riziko." />
+                    <Row label="0.0" desc="Žádná korelace. Páry se pohybují nezávisle." />
+                    <Row label="Jak použít" desc="Nekumuluj vysoce korelované pozice (EUR/USD + GBP/USD). Inverzní korelace (EUR/USD + USD/JPY) lze hedgovat." />
+                  </Section>
+
+                  <Section emoji="📈" title="SEZÓNNOST">
+                    <Row label="Co to je" desc="Průměrný měsíční výnos měn za zvolené období (1/3/5/10 let). Historický vzor opakující se každý rok." />
+                    <Row label="🟢 Zelená" desc="Měna historicky v daném měsíci posilovala (kladný průměrný výnos)." />
+                    <Row label="🔴 Červená" desc="Měna historicky v daném měsíci oslabovala (záporný průměrný výnos)." />
+                    <Row label="Jak použít" desc="Sezónnost je doplňkový nástroj. Silný sezónní vzor + potvrzení od COT + sentimentu = silnější signál." />
+                    <Row label="Pozor" desc="Minulé výnosy nezaručují budoucí. Sezónnost funguje nejlépe jako filtr, ne jako hlavní signál." />
+                  </Section>
+
+                  <Section emoji="🕐" title="HISTORIE SENTIMENTU">
+                    <Row label="Co to je" desc="7denní přehled denního risk sentimentu. Ukládá se do DB každý den." />
+                    <Row label="Jak použít" desc="Sleduj trend. Pokud sentiment klesá 3+ dny po sobě → Risk OFF trend. Rychlý obrat → možný sentiment shift." />
+                  </Section>
+
+                  <Section emoji="💱" title="MĚNOVÝ BIAS A PÁRY">
+                    <Row label="Celkový bias" desc="Vážený průměr AI dopadů posledních zpráv na každou měnu. Novější zprávy mají větší váhu (exponenciální decay)." />
+                    <Row label="Páry (Pary tab)" desc="Skóre páru = bias základní měny − bias kótovací měny. Kladné = buy signál, záporné = sell signál." />
+                    <Row label="Risk ON měny" desc="AUD, NZD, CAD — posilují při dobré náladě trhů (risk appetite)." />
+                    <Row label="Risk OFF měny" desc="USD, JPY, CHF — safe haven, posilují při strachu a nejistotě." />
+                    <Row label="Neutral" desc="EUR, GBP — smíšené charakteristiky, závisí na domácí ekonomice." />
+                  </Section>
+
+                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 4 }}>
+                    Data se aktualizují automaticky každou hodinu · COT každý pátek · Sezónnost každých 24h
+                  </div>
+
+                </div>
+              );
+            })()}
 
             </div>{/* /content wrapper */}
           </div>
