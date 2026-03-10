@@ -145,6 +145,7 @@ function SectionLabel({ children, center }) {
 }
 
 export default function Dashboard() {
+  const isAdmin = typeof window !== "undefined" && window.location.search.includes("admin");
   const [backendStatus, setBackendStatus] = useState("checking...");
   const [centralBanks, setCentralBanks] = useState([]);
   const [scenarios, setScenarios] = useState([]);
@@ -331,15 +332,19 @@ export default function Dashboard() {
           </div>
         </div>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 9, color: C.textDim }}>LAST SCAN</div>
-            <div style={{ fontSize: 12, color: C.accent }}>{lastUpdate}</div>
-          </div>
-          <button onClick={runScan} disabled={scanning} style={{
-            background: `${C.accent}18`, border: `1px solid ${scanning ? C.muted : C.accent}`,
-            color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
-            letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
-          }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
+          {isAdmin && (
+            <>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 9, color: C.textDim }}>LAST SCAN</div>
+                <div style={{ fontSize: 12, color: C.accent }}>{lastUpdate}</div>
+              </div>
+              <button onClick={runScan} disabled={scanning} style={{
+                background: `${C.accent}18`, border: `1px solid ${scanning ? C.muted : C.accent}`,
+                color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
+                letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
+              }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
+            </>
+          )}
           <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
             color: C.textDim, padding: "6px 9px", fontSize: 14,
