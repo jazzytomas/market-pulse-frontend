@@ -286,12 +286,8 @@ export default function Dashboard() {
             fetch(`${API}/api/sentiment`).then(r => r.json()),
             fetch(`${API}/api/events`).then(r => r.json()),
             fetch(`${API}/api/history`).then(r => r.json()),
-          ]).then(([sc, se, ev, hi]) => {
-            setScenarios(sc || []);
-            setSentiment(se || { total_score: 0, label: "NEUTRAL" });
-            setEvents(ev || []);
-            setHistoryData(hi || []);
-            setScanning(false);
+          ]).then(() => {
+            window.location.reload();
           });
         }, 30000);
       })
