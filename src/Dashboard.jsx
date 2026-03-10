@@ -287,23 +287,14 @@ export default function Dashboard() {
 
   const runScan = () => {
     setScanning(true);
-    fetch(`${API}/api/rescan`)
-      .then(() => {
-        setTimeout(() => {
-          const now = new Date();
-          const timeStr = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
-          localStorage.setItem("mp_last_scan", timeStr); // uložit před reload
-          Promise.all([
-            fetch(`${API}/api/scenarios`).then(r => r.json()),
-            fetch(`${API}/api/sentiment`).then(r => r.json()),
-            fetch(`${API}/api/events`).then(r => r.json()),
-            fetch(`${API}/api/history`).then(r => r.json()),
-          ]).then(() => {
-            window.location.reload();
-          });
-        }, 30000);
-      })
-      .catch(() => setScanning(false));
+    // Pošli rescan – timer běží okamžitě, nezávisí na odpovědi serveru
+    fetch(`${API}/api/rescan`).catch(() => {});
+    setTimeout(() => {
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+      localStorage.setItem("mp_last_scan", timeStr);
+      window.location.reload();
+    }, 35000);
   };
 
   const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
