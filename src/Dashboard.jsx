@@ -510,7 +510,7 @@ export default function Dashboard() {
 
             {centerTab === "cot" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>CFTC Commitments of Traders — Leveraged Money pozice (update kazdy patek)</div>
+                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>CFTC Commitments of Traders — Leveraged Money pozice · stahuje se každý pátek · datum = reportovací týden (úterý)</div>
                 {(() => {
                   const maxVal = Math.max(1, ...cotData.map(c => Math.max(c.long || 0, c.short || 0)));
                   return (
