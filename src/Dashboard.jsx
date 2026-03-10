@@ -530,15 +530,37 @@ export default function Dashboard() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {events.map((ev, i) => {
                   const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
+                  const hasActual = ev.actual && ev.actual.trim() !== "";
+                  const actualColor = (() => {
+                    if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
+                    const a = parseFloat(ev.actual);
+                    const f = parseFloat(ev.forecast);
+                    if (isNaN(a) || isNaN(f)) return C.text;
+                    return a > f ? C.green : a < f ? C.red : C.yellow;
+                  })();
                   return (
                     <div key={i} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6, padding: "10px 12px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                           <span style={{ width: 7, height: 7, borderRadius: "50%", background: col, display: "inline-block" }} />
                           <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
                           <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
                         </div>
                         <span style={{ fontSize: 10, color: C.accent }}>{ev.date || ev.event_time}</span>
+                      </div>
+                      <div style={{ display: "flex", gap: 14 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
+                          <span style={{ fontSize: 10, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>ACTUAL</span>
+                          <span style={{ fontSize: 10, fontWeight: hasActual ? 700 : 400, color: hasActual ? actualColor : C.muted }}>{hasActual ? ev.actual : "—"}</span>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
+                          <span style={{ fontSize: 10, color: C.muted }}>{ev.previous && ev.previous.trim() ? ev.previous : "—"}</span>
+                        </div>
                       </div>
                     </div>
                   );
