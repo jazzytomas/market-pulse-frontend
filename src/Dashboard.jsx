@@ -384,11 +384,9 @@ export default function Dashboard() {
 
           {/* Commodities */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim }}>KOMODITY</div>
-              <span style={{ fontSize: 7, color: C.muted, textAlign: "right", lineHeight: 1.5 }}>
-                koreluje = měny reagující na pohyb<br/>dnes = risk signál z dnešního pohybu
-              </span>
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 3 }}>KOMODITY</div>
+              <div style={{ fontSize: 7, color: C.muted }}>měny = korelované měny &nbsp;·&nbsp; dnes = signál z pohybu ceny</div>
             </div>
             {commodities.length === 0 ? (
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
@@ -406,9 +404,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 8, color: C.muted }}>
-                      <span style={{ color: C.textDim, marginRight: 2, fontSize: 7 }}>koreluje:</span>{c.currencies}
-                    </span>
+                    <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                       <span style={{ fontSize: 7, color: C.muted }}>dnes:</span>
                       <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
