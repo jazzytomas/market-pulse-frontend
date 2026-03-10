@@ -46,7 +46,8 @@ function computeCurrencyTotals(list) {
   CURRENCIES.forEach((c) => {
     const relevant = [];
     for (const s of (list || [])) {
-      const ci = s.currency_impact || s.currencyImpact;
+      const ciRaw = s.currency_impact || s.currencyImpact;
+      const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
       if (ci && ci[c]) {
         const score = ci[c].score || 0;
         if (score !== 0) {
