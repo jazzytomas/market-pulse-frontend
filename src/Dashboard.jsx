@@ -161,6 +161,7 @@ export default function Dashboard() {
   const [historyData, setHistoryData] = useState([]);
   const [watchlistData, setWatchlistData] = useState([]);
   const [seasonalLive, setSeasonalLive] = useState([]);
+  const [seasonalYears, setSeasonalYears] = useState(10);
   const [correlationData, setCorrelationData] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -202,11 +203,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API}/api/seasonal`)
+    setSeasonalLive([]);
+    fetch(`${API}/api/seasonal?years=${seasonalYears}`)
       .then(r => r.json())
       .then(data => setSeasonalLive(Array.isArray(data) ? data : []))
       .catch(() => {});
-  }, []);
+  }, [seasonalYears]);
 
   useEffect(() => {
     fetch(`${API}/api/correlation`)
@@ -618,8 +620,18 @@ export default function Dashboard() {
 
             {centerTab === "seasonal" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 10 }}>
-                  Průměrný měsíční výnos za posledních 10 let (%, live z yfinance)
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                  <span style={{ fontSize: 9, color: C.textDim }}>Průměrný měsíční výnos za posledních</span>
+                  {[1, 3, 5, 10].map(y => (
+                    <button key={y} onClick={() => setSeasonalYears(y)} style={{
+                      fontSize: 9, padding: "2px 8px", borderRadius: 4, cursor: "pointer",
+                      fontWeight: seasonalYears === y ? 700 : 400,
+                      background: seasonalYears === y ? C.accent : C.border,
+                      color: seasonalYears === y ? "#000" : C.textDim,
+                      border: `1px solid ${seasonalYears === y ? C.accent : C.border}`
+                    }}>{y}R</button>
+                  ))}
+                  <span style={{ fontSize: 9, color: C.textDim }}>(%, live z yfinance)</span>
                 </div>
                 {seasonalLive.length === 0 ? (
                   <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>Načítám historická data...</div>
@@ -673,7 +685,7 @@ export default function Dashboard() {
                           ))}
                         </tbody>
                       </table>
-                      <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>* hodnoty v %, průměr 10 let · zdroj: yfinance</div>
+                      <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>* hodnoty v %, průměr {seasonalYears} {seasonalYears === 1 ? "rok" : seasonalYears < 5 ? "roky" : "let"} · zdroj: yfinance</div>
                     </div>
                   );
                 })()}
