@@ -154,7 +154,7 @@ export default function Dashboard() {
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("pairs");
   const [expandedScenario, setExpandedScenario] = useState(null);
-  const [scenarioFilter, setScenarioFilter] = useState("ALL");
+  const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [commodities, setCommodities] = useState([]);
@@ -415,7 +415,7 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
-                  {["ALL", "HIGH", "MED"].map(f => (
+                  {["HIGH", "MED"].map(f => (
                     <button key={f} onClick={() => setScenarioFilter(f)} style={{
                       fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f ? 700 : 400,
                       background: scenarioFilter === f ? C.accent : C.border,
@@ -427,7 +427,7 @@ export default function Dashboard() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[...scenarios]
-                  .filter(s => scenarioFilter === "ALL" || s.weight === scenarioFilter)
+                  .filter(s => s.weight === scenarioFilter)
                   .sort((a, b) => {
                     const w = { HIGH: 3, MED: 2, LOW: 1 };
                     if (w[b.weight] !== w[a.weight]) return w[b.weight] - w[a.weight];
@@ -745,7 +745,7 @@ export default function Dashboard() {
                     <Row label="HIGH váha" desc="Market-moving zprávy: NFP, rozhodnutí CB, geopolitické šoky. Počítají se 3× do sentimentu." />
                     <Row label="MED váha" desc="Důležité ale ne market-moving: komentáře CB, regionální data. Počítají se 1× do sentimentu." />
                     <Row label="LOW váha" desc="Pozadí a kontext. Do risk sentimentu se nezapočítávají." />
-                    <Row label="Filtr" desc="Tlačítka ALL / HIGH / MED filtrují seznam. Kliknutím na zprávu zobrazíš dopad na každou měnu." />
+                    <Row label="Filtr" desc="Tlačítka HIGH / MED přepínají seznam. Kliknutím na zprávu zobrazíš dopad na každou měnu." />
                   </Section>
 
                   <Section emoji="📅" title="EVENTS (EKONOMICKÝ KALENDÁŘ">
