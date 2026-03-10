@@ -43,23 +43,28 @@ const volWindows = [
 
 function computeCurrencyTotals(list) {
   const result = {};
+  const DECAY = 0.65; // každá starší zpráva má 65% váhu té novější
   CURRENCIES.forEach((c) => {
-    const relevant = [];
+    let weightedSum = 0;
+    let totalW = 0;
+    let idx = 0;
     for (const s of (list || [])) {
       const ciRaw = s.currency_impact || s.currencyImpact;
       const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
       if (ci && ci[c]) {
         const score = ci[c].score || 0;
         if (score !== 0) {
-          const w = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
-          if (w > 0) { relevant.push({ score, w }); }
-          if (relevant.length >= 5) break; // jen posledních 5 relevantních zpráv
+          const baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
+          if (baseW > 0) {
+            const w = baseW * Math.pow(DECAY, idx); // nejnovější = plná váha
+            weightedSum += score * w;
+            totalW += w;
+            idx++;
+          }
         }
       }
     }
-    if (relevant.length === 0) { result[c] = 0; return; }
-    const totalW = relevant.reduce((sum, r) => sum + r.w, 0);
-    result[c] = Math.round(relevant.reduce((sum, r) => sum + r.score * r.w, 0) / totalW);
+    result[c] = totalW > 0 ? Math.round(weightedSum / totalW) : 0;
   });
   return result;
 }
