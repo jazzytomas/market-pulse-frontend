@@ -166,7 +166,15 @@ export default function Dashboard() {
   const [backtestData, setBacktestData] = useState(null);
   const [fearGreedData, setFearGreedData] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [winW, setWinW] = useState(window.innerWidth);
 
+  useEffect(() => {
+    const h = () => setWinW(window.innerWidth);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+
+  const isMobile = winW < 900;
   const C = darkMode ? DARK : LIGHT;
 
   useEffect(() => {
@@ -302,7 +310,8 @@ export default function Dashboard() {
 
   return (
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, height: "100vh", color: C.text, fontFamily: "monospace", padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
+    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "100%", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, flexShrink: 0 }}>
@@ -331,10 +340,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: 12, flex: 1, minHeight: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? {} : { flex: 1, minHeight: 0 }) }}>
 
         {/* LEFT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, ...(isMobile ? {} : { minHeight: 0 }) }}>
 
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
@@ -418,10 +427,10 @@ export default function Dashboard() {
         </div>
 
         {/* RIGHT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, ...(isMobile ? {} : { minHeight: 0 }) }}>
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400 } : { flex: 1, minHeight: 0 }) }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="⚡ Scenarios" active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label="📅 Events" active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -434,7 +443,7 @@ export default function Dashboard() {
               <TabBtn label="📖 Průvodce" active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <div style={{ ...(isMobile ? {} : { flex: 1, overflowY: "auto", minHeight: 0 }) }}>
 
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -982,7 +991,7 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0, height: 300, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 300 }) }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="Pary" active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
@@ -991,7 +1000,7 @@ export default function Dashboard() {
               <TabBtn label="Watchlist" active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
 
-            <div style={{ padding: 14, flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <div style={{ padding: 14, ...(isMobile ? {} : { flex: 1, overflowY: "auto", minHeight: 0 }) }}>
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -1157,6 +1166,7 @@ export default function Dashboard() {
         <span>⚡ AI scanning: ForexLive · FXStreet · ForexFactory · CFTC</span>
         <span>NOT FINANCIAL ADVICE — INFORMATIONAL ONLY</span>
       </div>
+    </div>
     </div>
     </ThemeContext.Provider>
   );
