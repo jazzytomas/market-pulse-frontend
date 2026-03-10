@@ -700,8 +700,8 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
-            <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", flexShrink: 0, height: 300, display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="Pary" active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
               <TabBtn label="Meny" active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
@@ -709,7 +709,7 @@ export default function Dashboard() {
               <TabBtn label="Watchlist" active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
 
-            <div style={{ padding: 14, height: 260, overflowY: "auto", boxSizing: "border-box" }}>
+            <div style={{ padding: 14, flex: 1, overflowY: "auto", minHeight: 0 }}>
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
