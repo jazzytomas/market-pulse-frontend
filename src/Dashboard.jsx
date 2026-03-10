@@ -147,6 +147,7 @@ export default function Dashboard() {
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("pairs");
   const [expandedScenario, setExpandedScenario] = useState(null);
+  const [scenarioFilter, setScenarioFilter] = useState("ALL");
   const [scanning, setScanning] = useState(false);
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [commodities, setCommodities] = useState([]);
@@ -403,9 +404,20 @@ export default function Dashboard() {
 
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 2 }}>Klikni na scenar pro detail dopadu ▼</div>
+                <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
+                  {["ALL", "HIGH", "MED"].map(f => (
+                    <button key={f} onClick={() => setScenarioFilter(f)} style={{
+                      fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f ? 700 : 400,
+                      background: scenarioFilter === f ? C.accent : C.border,
+                      color: scenarioFilter === f ? "#000" : C.textDim,
+                      border: `1px solid ${scenarioFilter === f ? C.accent : C.border}`
+                    }}>{f}</button>
+                  ))}
+                  <span style={{ fontSize: 9, color: C.textDim, alignSelf: "center", marginLeft: 4 }}>Klikni pro detail ▼</span>
+                </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[...scenarios]
+                  .filter(s => scenarioFilter === "ALL" || s.weight === scenarioFilter)
                   .sort((a, b) => {
                     const w = { HIGH: 3, MED: 2, LOW: 1 };
                     if (w[b.weight] !== w[a.weight]) return w[b.weight] - w[a.weight];
