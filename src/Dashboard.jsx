@@ -156,7 +156,7 @@ export default function Dashboard() {
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scanning, setScanning] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState("--:--:--");
+  const [lastUpdate, setLastUpdate] = useState(() => localStorage.getItem("mp_last_scan") || "--:--:--");
   const [commodities, setCommodities] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const [watchlistData, setWatchlistData] = useState([]);
@@ -264,6 +264,17 @@ export default function Dashboard() {
         setScenarios(sc || []);
         setEvents(ev || []);
         setSentiment(se || { total_score: 0, label: "NEUTRAL" });
+        // Aktualizuj LAST SCAN z created_at nejnovějšího scénáře (pokrývá i auto-scan)
+        if (sc && sc.length > 0 && sc[0].created_at) {
+          const d = new Date(sc[0].created_at + "Z"); // UTC → local
+          const timeStr = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+          const stored = localStorage.getItem("mp_last_scan") || "";
+          // Vezmi novější z: localStorage vs. created_at
+          if (!stored || stored === "--:--:--" || timeStr > stored) {
+            setLastUpdate(timeStr);
+            localStorage.setItem("mp_last_scan", timeStr);
+          }
+        }
       })
       .catch(() => {
         setScenarios([]);
@@ -280,7 +291,8 @@ export default function Dashboard() {
       .then(() => {
         setTimeout(() => {
           const now = new Date();
-          setLastUpdate(`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`);
+          const timeStr = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+          localStorage.setItem("mp_last_scan", timeStr); // uložit před reload
           Promise.all([
             fetch(`${API}/api/scenarios`).then(r => r.json()),
             fetch(`${API}/api/sentiment`).then(r => r.json()),
