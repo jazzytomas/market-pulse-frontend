@@ -164,6 +164,7 @@ export default function Dashboard() {
   const [seasonalYears, setSeasonalYears] = useState(10);
   const [correlationData, setCorrelationData] = useState(null);
   const [backtestData, setBacktestData] = useState(null);
+  const [fearGreedData, setFearGreedData] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
   const C = darkMode ? DARK : LIGHT;
@@ -222,6 +223,13 @@ export default function Dashboard() {
     fetch(`${API}/api/backtest`)
       .then(r => r.json())
       .then(data => setBacktestData(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/fear_greed`)
+      .then(r => r.json())
+      .then(data => setFearGreedData(data))
       .catch(() => {});
   }, []);
 
@@ -415,6 +423,7 @@ export default function Dashboard() {
               <TabBtn label="🔗 Korelace" active={centerTab === "corr"} onClick={() => setCenterTab("corr")} />
               <TabBtn label="📈 Sezona" active={centerTab === "seasonal"} onClick={() => setCenterTab("seasonal")} />
               <TabBtn label="🕐 Historie" active={centerTab === "history"} onClick={() => setCenterTab("history")} />
+              <TabBtn label="😱 Fear&Greed" active={centerTab === "feargreed"} onClick={() => setCenterTab("feargreed")} />
               <TabBtn label="🎯 Backtest" active={centerTab === "backtest"} onClick={() => setCenterTab("backtest")} />
               <TabBtn label="📖 Průvodce" active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
@@ -725,6 +734,72 @@ export default function Dashboard() {
               </div>
             )}
 
+            {centerTab === "feargreed" && (() => {
+              const fgColor = (v) => v <= 20 ? C.red : v <= 40 ? C.orange : v <= 60 ? C.yellow : v <= 80 ? "#7ec850" : C.green;
+              const FGGauge = ({ label, icon, data }) => {
+                if (!data) return (
+                  <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, textAlign: "center" }}>
+                    <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
+                    <div style={{ fontSize: 10, color: C.textDim, marginBottom: 12 }}>{label}</div>
+                    <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
+                  </div>
+                );
+                const col = fgColor(data.value);
+                const pct = data.value;
+                // SVG arc gauge
+                const r = 52, cx = 70, cy = 68, sw = 12;
+                const toRad = (deg) => (deg - 180) * Math.PI / 180;
+                const startDeg = 0, endDeg = 180;
+                const valueDeg = startDeg + (pct / 100) * endDeg;
+                const x1 = cx + r * Math.cos(toRad(startDeg)), y1 = cy + r * Math.sin(toRad(startDeg));
+                const x2 = cx + r * Math.cos(toRad(valueDeg)), y2 = cy + r * Math.sin(toRad(valueDeg));
+                const large = valueDeg - startDeg > 90 ? 1 : 0;
+                return (
+                  <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
+                    <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
+                    <div style={{ fontSize: 9, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
+                    <svg width="140" height="80" viewBox="0 0 140 80" style={{ overflow: "visible" }}>
+                      {/* Background arc */}
+                      <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
+                        fill="none" stroke={C.border} strokeWidth={sw} strokeLinecap="round" />
+                      {/* Value arc */}
+                      <path d={`M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`}
+                        fill="none" stroke={col} strokeWidth={sw} strokeLinecap="round" />
+                      {/* Value text */}
+                      <text x={cx} y={cy - 4} textAnchor="middle" fill={col} fontSize="22" fontWeight="900" fontFamily="monospace">{pct}</text>
+                      {/* Labels */}
+                      <text x={cx - r - 4} y={cy + 16} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
+                      <text x={cx + r + 4} y={cy + 16} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
+                    </svg>
+                    <div style={{ fontSize: 12, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
+                    {data.vix && <div style={{ fontSize: 8, color: C.muted, marginTop: 4 }}>VIX {data.vix}</div>}
+                  </div>
+                );
+              };
+              return (
+                <div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+                    <FGGauge label="FOREX" icon="💱" data={fearGreedData?.forex} />
+                    <FGGauge label="AKCIE (S&P 500)" icon="📈" data={fearGreedData?.stocks} />
+                    <FGGauge label="KRYPTO" icon="₿" data={fearGreedData?.crypto} />
+                  </div>
+                  <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
+                      {[["0–20","Extreme Fear",C.red],["21–40","Fear",C.orange],["41–60","Neutral",C.yellow],["61–80","Greed","#7ec850"],["81–100","Extreme Greed",C.green]].map(([range, lbl, col]) => (
+                        <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: 2, background: col }} />
+                          <span style={{ fontSize: 8, color: C.textDim }}>{range} {lbl}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>
+                      Forex = náš AI sentiment + VIX · Akcie = VIX + S&P momentum · Krypto = alternative.me · cache 15 min
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {centerTab === "backtest" && (
               <div>
                 {!backtestData || backtestData.total === 0 ? (
@@ -864,6 +939,16 @@ export default function Dashboard() {
                   <Section emoji="🕐" title="HISTORIE SENTIMENTU">
                     <Row label="Co to je" desc="7denní přehled denního risk sentimentu. Ukládá se do DB každý den." />
                     <Row label="Jak použít" desc="Sleduj trend. Pokud sentiment klesá 3+ dny po sobě → Risk OFF trend. Rychlý obrat → možný sentiment shift." />
+                  </Section>
+
+                  <Section emoji="😱" title="FEAR & GREED INDEX">
+                    <Row label="Co to je" desc="Kompozitní index strachu a chamtivosti trhu na škále 0–100. Nízká hodnota = strach, vysoká = chamtivost." />
+                    <Row label="💱 Forex F&G" desc="Vypočítán z našeho AI sentimentu (65%) + VIX (35%). Normalizován na 0–100." />
+                    <Row label="📈 Akcie F&G" desc="VIX index strachu (60%) + S&P 500 momentum vůči 125dennímu průměru (40%)." />
+                    <Row label="₿ Krypto F&G" desc="Oficiální index z alternative.me. Zahrnuje volatilitu, momentum, sociální média a dominanci Bitcoinu." />
+                    <Row label="0–20 Extreme Fear" desc="Trh v panice. Historicky dobrá příležitost k nákupu (contrarian)." />
+                    <Row label="80–100 Extreme Greed" desc="Trh přehřátý, investoři příliš optimistični. Zvýšené riziko korekce." />
+                    <Row label="Jak použít" desc="Porovnej Fear&Greed napříč trhy. Pokud krypto Extreme Fear ale Forex Greed → diverzifikace signálů." />
                   </Section>
 
                   <Section emoji="💱" title="MĚNOVÝ BIAS A PÁRY">
