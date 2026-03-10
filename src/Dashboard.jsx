@@ -156,6 +156,7 @@ export default function Dashboard() {
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scanning, setScanning] = useState(false);
+  const [scanCountdown, setScanCountdown] = useState(0);
   const [lastUpdate, setLastUpdate] = useState(() => localStorage.getItem("mp_last_scan") || "--:--:--");
   const [commodities, setCommodities] = useState([]);
   const [historyData, setHistoryData] = useState([]);
@@ -287,14 +288,22 @@ export default function Dashboard() {
 
   const runScan = () => {
     setScanning(true);
-    // Pošli rescan – timer běží okamžitě, nezávisí na odpovědi serveru
     fetch(`${API}/api/rescan`).catch(() => {});
+    // Odpočet viditelný pro uživatele
+    let secs = 40;
+    setScanCountdown(secs);
+    const tick = setInterval(() => {
+      secs -= 1;
+      setScanCountdown(secs);
+      if (secs <= 0) clearInterval(tick);
+    }, 1000);
     setTimeout(() => {
+      clearInterval(tick);
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
       localStorage.setItem("mp_last_scan", timeStr);
       window.location.reload();
-    }, 35000);
+    }, 40000);
   };
 
   const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
@@ -330,7 +339,7 @@ export default function Dashboard() {
             background: `${C.accent}18`, border: `1px solid ${scanning ? C.muted : C.accent}`,
             color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
             letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
-          }}>{scanning ? "◌ SCANNING..." : "⟳ RESCAN"}</button>
+          }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
           <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
             color: C.textDim, padding: "6px 9px", fontSize: 14,
