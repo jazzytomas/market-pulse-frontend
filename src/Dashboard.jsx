@@ -384,7 +384,12 @@ export default function Dashboard() {
 
           {/* Commodities */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
-            <SectionLabel>KOMODITY</SectionLabel>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+              <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim }}>KOMODITY</div>
+              <span style={{ fontSize: 7, color: C.muted, textAlign: "right", lineHeight: 1.5 }}>
+                koreluje = měny reagující na pohyb<br/>dnes = risk signál z dnešního pohybu
+              </span>
+            </div>
             {commodities.length === 0 ? (
               <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
             ) : commodities.map(c => {
@@ -401,8 +406,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
-                    <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
+                    <span style={{ fontSize: 8, color: C.muted }}>
+                      <span style={{ color: C.textDim, marginRight: 2, fontSize: 7 }}>koreluje:</span>{c.currencies}
+                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                      <span style={{ fontSize: 7, color: C.muted }}>dnes:</span>
+                      <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -947,6 +957,13 @@ export default function Dashboard() {
                     <Row label="0–20 Extreme Fear" desc="Trh v panice. Historicky dobrá příležitost k nákupu (contrarian)." />
                     <Row label="80–100 Extreme Greed" desc="Trh přehřátý, investoři příliš optimistični. Zvýšené riziko korekce." />
                     <Row label="Jak použít" desc="Porovnej Fear&Greed napříč trhy. Pokud krypto Extreme Fear ale Forex Greed → diverzifikace signálů." />
+                  </Section>
+
+                  <Section emoji="🛢️" title="KOMODITY">
+                    <Row label="Co to je" desc="Live ceny 7 komodit z yfinance. Aktualizuje se každých 5 minut." />
+                    <Row label="▲/▼ % změna" desc="Dnešní procentuální pohyb ceny komodity oproti předchozímu dni." />
+                    <Row label="koreluje:" desc="Měny, které historicky reagují na pohyb dané komodity. Např. CAD ↑ = když roste WTI ropa, CAD má tendenci posilovat (Kanada je exportér ropy)." />
+                    <Row label="dnes: risk on/off" desc="Risk signál odvozený z dnešního pohybu ceny. Ropa ↑ = risk on (ekonomika roste, chuť riskovat). Zlato ↑ = risk off (trh hledá bezpečí). Neutral = pohyb je nevýrazný." />
                   </Section>
 
                   <Section emoji="💱" title="MĚNOVÝ BIAS A PÁRY">
