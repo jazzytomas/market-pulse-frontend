@@ -313,6 +313,17 @@ export default function Dashboard() {
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
             <SectionLabel center>RISK SENTIMENT</SectionLabel>
             <RiskMeter score={sentiment.total_score} />
+            {sentiment.vix != null && (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 4, marginBottom: 2 }}>
+                <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>VIX</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>
+                  {sentiment.vix.toFixed(1)}
+                </span>
+                <span style={{ fontSize: 8, color: C.textDim }}>
+                  {sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}
+                </span>
+              </div>
+            )}
 
             {/* Menovy prehled - risk ON / risk OFF klasifikace */}
             <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
