@@ -709,7 +709,7 @@ export default function Dashboard() {
               <TabBtn label="Watchlist" active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
 
-            <div style={{ padding: 14, maxHeight: 260, overflowY: "auto" }}>
+            <div style={{ padding: 14, height: 260, overflowY: "auto", boxSizing: "border-box" }}>
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
