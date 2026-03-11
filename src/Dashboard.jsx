@@ -311,6 +311,71 @@ export default function Dashboard() {
   const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   const riskLabel = sentiment.total_score > NEUTRAL_THRESHOLD ? "RISK ON" : sentiment.total_score < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
 
+  const RISK_CHAR_GLOBAL = {
+    AUD: "risk_on", NZD: "risk_on", CAD: "risk_on",
+    EUR: "neutral", GBP: "neutral",
+    USD: "safe_haven", JPY: "safe_haven", CHF: "safe_haven"
+  };
+
+  const computeConfluenceForPair = (base, quote) => {
+    const mktMode = sentiment.total_score > NEUTRAL_THRESHOLD ? "risk_on"
+      : sentiment.total_score < -NEUTRAL_THRESHOLD ? "risk_off" : "neutral";
+    const baseCOT = cotData.find(c => c.currency === base);
+    const quoteCOT = cotData.find(c => c.currency === quote);
+    const baseNet = baseCOT ? baseCOT.net : null;
+    const quoteNet = quoteCOT ? quoteCOT.net : null;
+    const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const curMonth = MONTHS[new Date().getMonth()];
+    const seasonRow = seasonalLive.find(m => m.month === curMonth);
+    const baseSeas = seasonRow ? (seasonRow[base] ?? null) : null;
+    const quoteSeas = seasonRow ? (seasonRow[quote] ?? null) : null;
+    const baseCB = centralBanks.find(c => c.currency === base);
+    const quoteCB = centralBanks.find(c => c.currency === quote);
+    const baseRate = baseCB ? parseFloat(baseCB.rate) : null;
+    const quoteRate = quoteCB ? parseFloat(quoteCB.rate) : null;
+    const riskAlign = (() => {
+      if (mktMode === "risk_on") {
+        if (RISK_CHAR_GLOBAL[base] === "risk_on" && RISK_CHAR_GLOBAL[quote] !== "risk_on") return "long";
+        if (RISK_CHAR_GLOBAL[quote] === "risk_on" && RISK_CHAR_GLOBAL[base] !== "risk_on") return "short";
+      } else if (mktMode === "risk_off") {
+        if (RISK_CHAR_GLOBAL[base] === "safe_haven" && RISK_CHAR_GLOBAL[quote] !== "safe_haven") return "long";
+        if (RISK_CHAR_GLOBAL[quote] === "safe_haven" && RISK_CHAR_GLOBAL[base] !== "safe_haven") return "short";
+      }
+      return "neutral";
+    })();
+    const factors = [
+      { aligns: currencyTotals[base] > currencyTotals[quote] ? "long" : currencyTotals[base] < currencyTotals[quote] ? "short" : "neutral" },
+      { aligns: (baseNet !== null && quoteNet !== null) ? (baseNet > quoteNet ? "long" : baseNet < quoteNet ? "short" : "neutral") : "neutral" },
+      { aligns: (baseSeas !== null && quoteSeas !== null) ? (baseSeas > quoteSeas ? "long" : baseSeas < quoteSeas ? "short" : "neutral") : "neutral" },
+      { aligns: riskAlign },
+      { aligns: (baseRate !== null && quoteRate !== null) ? (baseRate > quoteRate ? "long" : baseRate < quoteRate ? "short" : "neutral") : "neutral" },
+    ];
+    const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
+    const longCount = factors.filter(f => f.aligns === "long").length;
+    const shortCount = factors.filter(f => f.aligns === "short").length;
+    const biasDir = pairScore > NEUTRAL_THRESHOLD ? "long" : pairScore < -NEUTRAL_THRESHOLD ? "short" : "neutral";
+    const biasCount = biasDir === "long" ? longCount : biasDir === "short" ? shortCount : Math.max(longCount, shortCount);
+    return { pairScore, biasDir, biasCount, longCount, shortCount, total: 5 };
+  };
+
+  const ALL_PAIRS = [
+    { pair: "EUR/USD", base: "EUR", quote: "USD" },
+    { pair: "GBP/USD", base: "GBP", quote: "USD" },
+    { pair: "AUD/USD", base: "AUD", quote: "USD" },
+    { pair: "NZD/USD", base: "NZD", quote: "USD" },
+    { pair: "USD/JPY", base: "USD", quote: "JPY" },
+    { pair: "USD/CHF", base: "USD", quote: "CHF" },
+    { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
+    { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
+    { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
+    { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
+    { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
+    { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
+  ];
+
+  const pairsWithConfluence = ALL_PAIRS.map(p => ({ ...p, ...computeConfluenceForPair(p.base, p.quote) }));
+  const topSetups = [...pairsWithConfluence].sort((a, b) => b.biasCount - a.biasCount).slice(0, 4);
+
   const corrColor = (val) => {
     if (val >= 0.7) return C.green;
     if (val <= -0.7) return C.red;
@@ -1026,6 +1091,30 @@ export default function Dashboard() {
             </div>{/* /content wrapper */}
           </div>
 
+          {/* TOP SETUPS strip */}
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, flexShrink: 0 }}>TOP SETUPY:</span>
+              {topSetups.map(p => {
+                const col = p.biasDir === "long" ? C.green : p.biasDir === "short" ? C.red : C.yellow;
+                const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
+                const isPerfect = p.biasCount === 5;
+                return (
+                  <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
+                    style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
+                      background: isPerfect ? `${C.accent}22` : `${col}0f`,
+                      border: isPerfect ? `1px solid ${C.accent}` : `1px solid ${col}44`,
+                      animation: isPerfect ? "pulse 2s infinite" : "none" }}>
+                    {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
+                    <span style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{p.pair}</span>
+                    <span style={{ fontSize: 9, color: col }}>{arrow}</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: col }}>{p.biasCount}/5</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* BOTTOM tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 300 }) }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
@@ -1248,6 +1337,106 @@ export default function Dashboard() {
                         })}
                       </div>
                       <div style={{ fontSize: 7, color: C.muted, marginTop: 7 }}>✓ podporuje nákup · ✗ podporuje prodej · — neutrální</div>
+
+                      {/* HISTORICKÝ SCORE (mini chart) */}
+                      {(() => {
+                        const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                        const days = {};
+                        scenarios.forEach(s => {
+                          const d = s.created_at ? s.created_at.split("T")[0] : null;
+                          if (!d) return;
+                          if (!days[d]) days[d] = [];
+                          days[d].push(s);
+                        });
+                        const dayKeys = Object.keys(days).sort();
+                        if (dayKeys.length < 2) return null;
+                        const points = dayKeys.map(d => {
+                          const t = computeCurrencyTotals(days[d]);
+                          return { d, score: Math.round((t[base] || 0) - (t[quote] || 0)) };
+                        });
+                        const maxAbs = Math.max(1, ...points.map(p => Math.abs(p.score)));
+                        return (
+                          <div style={{ marginTop: 10, padding: "8px 10px", background: C.bg, borderRadius: 6, border: `1px solid ${C.border}` }}>
+                            <div style={{ fontSize: 8, color: C.textDim, marginBottom: 6 }}>HISTORICKÉ SKÓRE — posledních {points.length} dní</div>
+                            <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 36 }}>
+                              {points.map((p, i) => {
+                                const h = Math.max(3, (Math.abs(p.score) / maxAbs) * 34);
+                                const col = p.score > NEUTRAL_THRESHOLD ? C.green : p.score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                                return (
+                                  <div key={i} title={`${p.d}: ${p.score > 0 ? "+" : ""}${p.score}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: 36 }}>
+                                    <div style={{ width: "100%", height: h, background: col, borderRadius: 2, opacity: 0.85 }} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
+                              <span style={{ fontSize: 6, color: C.muted }}>{points[0]?.d?.slice(5)}</span>
+                              <span style={{ fontSize: 6, color: C.muted }}>{points[points.length - 1]?.d?.slice(5)}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* ZPRÁVY (News) */}
+                      {(() => {
+                        const relevant = scenarios.filter(s => {
+                          const ci = typeof s.currency_impact === 'string' ? JSON.parse(s.currency_impact) : (s.currency_impact || {});
+                          return (ci[base] && ci[base].score !== 0) || (ci[quote] && ci[quote].score !== 0);
+                        }).slice(0, 4);
+                        if (relevant.length === 0) return null;
+                        return (
+                          <div style={{ marginTop: 10 }}>
+                            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>POSLEDNÍ ZPRÁVY (News)</div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                              {relevant.map(s => {
+                                const ci = typeof s.currency_impact === 'string' ? JSON.parse(s.currency_impact) : (s.currency_impact || {});
+                                const bScore = ci[base]?.score || 0;
+                                const qScore = ci[quote]?.score || 0;
+                                const net = bScore - qScore;
+                                const col = net > 5 ? C.green : net < -5 ? C.red : C.yellow;
+                                return (
+                                  <div key={s.id} style={{ padding: "5px 8px", background: `${col}08`, border: `1px solid ${col}22`, borderLeft: `2px solid ${col}`, borderRadius: 4 }}>
+                                    <div style={{ fontSize: 8, color: C.text, lineHeight: 1.3 }}>{s.title || s.headline}</div>
+                                    <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
+                                      <span style={{ fontSize: 7, color: C.textDim }}>{base}: {bScore > 0 ? "+" : ""}{bScore}</span>
+                                      <span style={{ fontSize: 7, color: C.textDim }}>{quote}: {qScore > 0 ? "+" : ""}{qScore}</span>
+                                      <span style={{ fontSize: 7, color: col, fontWeight: 700 }}>net: {net > 0 ? "+" : ""}{net}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* NADCHÁZEJÍCÍ UDÁLOSTI (Upcoming Events) */}
+                      {(() => {
+                        const relEvents = events.filter(e => e.currency === base || e.currency === quote).slice(0, 4);
+                        if (relEvents.length === 0) return null;
+                        return (
+                          <div style={{ marginTop: 10 }}>
+                            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>NADCHÁZEJÍCÍ UDÁLOSTI (Events)</div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                              {relEvents.map((e, i) => {
+                                const impCol = e.impact === "HIGH" ? C.red : e.impact === "MED" ? C.yellow : C.muted;
+                                return (
+                                  <div key={i} style={{ padding: "5px 8px", background: `${impCol}08`, border: `1px solid ${impCol}22`, borderRadius: 4 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                      <span style={{ fontSize: 8, color: C.text }}>{e.title}</span>
+                                      <span style={{ fontSize: 7, color: impCol, border: `1px solid ${impCol}44`, padding: "1px 4px", borderRadius: 3 }}>{e.impact}</span>
+                                    </div>
+                                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                                      <span style={{ fontSize: 7, color: C.textDim }}>{e.currency} · {e.time || e.date}</span>
+                                      {e.forecast && <span style={{ fontSize: 7, color: C.muted }}>Oček.: {e.forecast}</span>}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 }
@@ -1256,15 +1445,26 @@ export default function Dashboard() {
                   <div>
                     <SectionLabel>SKÓRE PÁR — klikni pro Confluence detail</SectionLabel>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {PAIRS_LIST.map(({ pair, base, quote }) => {
+                      {pairsWithConfluence.map(({ pair, base, quote, biasCount, biasDir }) => {
                         const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
                         const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
                         const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
+                        const isPerfect = biasCount === 5;
                         return (
-                          <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })} style={{ padding: "8px 10px", background: `${col}0a`, border: `1px solid ${col}33`, borderLeft: `3px solid ${col}`, borderRadius: 6, cursor: "pointer" }}>
+                          <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
+                            style={{ padding: "8px 10px", background: isPerfect ? `${C.accent}15` : `${col}0a`,
+                              border: isPerfect ? `1px solid ${C.accent}` : `1px solid ${col}33`,
+                              borderLeft: `3px solid ${isPerfect ? C.accent : col}`, borderRadius: 6, cursor: "pointer",
+                              animation: isPerfect ? "pulse 2s infinite" : "none" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
-                              <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
+                              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                {isPerfect && <span style={{ fontSize: 10 }}>⚡</span>}
+                                <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
+                              </div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                <span style={{ fontSize: 8, color: isPerfect ? C.accent : col, fontWeight: 700 }}>{biasCount}/5</span>
+                                <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
+                              </div>
                             </div>
                             <div style={{ marginBottom: 5 }}><ScoreBar score={score} height={4} /></div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
