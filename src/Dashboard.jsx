@@ -389,8 +389,8 @@ export default function Dashboard() {
 
   return (
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
-    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "100%", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh", overflowX: "hidden" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
+    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh", width: "100%", overflowX: "hidden" } : { height: "100%", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, flexShrink: 0 }}>
