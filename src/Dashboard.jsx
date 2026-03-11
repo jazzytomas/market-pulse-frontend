@@ -1554,7 +1554,7 @@ export default function Dashboard() {
       </div>
 
       <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
-        <span>⚡ AI scanning: ForexLive · FXStreet · ForexFactory · CFTC</span>
+        <span>⚡ AI scanning: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT</span>
         <span>NOT FINANCIAL ADVICE — INFORMATIONAL ONLY</span>
       </div>
     </div>
