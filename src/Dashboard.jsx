@@ -324,6 +324,10 @@ export default function Dashboard() {
     const quoteCOT = cotData.find(c => c.currency === quote);
     const baseNet = baseCOT ? baseCOT.net : null;
     const quoteNet = quoteCOT ? quoteCOT.net : null;
+    const baseTotal = baseCOT ? ((baseCOT.long || 0) + (baseCOT.short || 0)) : 0;
+    const quoteTotal = quoteCOT ? ((quoteCOT.long || 0) + (quoteCOT.short || 0)) : 0;
+    const baseNetPct = (baseNet !== null && baseTotal > 0) ? baseNet / baseTotal : null;
+    const quoteNetPct = (quoteNet !== null && quoteTotal > 0) ? quoteNet / quoteTotal : null;
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const curMonth = MONTHS[new Date().getMonth()];
     const seasonRow = seasonalLive.find(m => m.month === curMonth);
@@ -345,7 +349,7 @@ export default function Dashboard() {
     })();
     const factors = [
       { aligns: currencyTotals[base] > currencyTotals[quote] ? "long" : currencyTotals[base] < currencyTotals[quote] ? "short" : "neutral" },
-      { aligns: (baseNet !== null && quoteNet !== null) ? (baseNet > quoteNet ? "long" : baseNet < quoteNet ? "short" : "neutral") : "neutral" },
+      { aligns: (baseNetPct !== null && quoteNetPct !== null) ? (baseNetPct > quoteNetPct ? "long" : baseNetPct < quoteNetPct ? "short" : "neutral") : "neutral" },
       { aligns: (baseSeas !== null && quoteSeas !== null) ? (baseSeas > quoteSeas ? "long" : baseSeas < quoteSeas ? "short" : "neutral") : "neutral" },
       { aligns: riskAlign },
       { aligns: (baseRate !== null && quoteRate !== null) ? (baseRate > quoteRate ? "long" : baseRate < quoteRate ? "short" : "neutral") : "neutral" },
@@ -1219,6 +1223,10 @@ export default function Dashboard() {
                   const quoteCOT = cotData.find(c => c.currency === quote);
                   const baseNet = baseCOT ? baseCOT.net : null;
                   const quoteNet = quoteCOT ? quoteCOT.net : null;
+                  const baseTot = baseCOT ? ((baseCOT.long || 0) + (baseCOT.short || 0)) : 0;
+                  const quoteTot = quoteCOT ? ((quoteCOT.long || 0) + (quoteCOT.short || 0)) : 0;
+                  const baseNetPct = (baseNet !== null && baseTot > 0) ? baseNet / baseTot : null;
+                  const quoteNetPct = (quoteNet !== null && quoteTot > 0) ? quoteNet / quoteTot : null;
 
                   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                   const curMonth = MONTHS[new Date().getMonth()];
@@ -1255,11 +1263,11 @@ export default function Dashboard() {
                       favors: currencyTotals[base] !== currencyTotals[quote] ? (currencyTotals[base] > currencyTotals[quote] ? base : quote) : null,
                     },
                     {
-                      label: "COT Report (Spekulanti)",
-                      baseVal: baseNet !== null ? `${baseNet > 0 ? "+" : ""}${(baseNet / 1000).toFixed(1)}K` : "—",
-                      quoteVal: quoteNet !== null ? `${quoteNet > 0 ? "+" : ""}${(quoteNet / 1000).toFixed(1)}K` : "—",
-                      aligns: (baseNet !== null && quoteNet !== null) ? (baseNet > quoteNet ? "long" : baseNet < quoteNet ? "short" : "neutral") : "neutral",
-                      favors: (baseNet !== null && quoteNet !== null && baseNet !== quoteNet) ? (baseNet > quoteNet ? base : quote) : null,
+                      label: "COT Report (Spekulanti) — % z open interest",
+                      baseVal: baseNetPct !== null ? `${(baseNetPct * 100).toFixed(1)}%` : "—",
+                      quoteVal: quoteNetPct !== null ? `${(quoteNetPct * 100).toFixed(1)}%` : "—",
+                      aligns: (baseNetPct !== null && quoteNetPct !== null) ? (baseNetPct > quoteNetPct ? "long" : baseNetPct < quoteNetPct ? "short" : "neutral") : "neutral",
+                      favors: (baseNetPct !== null && quoteNetPct !== null && baseNetPct !== quoteNetPct) ? (baseNetPct > quoteNetPct ? base : quote) : null,
                     },
                     {
                       label: "Sezóna (Seasonality) — " + curMonth,
