@@ -560,7 +560,7 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
                             <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? sc : C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? sc : C.muted, background: s.weight === "HIGH" ? `${sc}28` : C.border, border: s.weight === "HIGH" ? `1px solid ${sc}66` : "none", padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
                               <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
