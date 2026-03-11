@@ -560,7 +560,7 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
                             <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 8, color: C.muted, background: C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? sc : C.border, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
                               <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
@@ -569,6 +569,7 @@ export default function Dashboard() {
                           {!isMed && <ScoreBar score={rScore} />}
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
                             <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
+                            {s.created_at && <span style={{ fontSize: 8, color: C.muted }}>{new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
                           </div>
                         </div>
                         {isExp && (
@@ -1402,13 +1403,17 @@ export default function Dashboard() {
                                 const qScore = ci[quote]?.score || 0;
                                 const net = bScore - qScore;
                                 const col = net > 5 ? C.green : net < -5 ? C.red : C.yellow;
+                                const dateStr = s.created_at ? new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : null;
                                 return (
-                                  <div key={s.id} style={{ padding: "5px 8px", background: `${col}08`, border: `1px solid ${col}22`, borderLeft: `2px solid ${col}`, borderRadius: 4 }}>
+                                  <div key={s.id} onClick={() => { setCenterTab("scenarios"); setExpandedScenario(s.id); setScenarioFilter(s.weight === "HIGH" ? "HIGH" : "MED"); }} style={{ padding: "5px 8px", background: `${col}08`, border: `1px solid ${col}22`, borderLeft: `2px solid ${col}`, borderRadius: 4, cursor: "pointer" }}>
                                     <div style={{ fontSize: 8, color: C.text, lineHeight: 1.3 }}>{s.title || s.headline}</div>
-                                    <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                                      <span style={{ fontSize: 7, color: C.textDim }}>{base}: {bScore > 0 ? "+" : ""}{bScore}</span>
-                                      <span style={{ fontSize: 7, color: C.textDim }}>{quote}: {qScore > 0 ? "+" : ""}{qScore}</span>
-                                      <span style={{ fontSize: 7, color: col, fontWeight: 700 }}>net: {net > 0 ? "+" : ""}{net}</span>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 3 }}>
+                                      <div style={{ display: "flex", gap: 8 }}>
+                                        <span style={{ fontSize: 7, color: C.textDim }}>{base}: {bScore > 0 ? "+" : ""}{bScore}</span>
+                                        <span style={{ fontSize: 7, color: C.textDim }}>{quote}: {qScore > 0 ? "+" : ""}{qScore}</span>
+                                        <span style={{ fontSize: 7, color: col, fontWeight: 700 }}>net: {net > 0 ? "+" : ""}{net}</span>
+                                      </div>
+                                      {dateStr && <span style={{ fontSize: 7, color: C.muted }}>{dateStr}</span>}
                                     </div>
                                   </div>
                                 );
