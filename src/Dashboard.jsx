@@ -389,7 +389,7 @@ export default function Dashboard() {
 
   return (
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh", overflowX: "hidden" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
+    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
 
       {/* Header – full width */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
@@ -424,9 +424,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh", overflowX: "hidden", width: "100%" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? {} : { flex: 1, minHeight: 0 }) }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? { width: "100%", minWidth: 0 } : { flex: 1, minHeight: 0 }) }}>
 
         {/* LEFT – desktop sidebar */}
         {!isMobile && (
@@ -493,7 +493,7 @@ export default function Dashboard() {
         )}
 
         {/* RIGHT / mobile-full */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, ...(isMobile ? {} : { minHeight: 0 }) }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0, ...(isMobile ? {} : { minHeight: 0 }) }}>
 
         {/* Mobile: Risk Sentiment strip – gauge vlevo, VIX nahoře + měny dole vpravo */}
         {isMobile && (
