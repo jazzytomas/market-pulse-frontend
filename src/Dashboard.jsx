@@ -390,10 +390,9 @@ export default function Dashboard() {
   return (
     <ThemeContext.Provider value={C}>
     <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
-    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "100%", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, flexShrink: 0 }}>
+      {/* Header – full width */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent }}>◈ MARKET PULSE</div>
           <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 2 }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
@@ -422,6 +421,8 @@ export default function Dashboard() {
           }}>{darkMode ? "☀️" : "🌙"}</button>
         </div>
       </div>
+
+    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? {} : { flex: 1, minHeight: 0 }) }}>
 
@@ -474,38 +475,6 @@ export default function Dashboard() {
 
           </div>
 
-          {/* Commodities */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
-            <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 3 }}>KOMODITY</div>
-              <div style={{ fontSize: 7, color: C.muted }}>měny = korelované měny &nbsp;·&nbsp; dnes = signál z pohybu ceny</div>
-            </div>
-            {commodities.length === 0 ? (
-              <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
-            ) : commodities.map(c => {
-              const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
-              const signal = c.signal || "neutral";
-              const sigCol = signal === "risk on" ? C.green : signal === "risk off" ? C.red : C.yellow;
-              return (
-                <div key={c.name} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
-                    <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                      <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : "▼"} {Math.abs(c.change)}%</span>
-                      <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
-                    <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                      <span style={{ fontSize: 7, color: C.muted }}>dnes:</span>
-                      <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
 
         </div>
 
@@ -1551,6 +1520,37 @@ export default function Dashboard() {
           </div>
 
         </div>
+      </div>
+
+      {/* Commodities – bottom strip */}
+      <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", marginTop: 12, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 9, letterSpacing: 3, color: C.textDim }}>KOMODITY</span>
+          <span style={{ fontSize: 7, color: C.muted }}>měny = korelované měny &nbsp;·&nbsp; dnes = signál z pohybu ceny</span>
+        </div>
+        {commodities.length === 0 ? (
+          <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
+        ) : (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {commodities.map(c => {
+              const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
+              const signal = c.signal || "neutral";
+              const sigCol = signal === "risk on" ? C.green : signal === "risk off" ? C.red : C.yellow;
+              return (
+                <div key={c.name} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 10px", minWidth: 110 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
+                    <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : "▼"} {Math.abs(c.change)}%</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
+                    <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 4px", borderRadius: 3 }}>{signal}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
