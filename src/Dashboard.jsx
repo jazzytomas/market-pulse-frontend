@@ -154,6 +154,7 @@ export default function Dashboard() {
   const [cotData, setCotData] = useState([]);
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("pairs");
+  const [selectedPair, setSelectedPair] = useState(null);
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scanning, setScanning] = useState(false);
@@ -1097,46 +1098,188 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {rightTab === "pairs" && (
-                <div>
-                  <SectionLabel>SKORE PAR — AI FUNDAMENTAL BIAS</SectionLabel>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    {[
-                      { pair: "EUR/USD", base: "EUR", quote: "USD" },
-                      { pair: "GBP/USD", base: "GBP", quote: "USD" },
-                      { pair: "AUD/USD", base: "AUD", quote: "USD" },
-                      { pair: "NZD/USD", base: "NZD", quote: "USD" },
-                      { pair: "USD/JPY", base: "USD", quote: "JPY" },
-                      { pair: "USD/CHF", base: "USD", quote: "CHF" },
-                      { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
-                      { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
-                      { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
-                      { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
-                      { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
-                      { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
-                    ].map(({ pair, base, quote }) => {
-                      const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
-                      const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
-                      const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
-                      return (
-                        <div key={pair} style={{ padding: "8px 10px", background: `${col}0a`, border: `1px solid ${col}33`, borderLeft: `3px solid ${col}`, borderRadius: 6 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
-                            <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
-                          </div>
-                          <div style={{ marginBottom: 5 }}><ScoreBar score={score} height={4} /></div>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 8, color: col, fontWeight: 700 }}>{direction}</span>
-                            <span style={{ fontSize: 8, color: C.muted }}>
-                              {base} {currencyTotals[base] > 0 ? "+" : ""}{currencyTotals[base]} / {quote} {currencyTotals[quote] > 0 ? "+" : ""}{currencyTotals[quote]}
-                            </span>
-                          </div>
+              {rightTab === "pairs" && (() => {
+                const PAIRS_LIST = [
+                  { pair: "EUR/USD", base: "EUR", quote: "USD" },
+                  { pair: "GBP/USD", base: "GBP", quote: "USD" },
+                  { pair: "AUD/USD", base: "AUD", quote: "USD" },
+                  { pair: "NZD/USD", base: "NZD", quote: "USD" },
+                  { pair: "USD/JPY", base: "USD", quote: "JPY" },
+                  { pair: "USD/CHF", base: "USD", quote: "CHF" },
+                  { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
+                  { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
+                  { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
+                  { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
+                  { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
+                  { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
+                ];
+                const RISK_CHAR = {
+                  AUD: "risk_on", NZD: "risk_on", CAD: "risk_on",
+                  EUR: "neutral", GBP: "neutral",
+                  USD: "safe_haven", JPY: "safe_haven", CHF: "safe_haven"
+                };
+                const RISK_CHAR_LABEL = { risk_on: "Risk ON", safe_haven: "Safe Haven", neutral: "Neutrální" };
+
+                if (selectedPair) {
+                  const { pair, base, quote } = selectedPair;
+                  const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
+                  const pairCol = pairScore > NEUTRAL_THRESHOLD ? C.green : pairScore < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                  const pairBias = pairScore > NEUTRAL_THRESHOLD ? "▲ NÁKUP (Long)" : pairScore < -NEUTRAL_THRESHOLD ? "▼ PRODEJ (Short)" : "→ NEUTRÁLNÍ (Neutral)";
+
+                  const baseCOT = cotData.find(c => c.currency === base);
+                  const quoteCOT = cotData.find(c => c.currency === quote);
+                  const baseNet = baseCOT ? baseCOT.net : null;
+                  const quoteNet = quoteCOT ? quoteCOT.net : null;
+
+                  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                  const curMonth = MONTHS[new Date().getMonth()];
+                  const seasonRow = seasonalLive.find(m => m.month === curMonth);
+                  const baseSeas = seasonRow ? (seasonRow[base] ?? null) : null;
+                  const quoteSeas = seasonRow ? (seasonRow[quote] ?? null) : null;
+
+                  const baseCB = centralBanks.find(c => c.currency === base);
+                  const quoteCB = centralBanks.find(c => c.currency === quote);
+                  const baseRate = baseCB ? parseFloat(baseCB.rate) : null;
+                  const quoteRate = quoteCB ? parseFloat(quoteCB.rate) : null;
+
+                  const mktMode = sentiment.total_score > NEUTRAL_THRESHOLD ? "risk_on"
+                    : sentiment.total_score < -NEUTRAL_THRESHOLD ? "risk_off" : "neutral";
+
+                  const riskAligns = (() => {
+                    if (mktMode === "risk_on") {
+                      if (RISK_CHAR[base] === "risk_on" && RISK_CHAR[quote] !== "risk_on") return "long";
+                      if (RISK_CHAR[quote] === "risk_on" && RISK_CHAR[base] !== "risk_on") return "short";
+                    } else if (mktMode === "risk_off") {
+                      if (RISK_CHAR[base] === "safe_haven" && RISK_CHAR[quote] !== "safe_haven") return "long";
+                      if (RISK_CHAR[quote] === "safe_haven" && RISK_CHAR[base] !== "safe_haven") return "short";
+                    }
+                    return "neutral";
+                  })();
+                  const riskFavors = riskAligns === "long" ? base : riskAligns === "short" ? quote : null;
+
+                  const factors = [
+                    {
+                      label: "Sentiment zpráv (News Sentiment)",
+                      baseVal: `${currencyTotals[base] > 0 ? "+" : ""}${currencyTotals[base]}`,
+                      quoteVal: `${currencyTotals[quote] > 0 ? "+" : ""}${currencyTotals[quote]}`,
+                      aligns: currencyTotals[base] > currencyTotals[quote] ? "long" : currencyTotals[base] < currencyTotals[quote] ? "short" : "neutral",
+                      favors: currencyTotals[base] !== currencyTotals[quote] ? (currencyTotals[base] > currencyTotals[quote] ? base : quote) : null,
+                    },
+                    {
+                      label: "COT Report (Spekulanti)",
+                      baseVal: baseNet !== null ? `${baseNet > 0 ? "+" : ""}${(baseNet / 1000).toFixed(1)}K` : "—",
+                      quoteVal: quoteNet !== null ? `${quoteNet > 0 ? "+" : ""}${(quoteNet / 1000).toFixed(1)}K` : "—",
+                      aligns: (baseNet !== null && quoteNet !== null) ? (baseNet > quoteNet ? "long" : baseNet < quoteNet ? "short" : "neutral") : "neutral",
+                      favors: (baseNet !== null && quoteNet !== null && baseNet !== quoteNet) ? (baseNet > quoteNet ? base : quote) : null,
+                    },
+                    {
+                      label: "Sezóna (Seasonality) — " + curMonth,
+                      baseVal: baseSeas !== null ? `${baseSeas > 0 ? "+" : ""}${baseSeas.toFixed(1)}%` : "—",
+                      quoteVal: quoteSeas !== null ? `${quoteSeas > 0 ? "+" : ""}${quoteSeas.toFixed(1)}%` : "—",
+                      aligns: (baseSeas !== null && quoteSeas !== null) ? (baseSeas > quoteSeas ? "long" : baseSeas < quoteSeas ? "short" : "neutral") : "neutral",
+                      favors: (baseSeas !== null && quoteSeas !== null && baseSeas !== quoteSeas) ? (baseSeas > quoteSeas ? base : quote) : null,
+                    },
+                    {
+                      label: "Tržní nálada (Risk Sentiment) — " + (mktMode === "risk_on" ? "RISK ON" : mktMode === "risk_off" ? "RISK OFF" : "NEUTRAL"),
+                      baseVal: RISK_CHAR_LABEL[RISK_CHAR[base]],
+                      quoteVal: RISK_CHAR_LABEL[RISK_CHAR[quote]],
+                      aligns: riskAligns,
+                      favors: riskFavors,
+                    },
+                    {
+                      label: "Carry Trade (CB Sazby / Interest Rates)",
+                      baseVal: baseRate !== null ? `${baseRate.toFixed(2)}%` : "—",
+                      quoteVal: quoteRate !== null ? `${quoteRate.toFixed(2)}%` : "—",
+                      aligns: (baseRate !== null && quoteRate !== null) ? (baseRate > quoteRate ? "long" : baseRate < quoteRate ? "short" : "neutral") : "neutral",
+                      favors: (baseRate !== null && quoteRate !== null && baseRate !== quoteRate) ? (baseRate > quoteRate ? base : quote) : null,
+                    },
+                  ];
+
+                  const longCount = factors.filter(f => f.aligns === "long").length;
+                  const shortCount = factors.filter(f => f.aligns === "short").length;
+                  const biasCount = pairScore > NEUTRAL_THRESHOLD ? longCount : pairScore < -NEUTRAL_THRESHOLD ? shortCount : Math.max(longCount, shortCount);
+                  const confluenceCol = biasCount >= 4 ? C.green : biasCount >= 3 ? C.yellow : C.red;
+
+                  return (
+                    <div>
+                      <button onClick={() => setSelectedPair(null)} style={{ background: "none", border: `1px solid ${C.border}`, color: C.textDim, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontSize: 9, marginBottom: 10 }}>← Zpět (Back)</button>
+
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
+                        <div>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: C.text, letterSpacing: 1 }}>{pair}</div>
+                          <div style={{ fontSize: 8, color: C.muted }}>{base} základní · {quote} kótovací</div>
                         </div>
-                      );
-                    })}
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 26, fontWeight: 900, color: pairCol, lineHeight: 1 }}>{pairScore > 0 ? "+" : ""}{pairScore}</div>
+                          <div style={{ fontSize: 9, color: pairCol, fontWeight: 700 }}>{pairBias}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ background: `${confluenceCol}12`, border: `1px solid ${confluenceCol}40`, borderRadius: 6, padding: "7px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 9, fontWeight: 700, color: C.text }}>SHODA FAKTORŮ (Confluence)</div>
+                          <div style={{ fontSize: 8, color: C.muted }}>Kolik faktorů podporuje aktuální bias</div>
+                        </div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: confluenceCol }}>{biasCount}<span style={{ fontSize: 12, color: C.muted }}>/{factors.length}</span></div>
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        {factors.map((f, i) => {
+                          const alCol = f.aligns === "long" ? C.green : f.aligns === "short" ? C.red : C.yellow;
+                          const icon = f.aligns === "long" ? "✓" : f.aligns === "short" ? "✗" : "—";
+                          return (
+                            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 52px 1fr", gap: 4, alignItems: "center", padding: "6px 8px", background: `${alCol}08`, border: `1px solid ${alCol}22`, borderRadius: 5 }}>
+                              <div>
+                                <div style={{ fontSize: 7, color: C.muted, marginBottom: 2 }}>{f.label}</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{f.baseVal}</div>
+                                <div style={{ fontSize: 7, color: C.textDim }}>{base}</div>
+                              </div>
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{ fontSize: 13, color: alCol, fontWeight: 900 }}>{icon}</div>
+                                <div style={{ fontSize: 6, color: alCol, lineHeight: 1.2 }}>{f.favors ? `→ ${f.favors}` : "neutr."}</div>
+                              </div>
+                              <div style={{ textAlign: "right" }}>
+                                <div style={{ fontSize: 7, color: C.muted, marginBottom: 2 }}>&nbsp;</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{f.quoteVal}</div>
+                                <div style={{ fontSize: 7, color: C.textDim }}>{quote}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div style={{ fontSize: 7, color: C.muted, marginTop: 7 }}>✓ podporuje nákup · ✗ podporuje prodej · — neutrální</div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div>
+                    <SectionLabel>SKÓRE PÁR — klikni pro Confluence detail</SectionLabel>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {PAIRS_LIST.map(({ pair, base, quote }) => {
+                        const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
+                        const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                        const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
+                        return (
+                          <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })} style={{ padding: "8px 10px", background: `${col}0a`, border: `1px solid ${col}33`, borderLeft: `3px solid ${col}`, borderRadius: 6, cursor: "pointer" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
+                              <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
+                            </div>
+                            <div style={{ marginBottom: 5 }}><ScoreBar score={score} height={4} /></div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 8, color: col, fontWeight: 700 }}>{direction}</span>
+                              <span style={{ fontSize: 8, color: C.muted }}>
+                                {base} {currencyTotals[base] > 0 ? "+" : ""}{currencyTotals[base]} / {quote} {currencyTotals[quote] > 0 ? "+" : ""}{currencyTotals[quote]}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {rightTab === "cb" && (
                 <div>
