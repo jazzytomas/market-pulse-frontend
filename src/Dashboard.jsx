@@ -426,42 +426,84 @@ export default function Dashboard() {
 
     <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, ...(isMobile ? {} : { flex: 1, minHeight: 0 }) }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? {} : { flex: 1, minHeight: 0 }) }}>
 
-        {/* Risk Sentiment – horizontal strip */}
-        <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", flexShrink: 0 }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 2 }}>RISK SENTIMENT</div>
-            <RiskMeter score={sentiment.total_score} />
-          </div>
-          {sentiment.vix != null && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "6px 14px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
-              <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1, marginBottom: 2 }}>VIX</span>
-              <span style={{ fontSize: 20, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
-              <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}</span>
-            </div>
-          )}
-          <div style={{ flex: 1, minWidth: 160, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
-            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>MĚNOVÝ PŘEHLED</div>
-            {[
-              { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
-              { label: "Neutral",  currencies: ["GBP", "EUR"] },
-              { label: "Risk OFF", currencies: ["USD", "JPY", "CHF"] },
-            ].map(group => (
-              <div key={group.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
-                <span style={{ fontSize: 9, color: C.textDim, width: 54, flexShrink: 0 }}>{group.label}</span>
-                <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                  {group.currencies.map(c => {
-                    const score = currencyTotals[c] || 0;
-                    const isDark = C.bg === "#0a0a12";
-                    const col = isDark ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow) : C.text;
-                    return <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>;
-                  })}
+        {/* LEFT – desktop sidebar */}
+        {!isMobile && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+              <SectionLabel center>RISK SENTIMENT</SectionLabel>
+              <RiskMeter score={sentiment.total_score} />
+              {sentiment.vix != null && (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 4, marginBottom: 2 }}>
+                  <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>VIX</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
+                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}</span>
                 </div>
+              )}
+              <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+                <SectionLabel>MENOVY PREHLED</SectionLabel>
+                {[
+                  { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
+                  { label: "Neutral",  currencies: ["GBP", "EUR"] },
+                  { label: "Risk OFF", currencies: ["USD", "JPY", "CHF"] },
+                ].map(group => (
+                  <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
+                    <span style={{ fontSize: 9, color: C.textDim, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
+                    <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+                      {group.currencies.map(c => {
+                        const score = currencyTotals[c] || 0;
+                        const isDark = C.bg === "#0a0a12";
+                        const col = isDark ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow) : C.text;
+                        return <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>;
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* RIGHT / mobile-full */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, ...(isMobile ? {} : { minHeight: 0 }) }}>
+
+        {/* Mobile: Risk Sentiment horizontal strip */}
+        {isMobile && (
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 2 }}>RISK SENTIMENT</div>
+              <RiskMeter score={sentiment.total_score} />
+            </div>
+            {sentiment.vix != null && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "6px 12px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+                <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1, marginBottom: 2 }}>VIX</span>
+                <span style={{ fontSize: 18, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
+                <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}</span>
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: 140, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+              <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>MĚNOVÝ PŘEHLED</div>
+              {[
+                { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
+                { label: "Neutral",  currencies: ["GBP", "EUR"] },
+                { label: "Risk OFF", currencies: ["USD", "JPY", "CHF"] },
+              ].map(group => (
+                <div key={group.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontSize: 9, color: C.textDim, width: 50, flexShrink: 0 }}>{group.label}</span>
+                  <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+                    {group.currencies.map(c => {
+                      const score = currencyTotals[c] || 0;
+                      const isDark = C.bg === "#0a0a12";
+                      const col = isDark ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow) : C.text;
+                      return <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>;
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
           {/* CENTER tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400 } : { flex: 1, minHeight: 0 }) }}>
@@ -1501,7 +1543,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-      </div>
+        </div>{/* end RIGHT column */}
+      </div>{/* end grid */}
 
       {/* Commodities – bottom strip */}
       <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", marginTop: 12, flexShrink: 0 }}>
