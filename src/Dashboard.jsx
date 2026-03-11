@@ -537,7 +537,7 @@ export default function Dashboard() {
         )}
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400 } : { flex: 1, minHeight: 0 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400, order: 2 } : { flex: 1, minHeight: 0 }) }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="⚡ Scenarios" active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label="📅 Events" active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -1121,7 +1121,7 @@ export default function Dashboard() {
           </div>
 
           {/* TOP SETUPS strip */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", flexShrink: 0 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", flexShrink: 0, ...(isMobile ? { order: 1 } : {}) }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, flexShrink: 0 }}>TOP SETUPY:</span>
               {topSetups.map(p => {
