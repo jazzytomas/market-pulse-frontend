@@ -1150,7 +1150,7 @@ export default function Dashboard() {
                     style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
                       background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0f`,
                       border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}44`,
-                      animation: isPerfect ? "pulseBlue 1.4s ease-in-out infinite" : "none" }}>
+                      animation: isPerfect ? "pulse 2s infinite" : "none" }}>
                     {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
                     <span style={{ fontSize: 10, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : C.text }}>{p.pair}</span>
                     <span style={{ fontSize: 9, color: col }}>{arrow}</span>
@@ -1511,7 +1511,7 @@ export default function Dashboard() {
                               background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0a`,
                               border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}33`,
                               borderLeft: `3px solid ${isPerfect ? PERFECT_BLUE : col}`, borderRadius: 6, cursor: "pointer",
-                              animation: isPerfect ? "pulseBlue 1.4s ease-in-out infinite" : "none" }}>
+                              animation: isPerfect ? "pulse 2s infinite" : "none" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                                 {isPerfect && <span style={{ fontSize: 10 }}>⚡</span>}
