@@ -663,45 +663,38 @@ export default function Dashboard() {
 
             {centerTab === "calendar" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {isAdmin && (
-                  <button onClick={() => fetch(`${API}/api/rescan_events`)} style={{
-                    background: `${C.accent}18`, border: `1px solid ${C.accent}`,
-                    color: C.accent, padding: "5px 10px", fontSize: 9,
-                    letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace", alignSelf: "flex-end",
-                  }}>⟳ RESCAN EVENTS</button>
-                )}
                 {(() => {
                   const now = new Date();
                   const todayStr = now.toDateString();
                   const sorted = [...events].sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
-                  let shownToday = false;
-                  let shownUpcoming = false;
+                  let shownPast = false, shownToday = false, shownUpcoming = false;
                   return sorted.map((ev, i) => {
                     const evDate = new Date(ev.event_time);
                     const isPast = evDate < now;
                     const isToday = evDate.toDateString() === todayStr;
+                    const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
+                    const hasActual = ev.actual && ev.actual.trim() !== "";
+                    const actualColor = (() => {
+                      if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
+                      const a = parseFloat(ev.actual); const f = parseFloat(ev.forecast);
+                      if (isNaN(a) || isNaN(f)) return C.text;
+                      return a > f ? C.green : a < f ? C.red : C.yellow;
+                    })();
+                    const fmtTime = (() => {
+                      try {
+                        const d = new Date(ev.event_time);
+                        if (isNaN(d)) return ev.event_time;
+                        const day = d.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" });
+                        const time = d.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
+                        return `${day} ${time}`;
+                      } catch { return ev.event_time; }
+                    })();
+                    const score = ev.score;
+                    const scoreColor = score == null ? null : score > 0 ? C.green : score < 0 ? C.red : C.yellow;
                     let sectionHeader = null;
-                    if (isToday && !shownToday) { shownToday = true; sectionHeader = "DNES"; }
+                    if (isPast && !isToday && !shownPast) { shownPast = true; sectionHeader = "PROBĚHLÉ"; }
+                    else if (isToday && !shownToday) { shownToday = true; sectionHeader = "DNES"; }
                     else if (!isToday && !isPast && !shownUpcoming) { shownUpcoming = true; sectionHeader = "NADCHÁZEJÍCÍ"; }
-                  const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
-                  const hasActual = ev.actual && ev.actual.trim() !== "";
-                  const actualColor = (() => {
-                    if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
-                    const a = parseFloat(ev.actual);
-                    const f = parseFloat(ev.forecast);
-                    if (isNaN(a) || isNaN(f)) return C.text;
-                    return a > f ? C.green : a < f ? C.red : C.yellow;
-                  })();
-                  const fmtTime = (() => {
-                    try {
-                      const d = new Date(ev.event_time);
-                      if (isNaN(d)) return ev.event_time;
-                      const day = d.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" });
-                      const time = d.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
-                      return `${day} ${time}`;
-                    } catch { return ev.event_time; }
-                  })();
-                  return (
                     return (
                       <React.Fragment key={i}>
                         {sectionHeader && (
@@ -716,7 +709,14 @@ export default function Dashboard() {
                               <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
                               <span style={{ fontSize: 8, color: isPast ? C.muted : col, border: `1px solid ${isPast ? C.muted : col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
                             </div>
-                            <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{fmtTime}</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              {score != null && (
+                                <span style={{ fontSize: 8, fontWeight: 700, color: scoreColor, border: `1px solid ${scoreColor}55`, padding: "1px 6px", borderRadius: 3 }}>
+                                  {score > 0 ? "+" : ""}{score}
+                                </span>
+                              )}
+                              <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{fmtTime}</span>
+                            </div>
                           </div>
                           <div style={{ display: "flex", gap: 14 }}>
                             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
