@@ -1145,6 +1145,7 @@ export default function Dashboard() {
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
                 const isPerfect = p.biasCount === 5;
                 const PERFECT_BLUE = "#1864dc";
+                const isDark = C.bg === "#0a0a12";
                 return (
                   <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
                     style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
@@ -1152,9 +1153,9 @@ export default function Dashboard() {
                       border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}44`,
                       animation: isPerfect ? "pulse 2s infinite" : "none" }}>
                     {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
-                    <span style={{ fontSize: 10, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : C.text }}>{p.pair}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text }}>{p.pair}</span>
                     <span style={{ fontSize: 9, color: col }}>{arrow}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : col }}>{p.biasCount}/5</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col }}>{p.biasCount}/5</span>
                   </div>
                 );
               })}
@@ -1496,6 +1497,7 @@ export default function Dashboard() {
                 }
 
                 const PERFECT_BLUE = "#1864dc";
+                const isDark = C.bg === "#0a0a12";
                 return (
                   <div>
                     <SectionLabel>SKÓRE PÁR — klikni pro Confluence detail</SectionLabel>
@@ -1505,6 +1507,8 @@ export default function Dashboard() {
                         const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
                         const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
                         const isPerfect = biasCount === 5;
+                        const perfectText = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text;
+                        const perfectScore = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col;
                         return (
                           <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
                             style={{ padding: "8px 10px",
@@ -1515,10 +1519,10 @@ export default function Dashboard() {
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                                 {isPerfect && <span style={{ fontSize: 10 }}>⚡</span>}
-                                <span style={{ fontSize: 11, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : C.text }}>{pair}</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: perfectText }}>{pair}</span>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                <span style={{ fontSize: 8, color: isPerfect ? PERFECT_BLUE : col, fontWeight: 700 }}>{biasCount}/5</span>
+                                <span style={{ fontSize: 8, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
                                 <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
                               </div>
                             </div>
