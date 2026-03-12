@@ -316,20 +316,20 @@ export default function Dashboard() {
     const highScenarios = scenarios.filter(s => s.weight === "HIGH");
     const allText = highScenarios.map(s => (s.title + " " + (s.summary || "")).toLowerCase()).join(" ");
     if (["iran","war","conflict","missile","attack","military","sanction","nato","nuclear","troops","strike","invasion","blockade","hormuz","weapon"].some(kw => allText.includes(kw)))
-      labels.push({ label: "GEOPOLITICAL SHOCK", color: "#e74c3c" });
+      labels.push({ label: "GEOPOLITICKÝ ŠOK", color: "#e74c3c" });
     if (["inflation"," cpi"," ppi","stagflat","price surge","price shock","overheating"].some(kw => allText.includes(kw)))
-      labels.push({ label: "INFLATIONARY SHOCK", color: "#e67e22" });
+      labels.push({ label: "INFLAČNÍ ŠOK", color: "#e67e22" });
     if (["supply chain","shortage","embargo","export ban","port clos","supply shock","mines in strait"].some(kw => allText.includes(kw)))
-      labels.push({ label: "SUPPLY SHOCK", color: "#9b59b6" });
+      labels.push({ label: "NABÍDKOVÝ ŠOK", color: "#9b59b6" });
     if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
-      labels.push({ label: "TRADE WAR", color: "#f39c12" });
+      labels.push({ label: "OBCHODNÍ VÁLKA", color: "#1abc9c" });
     const wti = commodities.find(c => c.name && c.name.toLowerCase().includes("wti"));
     if (wti && wti.change && wti.price) {
       const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
       const prev = priceNum - wti.change;
       const pct = prev !== 0 ? (wti.change / prev) * 100 : 0;
-      if (pct > 3) labels.push({ label: "OIL SPIKE", color: "#e74c3c" });
-      else if (pct < -3) labels.push({ label: "OIL CRASH", color: "#2ecc71" });
+      if (pct > 3) labels.push({ label: "ROPNÝ SKOK", color: "#f1c40f" });
+      else if (pct < -3) labels.push({ label: "PÁD ROPY", color: "#2ecc71" });
     }
     return labels;
   }, [scenarios, commodities]);
