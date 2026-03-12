@@ -571,7 +571,7 @@ export default function Dashboard() {
                   const newest10 = sorted.slice(0, 10);
                   const older10 = sorted.slice(10, 20);
                   const list = scenarioFilter === "STARŠÍ"
-                    ? older10
+                    ? older10.filter(s => s.weight === "HIGH")
                     : newest10.filter(s => s.weight === scenarioFilter);
                   return list.map(s => {
                     const isExp = expandedScenario === s.id;
