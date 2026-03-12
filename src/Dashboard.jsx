@@ -1144,16 +1144,17 @@ export default function Dashboard() {
                 const col = p.biasDir === "long" ? C.green : p.biasDir === "short" ? C.red : C.yellow;
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
                 const isPerfect = p.biasCount === 5;
+                const PERFECT_BLUE = "#1864dc";
                 return (
                   <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
                     style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
-                      background: isPerfect ? `${C.accent}22` : `${col}0f`,
-                      border: isPerfect ? `1px solid ${C.accent}` : `1px solid ${col}44`,
-                      animation: isPerfect ? "pulse 2s infinite" : "none" }}>
+                      background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0f`,
+                      border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}44`,
+                      animation: isPerfect ? "pulseBlue 1.4s ease-in-out infinite" : "none" }}>
                     {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
-                    <span style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{p.pair}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : C.text }}>{p.pair}</span>
                     <span style={{ fontSize: 9, color: col }}>{arrow}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: col }}>{p.biasCount}/5</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : col }}>{p.biasCount}/5</span>
                   </div>
                 );
               })}
@@ -1494,6 +1495,7 @@ export default function Dashboard() {
                   );
                 }
 
+                const PERFECT_BLUE = "#1864dc";
                 return (
                   <div>
                     <SectionLabel>SKÓRE PÁR — klikni pro Confluence detail</SectionLabel>
@@ -1505,17 +1507,18 @@ export default function Dashboard() {
                         const isPerfect = biasCount === 5;
                         return (
                           <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
-                            style={{ padding: "8px 10px", background: isPerfect ? `${C.accent}15` : `${col}0a`,
-                              border: isPerfect ? `1px solid ${C.accent}` : `1px solid ${col}33`,
-                              borderLeft: `3px solid ${isPerfect ? C.accent : col}`, borderRadius: 6, cursor: "pointer",
-                              animation: isPerfect ? "pulse 2s infinite" : "none" }}>
+                            style={{ padding: "8px 10px",
+                              background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0a`,
+                              border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}33`,
+                              borderLeft: `3px solid ${isPerfect ? PERFECT_BLUE : col}`, borderRadius: 6, cursor: "pointer",
+                              animation: isPerfect ? "pulseBlue 1.4s ease-in-out infinite" : "none" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                                 {isPerfect && <span style={{ fontSize: 10 }}>⚡</span>}
-                                <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair}</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: isPerfect ? PERFECT_BLUE : C.text }}>{pair}</span>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                <span style={{ fontSize: 8, color: isPerfect ? C.accent : col, fontWeight: 700 }}>{biasCount}/5</span>
+                                <span style={{ fontSize: 8, color: isPerfect ? PERFECT_BLUE : col, fontWeight: 700 }}>{biasCount}/5</span>
                                 <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
                               </div>
                             </div>
