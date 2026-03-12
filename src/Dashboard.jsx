@@ -555,25 +555,25 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
-                  {["HIGH", "MED"].map(f => (
+                  {["HIGH", "MED", "STARŠÍ"].map(f => (
                     <button key={f} onClick={() => setScenarioFilter(f)} style={{
                       fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f ? 700 : 400,
-                      background: scenarioFilter === f ? C.accent : C.border,
-                      color: scenarioFilter === f ? "#000" : C.textDim,
-                      border: `1px solid ${scenarioFilter === f ? C.accent : C.border}`
+                      background: scenarioFilter === f ? (f === "STARŠÍ" ? C.border : C.accent) : C.border,
+                      color: scenarioFilter === f ? (f === "STARŠÍ" ? C.textDim : "#000") : C.textDim,
+                      border: `1px solid ${scenarioFilter === f ? (f === "STARŠÍ" ? C.textDim : C.accent) : C.border}`
                     }}>{f}</button>
                   ))}
                   <span style={{ fontSize: 9, color: C.textDim, alignSelf: "center", marginLeft: 4 }}>Klikni pro detail ▼</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {[...scenarios]
-                  .filter(s => s.weight === scenarioFilter)
-                  .sort((a, b) => {
-                    const w = { HIGH: 3, MED: 2, LOW: 1 };
-                    if (w[b.weight] !== w[a.weight]) return w[b.weight] - w[a.weight];
-                    return Math.abs(b.risk_score) - Math.abs(a.risk_score);
-                  })
-                  .map(s => {
+                {(() => {
+                  const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                  const newest10 = sorted.slice(0, 10);
+                  const older10 = sorted.slice(10, 20);
+                  const list = scenarioFilter === "STARŠÍ"
+                    ? older10
+                    : newest10.filter(s => s.weight === scenarioFilter);
+                  return list.map(s => {
                     const isExp = expandedScenario === s.id;
                     const isMed = s.weight === "MED";
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
@@ -621,7 +621,8 @@ export default function Dashboard() {
                         )}
                       </div>
                     );
-                  })}
+                  });
+                })()}
                 </div>
               </div>
             )}
