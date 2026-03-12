@@ -670,7 +670,19 @@ export default function Dashboard() {
                     letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace", alignSelf: "flex-end",
                   }}>⟳ RESCAN EVENTS</button>
                 )}
-                {events.map((ev, i) => {
+                {(() => {
+                  const now = new Date();
+                  const todayStr = now.toDateString();
+                  const sorted = [...events].sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
+                  let shownToday = false;
+                  let shownUpcoming = false;
+                  return sorted.map((ev, i) => {
+                    const evDate = new Date(ev.event_time);
+                    const isPast = evDate < now;
+                    const isToday = evDate.toDateString() === todayStr;
+                    let sectionHeader = null;
+                    if (isToday && !shownToday) { shownToday = true; sectionHeader = "DNES"; }
+                    else if (!isToday && !isPast && !shownUpcoming) { shownUpcoming = true; sectionHeader = "NADCHÁZEJÍCÍ"; }
                   const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
                   const hasActual = ev.actual && ev.actual.trim() !== "";
                   const actualColor = (() => {
@@ -690,32 +702,41 @@ export default function Dashboard() {
                     } catch { return ev.event_time; }
                   })();
                   return (
-                    <div key={i} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6, padding: "10px 12px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                          <span style={{ width: 7, height: 7, borderRadius: "50%", background: col, display: "inline-block" }} />
-                          <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
-                          <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
+                    return (
+                      <React.Fragment key={i}>
+                        {sectionHeader && (
+                          <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, color: C.accent, borderBottom: `1px solid ${C.border}`, paddingBottom: 4, marginTop: i > 0 ? 8 : 0 }}>
+                            {sectionHeader}
+                          </div>
+                        )}
+                        <div style={{ border: `1px solid ${isPast ? C.border : col + "55"}`, borderLeft: `3px solid ${isPast ? C.muted : col}`, borderRadius: 6, padding: "10px 12px", opacity: isPast ? 0.45 : 1 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                              <span style={{ width: 7, height: 7, borderRadius: "50%", background: isPast ? C.muted : col, display: "inline-block" }} />
+                              <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
+                              <span style={{ fontSize: 8, color: isPast ? C.muted : col, border: `1px solid ${isPast ? C.muted : col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
+                            </div>
+                            <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{fmtTime}</span>
+                          </div>
+                          <div style={{ display: "flex", gap: 14 }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
+                              <span style={{ fontSize: 10, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>ACTUAL</span>
+                              <span style={{ fontSize: 10, fontWeight: hasActual ? 700 : 400, color: hasActual ? actualColor : C.muted }}>{hasActual ? ev.actual : "—"}</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
+                              <span style={{ fontSize: 10, color: C.muted }}>{ev.previous && ev.previous.trim() ? ev.previous : "—"}</span>
+                            </div>
+                          </div>
                         </div>
-                        <span style={{ fontSize: 10, color: C.accent }}>{fmtTime}</span>
-                      </div>
-                      <div style={{ display: "flex", gap: 14 }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
-                          <span style={{ fontSize: 10, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>ACTUAL</span>
-                          <span style={{ fontSize: 10, fontWeight: hasActual ? 700 : 400, color: hasActual ? actualColor : C.muted }}>{hasActual ? ev.actual : "—"}</span>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
-                          <span style={{ fontSize: 10, color: C.muted }}>{ev.previous && ev.previous.trim() ? ev.previous : "—"}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      </React.Fragment>
+                    );
+                  });
+                })()}
                 <div style={{ marginTop: 8, borderTop: `1px solid ${C.border}`, paddingTop: 12 }}>
                   <SectionLabel>VOLATILITA OKEN (EST)</SectionLabel>
                   {volWindows.map((w, i) => (
