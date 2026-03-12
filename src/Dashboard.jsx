@@ -604,9 +604,12 @@ export default function Dashboard() {
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                   const newest10 = sorted.slice(0, 10);
                   const older10 = sorted.slice(10, 20);
+                  // HIGH tab: zobraz všechna HIGH ze všech 20, ne jen z prvních 10
                   const list = scenarioFilter === "STARŠÍ"
                     ? older10.filter(s => s.weight === "HIGH")
-                    : newest10.filter(s => s.weight === scenarioFilter);
+                    : scenarioFilter === "HIGH"
+                      ? sorted.filter(s => s.weight === "HIGH")
+                      : newest10.filter(s => s.weight === scenarioFilter);
                   return list.map(s => {
                     const isExp = expandedScenario === s.id;
                     const isMed = s.weight === "MED";
