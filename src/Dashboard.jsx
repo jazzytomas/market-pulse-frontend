@@ -628,6 +628,13 @@ export default function Dashboard() {
 
             {centerTab === "calendar" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {isAdmin && (
+                  <button onClick={() => fetch(`${API}/api/rescan_events`)} style={{
+                    background: `${C.accent}18`, border: `1px solid ${C.accent}`,
+                    color: C.accent, padding: "5px 10px", fontSize: 9,
+                    letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace", alignSelf: "flex-end",
+                  }}>⟳ RESCAN EVENTS</button>
+                )}
                 {events.map((ev, i) => {
                   const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
                   const hasActual = ev.actual && ev.actual.trim() !== "";
@@ -638,6 +645,15 @@ export default function Dashboard() {
                     if (isNaN(a) || isNaN(f)) return C.text;
                     return a > f ? C.green : a < f ? C.red : C.yellow;
                   })();
+                  const fmtTime = (() => {
+                    try {
+                      const d = new Date(ev.event_time);
+                      if (isNaN(d)) return ev.event_time;
+                      const day = d.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" });
+                      const time = d.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
+                      return `${day} ${time}`;
+                    } catch { return ev.event_time; }
+                  })();
                   return (
                     <div key={i} style={{ border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6, padding: "10px 12px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -646,7 +662,7 @@ export default function Dashboard() {
                           <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
                           <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
                         </div>
-                        <span style={{ fontSize: 10, color: C.accent }}>{ev.date || ev.event_time}</span>
+                        <span style={{ fontSize: 10, color: C.accent }}>{fmtTime}</span>
                       </div>
                       <div style={{ display: "flex", gap: 14 }}>
                         <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
