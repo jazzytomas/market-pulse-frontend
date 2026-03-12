@@ -290,7 +290,7 @@ export default function Dashboard() {
 
   const runScan = () => {
     setScanning(true);
-    fetch(`${API}/api/rescan`).catch(() => {});
+    fetch(`${API}/api/rescan?token=mp-admin-2026`).catch(() => {});
     // Odpočet viditelný pro uživatele
     let secs = 40;
     setScanCountdown(secs);
