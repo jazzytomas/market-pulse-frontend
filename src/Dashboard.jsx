@@ -318,11 +318,11 @@ export default function Dashboard() {
     if (["iran","war","conflict","missile","attack","military","sanction","nato","nuclear","troops","strike","invasion","blockade","hormuz","weapon"].some(kw => allText.includes(kw)))
       labels.push({ label: "GEOPOLITICKÝ ŠOK", color: "#e74c3c" });
     if (["inflation"," cpi"," ppi","stagflat","price surge","price shock","overheating"].some(kw => allText.includes(kw)))
-      labels.push({ label: "INFLAČNÍ ŠOK", color: "#e67e22" });
+      labels.push({ label: "INFLAČNÍ ŠOK", color: "#1abc9c" });
     if (["supply chain","shortage","embargo","export ban","port clos","supply shock","mines in strait"].some(kw => allText.includes(kw)))
       labels.push({ label: "NABÍDKOVÝ ŠOK", color: "#9b59b6" });
     if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
-      labels.push({ label: "OBCHODNÍ VÁLKA", color: "#1abc9c" });
+      labels.push({ label: "OBCHODNÍ VÁLKA", color: "#e67e22" });
     const wti = commodities.find(c => c.name && c.name.toLowerCase().includes("wti"));
     if (wti && wti.change && wti.price) {
       const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
