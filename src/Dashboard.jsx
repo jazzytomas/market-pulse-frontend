@@ -311,6 +311,29 @@ export default function Dashboard() {
   const riskColor = sentiment.total_score > NEUTRAL_THRESHOLD ? C.green : sentiment.total_score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   const riskLabel = sentiment.total_score > NEUTRAL_THRESHOLD ? "RISK ON" : sentiment.total_score < -NEUTRAL_THRESHOLD ? "RISK OFF" : "NEUTRAL";
 
+  const shockLabels = React.useMemo(() => {
+    const labels = [];
+    const highScenarios = scenarios.filter(s => s.weight === "HIGH");
+    const allText = highScenarios.map(s => (s.title + " " + (s.summary || "")).toLowerCase()).join(" ");
+    if (["iran","war","conflict","missile","attack","military","sanction","nato","nuclear","troops","strike","invasion","blockade","hormuz","weapon"].some(kw => allText.includes(kw)))
+      labels.push({ label: "GEOPOLITICAL SHOCK", color: "#e74c3c" });
+    if (["inflation"," cpi"," ppi","stagflat","price surge","price shock","overheating"].some(kw => allText.includes(kw)))
+      labels.push({ label: "INFLATIONARY SHOCK", color: "#e67e22" });
+    if (["supply chain","shortage","embargo","export ban","port clos","supply shock","mines in strait"].some(kw => allText.includes(kw)))
+      labels.push({ label: "SUPPLY SHOCK", color: "#9b59b6" });
+    if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
+      labels.push({ label: "TRADE WAR", color: "#f39c12" });
+    const wti = commodities.find(c => c.name && c.name.toLowerCase().includes("wti"));
+    if (wti && wti.change && wti.price) {
+      const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
+      const prev = priceNum - wti.change;
+      const pct = prev !== 0 ? (wti.change / prev) * 100 : 0;
+      if (pct > 3) labels.push({ label: "OIL SPIKE", color: "#e74c3c" });
+      else if (pct < -3) labels.push({ label: "OIL CRASH", color: "#2ecc71" });
+    }
+    return labels;
+  }, [scenarios, commodities]);
+
   const RISK_CHAR_GLOBAL = {
     AUD: "risk_on", NZD: "risk_on", CAD: "risk_on",
     EUR: "neutral", GBP: "neutral",
@@ -396,6 +419,17 @@ export default function Dashboard() {
         <div>
           <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent }}>◈ MARKET PULSE</div>
           <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 2 }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
+          {shockLabels.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 5 }}>
+              {shockLabels.map(({ label, color }) => (
+                <span key={label} style={{
+                  fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                  color: color, border: `1px solid ${color}`, borderRadius: 3,
+                  padding: "2px 6px", background: `${color}18`
+                }}>{label}</span>
+              ))}
+            </div>
+          )}
           {isAdmin && (
             <div style={{ fontSize: 9, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, marginTop: 4 }}>
               Backend: <b>{backendStatus}</b>
