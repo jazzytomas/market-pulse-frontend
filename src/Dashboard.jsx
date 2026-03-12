@@ -448,6 +448,14 @@ export default function Dashboard() {
                 color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
                 letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
               }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
+              <button onClick={async () => {
+                await fetch(`${API}/api/seed_scenarios`, { method: "POST" });
+                setTimeout(() => window.location.reload(), 15000);
+              }} style={{
+                background: "#1abc9c18", border: "1px solid #1abc9c55",
+                color: "#1abc9c", padding: "6px 12px", fontSize: 9,
+                letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
+              }}>⬇ SEED</button>
             </>
           )}
           <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{
