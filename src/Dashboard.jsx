@@ -485,12 +485,9 @@ export default function Dashboard() {
                   <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
                     <span style={{ fontSize: 9, color: C.textDim, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                      {group.currencies.map(c => {
-                        const score = currencyTotals[c] || 0;
-                        const isDark = C.bg === "#0a0a12";
-                        const col = isDark ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow) : C.text;
-                        return <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>;
-                      })}
+                      {group.currencies.map(c => (
+                        <span key={c} style={{ fontSize: 9, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -556,12 +553,9 @@ export default function Dashboard() {
                   <div key={group.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <span style={{ fontSize: 9, color: C.textDim, width: 50, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                      {group.currencies.map(c => {
-                        const score = currencyTotals[c] || 0;
-                        const isDark = C.bg === "#0a0a12";
-                        const col = isDark ? (score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow) : C.text;
-                        return <span key={c} style={{ fontSize: 9, color: col, border: `1px solid ${col}55`, background: `${col}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>;
-                      })}
+                      {group.currencies.map(c => (
+                        <span key={c} style={{ fontSize: 9, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
+                      ))}
                     </div>
                   </div>
                 ))}
