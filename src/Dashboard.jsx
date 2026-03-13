@@ -168,7 +168,7 @@ export default function Dashboard() {
   const [correlationData, setCorrelationData] = useState(null);
   const [backtestData, setBacktestData] = useState(null);
   const [fearGreedData, setFearGreedData] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") === "dark");
   const [winW, setWinW] = useState(window.innerWidth);
 
   useEffect(() => {
@@ -450,7 +450,7 @@ export default function Dashboard() {
               }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
             </>
           )}
-          <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{
+          <button onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem("mp_theme", next ? "dark" : "light"); }} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
             color: C.textDim, padding: "6px 9px", fontSize: 14,
             cursor: "pointer", borderRadius: 4, lineHeight: 1,
