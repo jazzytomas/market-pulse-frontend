@@ -119,10 +119,10 @@ function RiskMeter({ score }) {
         <text x="152" y="108" fill={GD} fontSize="7" fontFamily="monospace" textAnchor="middle">risk on</text>
       </svg>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 26, fontWeight: 900, color: G, fontFamily: "monospace", filter: `drop-shadow(0 0 8px ${G})` }}>
+        <div style={{ fontSize: 26, fontWeight: 900, color: G, fontFamily: "Orbitron, monospace", filter: `drop-shadow(0 0 8px ${G})` }}>
           {clamp > 0 ? "+" : ""}{clamp}
         </div>
-        <div style={{ fontSize: 10, letterSpacing: 4, color: G }}>{label}</div>
+        <div style={{ fontSize: 10, letterSpacing: 4, color: G, fontFamily: "Orbitron, monospace" }}>{label}</div>
       </div>
     </div>
   );
@@ -137,7 +137,7 @@ function TabBtn({ label, active, onClick }) {
       borderBottom: active ? `2px solid ${C.accent}` : "2px solid transparent",
       color: active ? C.accent : C.textDim,
       padding: "4px 10px 8px", fontSize: 9, letterSpacing: 0.8,
-      cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400,
+      cursor: "pointer", fontFamily: "Orbitron, monospace", fontWeight: active ? 700 : 400,
       textTransform: "uppercase", whiteSpace: "nowrap",
       borderRadius: "4px 4px 0 0", transition: "color 0.15s, background 0.15s",
     }}>{label}</button>
@@ -146,7 +146,7 @@ function TabBtn({ label, active, onClick }) {
 
 function SectionLabel({ children, center }) {
   const C = React.useContext(ThemeContext);
-  return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left" }}>{children}</div>;
+  return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "Orbitron, monospace" }}>{children}</div>;
 }
 
 export default function Dashboard() {
@@ -417,13 +417,13 @@ export default function Dashboard() {
 
   return (
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "monospace" }}>
+    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "inherit" }}>
 
       {/* Header – full width */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent }}>◈ MARKET PULSE</div>
-          <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 2 }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
+          <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent, fontFamily: "Orbitron, monospace" }}>◈ MARKET PULSE</div>
+          <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>AI FUNDAMENTAL SENTIMENT ENGINE</div>
           {shockLabels.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 5 }}>
               {shockLabels.map(({ label, color }) => (
@@ -451,7 +451,7 @@ export default function Dashboard() {
               <button onClick={runScan} disabled={scanning} style={{
                 background: `${C.accent}18`, border: `1px solid ${scanning ? C.muted : C.accent}`,
                 color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
-                letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "monospace",
+                letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "Orbitron, monospace",
               }}>{scanning ? `◌ ${scanCountdown}s...` : "⟳ RESCAN"}</button>
             </>
           )}
