@@ -578,7 +578,7 @@ export default function Dashboard() {
           <button onClick={() => { const next = lang === "cz" ? "en" : "cz"; setLang(next); localStorage.setItem("mp_lang", next); }} title={lang === "cz" ? "Switch to English" : "Přepnout do češtiny"} style={{
             background: "none", border: `1px solid ${C.border}`,
             padding: "2px 6px", fontSize: 18, cursor: "pointer", borderRadius: 4, lineHeight: 1,
-          }}>{lang === "cz" ? "🇬🇧" : "🇨🇿"}</button>
+          }}>{lang === "cz" ? "🇺🇸" : "🇨🇿"}</button>
           <button onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem("mp_theme", next ? "dark" : "light"); }} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
             color: C.textDim, padding: "6px 9px", fontSize: 14,
