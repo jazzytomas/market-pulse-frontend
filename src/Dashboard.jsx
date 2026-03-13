@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 
 const LIGHT = {
-  bg: "#f0f4f8", panel: "#ffffff", border: "#d1dce8",
-  accent: "#0077cc", green: "#00914d", red: "#d93025",
-  yellow: "#c17f00", orange: "#c85a00", muted: "#9ab0c4",
-  text: "#1a2733", textDim: "#5a7a94",
+  bg: "#f1f5f9", panel: "#ffffff", border: "#e2e8f0",
+  accent: "#2563eb", green: "#059669", red: "#dc2626",
+  yellow: "#d97706", orange: "#ea580c", muted: "#94a3b8",
+  text: "#0f172a", textDim: "#64748b",
+  shadow: "0 2px 12px rgba(15,23,42,0.08)",
 };
 
 const DARK = {
-  bg: "#0a0a12", panel: "#11111f", border: "#2e2060",
-  accent: "#c9a227", green: "#00d49e", red: "#ff4d6a",
-  yellow: "#c9a227", orange: "#ff8c42", muted: "#6b5fa0",
-  text: "#ede6ff", textDim: "#a094cc",
+  bg: "#080812", panel: "#0f0f22", border: "#2a1d6e",
+  accent: "#c9a227", green: "#00e5a8", red: "#ff3d5e",
+  yellow: "#c9a227", orange: "#ff8c42", muted: "#5a4f8a",
+  text: "#f0eaff", textDim: "#9080c4",
+  shadow: "0 2px 16px rgba(0,0,0,0.5)",
 };
 
 const ThemeContext = React.createContext(LIGHT);
@@ -130,11 +132,14 @@ function TabBtn({ label, active, onClick }) {
   const C = React.useContext(ThemeContext);
   return (
     <button onClick={onClick} style={{
-      background: "none", border: "none",
+      background: active ? `${C.accent}18` : "none",
+      border: "none",
       borderBottom: active ? `2px solid ${C.accent}` : "2px solid transparent",
       color: active ? C.accent : C.textDim,
-      padding: "0 10px 8px", fontSize: 9, letterSpacing: 1,
-      cursor: "pointer", fontFamily: "monospace", textTransform: "uppercase", whiteSpace: "nowrap",
+      padding: "4px 10px 8px", fontSize: 9, letterSpacing: 0.8,
+      cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400,
+      textTransform: "uppercase", whiteSpace: "nowrap",
+      borderRadius: "4px 4px 0 0", transition: "color 0.15s, background 0.15s",
     }}>{label}</button>
   );
 }
@@ -465,7 +470,7 @@ export default function Dashboard() {
         {/* LEFT – desktop sidebar */}
         {!isMobile && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
-            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14 }}>
               <SectionLabel center>RISK SENTIMENT</SectionLabel>
               <RiskMeter score={sentiment.total_score} />
               {sentiment.vix != null && (
@@ -475,7 +480,7 @@ export default function Dashboard() {
                   <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}</span>
                 </div>
               )}
-              <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+              <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                 <SectionLabel>MENOVY PREHLED</SectionLabel>
                 {[
                   { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
@@ -494,7 +499,7 @@ export default function Dashboard() {
               </div>
             </div>
             {/* Commodities – back in desktop sidebar */}
-            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
               <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 3 }}>KOMODITY</div>
               <div style={{ fontSize: 7, color: C.muted, marginBottom: 8 }}>měny = korelované &nbsp;·&nbsp; dnes = signál</div>
               {commodities.length === 0 ? (
@@ -528,7 +533,7 @@ export default function Dashboard() {
 
         {/* Mobile: Risk Sentiment strip – gauge vlevo, VIX nahoře + měny dole vpravo */}
         {isMobile && (
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "stretch", gap: 12 }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 14px", display: "flex", alignItems: "stretch", gap: 12 }}>
             {/* Levý sloupec: gauge */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 2 }}>RISK SENTIMENT</div>
@@ -537,13 +542,13 @@ export default function Dashboard() {
             {/* Pravý sloupec: VIX nahoře, měny dole */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
               {sentiment.vix != null && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                   <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1 }}>VIX</span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
                   <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? "▲ strach" : sentiment.vix < 15 ? "▼ klid" : "— neutral"}</span>
                 </div>
               )}
-              <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+              <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                 <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 5 }}>MĚNOVÝ PŘEHLED</div>
                 {[
                   { label: "Risk ON",  currencies: ["AUD", "NZD", "CAD"] },
@@ -565,7 +570,7 @@ export default function Dashboard() {
         )}
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400, order: 2 } : { flex: 1, minHeight: 0 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400, order: 2 } : { flex: 1, minHeight: 0 }) }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="⚡ Scenarios" active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label="📅 Events" active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -995,7 +1000,7 @@ export default function Dashboard() {
                     <FGGauge label="AKCIE (S&P 500)" icon="📈" data={fearGreedData?.stocks} />
                     <FGGauge label="KRYPTO" icon="₿" data={fearGreedData?.crypto} />
                   </div>
-                  <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
                       {[["0–20","Extreme Fear",C.red],["21–40","Fear",C.orange],["41–60","Neutral",C.yellow],["61–80","Greed","#7ec850"],["81–100","Extreme Greed",C.green]].map(([range, lbl, col]) => (
                         <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -1190,7 +1195,7 @@ export default function Dashboard() {
           </div>
 
           {/* TOP SETUPS strip */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", flexShrink: 0, ...(isMobile ? { order: 1 } : {}) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "8px 12px", flexShrink: 0, ...(isMobile ? { order: 1 } : {}) }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, flexShrink: 0 }}>TOP SETUPY:</span>
               {topSetups.map(p => {
@@ -1216,7 +1221,7 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 300 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 300 }) }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label="Pary" active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label="Status" active={rightTab === "status"} onClick={() => setRightTab("status")} />
@@ -1229,7 +1234,7 @@ export default function Dashboard() {
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <div style={{ background: `${riskColor}12`, border: `1px solid ${riskColor}44`, borderRadius: 8, padding: 14 }}>
+                  <div style={{ background: `${riskColor}12`, border: `1px solid ${riskColor}44`, borderRadius: 12, padding: 14 }}>
                     <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 8 }}>CURRENT STATE</div>
                     <div style={{ fontSize: 18, fontWeight: 900, color: riskColor, letterSpacing: 3 }}>{riskLabel}</div>
                     <div style={{ fontSize: 9, color: C.textDim, marginTop: 8, lineHeight: 1.6 }}>
@@ -1238,7 +1243,7 @@ export default function Dashboard() {
                         : "Smisene signaly. Cekej na potvrzeni."}
                     </div>
                   </div>
-                  <div style={{ background: `${C.red}08`, border: `1px solid ${C.red}33`, borderRadius: 8, padding: 12 }}>
+                  <div style={{ background: `${C.red}08`, border: `1px solid ${C.red}33`, borderRadius: 12, padding: 12 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                       <div style={{ fontSize: 9, letterSpacing: 2, color: C.red }}>⚠ RISK EVENTS</div>
                       <div style={{ fontSize: 8, color: C.textDim, background: C.border, padding: "2px 6px", borderRadius: 3 }}>pristich 48h</div>
@@ -1654,7 +1659,7 @@ export default function Dashboard() {
       </div>{/* end grid */}
 
       {/* Commodities – bottom strip (mobile only; desktop shows them in sidebar) */}
-      {isMobile && <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", marginTop: 12, flexShrink: 0 }}>
+      {isMobile && <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "8px 12px", marginTop: 12, flexShrink: 0 }}>
         <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 6 }}>KOMODITY</div>
         {commodities.length === 0 ? (
           <div style={{ fontSize: 9, color: C.muted }}>Načítám...</div>
