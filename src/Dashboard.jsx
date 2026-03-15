@@ -540,7 +540,8 @@ export default function Dashboard() {
     <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "inherit" }}>
 
       {/* Header – full width */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+      <div style={{ borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", maxWidth: 1520, margin: "0 auto", boxSizing: "border-box" }}>
         <div>
           {(() => {
             const dk = C.bg === "#080812";
@@ -601,6 +602,7 @@ export default function Dashboard() {
             cursor: "pointer", borderRadius: 4, lineHeight: 1,
           }}>{darkMode ? "☀️" : "🌙"}</button>
         </div>
+      </div>
       </div>
 
     <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh", overflowX: "hidden", width: "100%" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
