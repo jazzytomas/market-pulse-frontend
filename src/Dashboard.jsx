@@ -551,7 +551,7 @@ export default function Dashboard() {
             const accentC = dk ? gold : "#2563eb";
             return (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img src={dk ? "/logo.png" : "/logo-light.png"} alt="markeTrade" style={{ height: 38, objectFit: "contain" }} />
+              <img src={dk ? "/logo.svg" : "/logo-light.svg"} alt="markeTrade" style={{ height: 42, objectFit: "contain" }} />
               <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>
             </div>
             );
