@@ -43,7 +43,7 @@ const T = {
   tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST" },
   // Section labels
   riskSentiment:   { cz: "RISK SENTIMENT", en: "RISK SENTIMENT" },
-  menovy:          { cz: "MENOVY PREHLED", en: "CURRENCY OVERVIEW" },
+  menovy:          { cz: "MĚNOVÝ PŘEHLED", en: "CURRENCY OVERVIEW" },
   komodity:        { cz: "KOMODITY", en: "COMMODITIES" },
   riskOn:          { cz: "Risk ON", en: "Risk ON" },
   riskOff:         { cz: "Risk OFF", en: "Risk OFF" },
@@ -691,7 +691,7 @@ export default function Dashboard() {
                 </div>
               )}
               <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
-                <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 5 }}>{t("menovy")}</div>
+                <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 5, fontFamily: "'Space Grotesk', sans-serif" }}>{t("menovy")}</div>
                 {[
                   { label: t("riskOn"),  currencies: ["AUD", "NZD", "CAD"] },
                   { label: t("neutral"),  currencies: ["GBP", "EUR"] },
