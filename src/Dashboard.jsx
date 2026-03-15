@@ -769,7 +769,7 @@ export default function Dashboard() {
                               <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
                           </div>
-                          <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{s.summary}</div>
+                          <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{lang === "cz" && s.summary_cz ? s.summary_cz : s.summary}</div>
                           {!isMed && <ScoreBar score={rScore} />}
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
                             <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
