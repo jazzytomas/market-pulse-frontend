@@ -551,13 +551,8 @@ export default function Dashboard() {
             const accentC = dk ? gold : "#2563eb";
             return (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ fontFamily: "Orbitron, monospace", lineHeight: 1.1 }}>
-                <div style={{ fontSize: 6.5, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
-                <div style={{ fontSize: 20, letterSpacing: 0.5 }}>
-                  <span style={{ color: dk ? "#e8e0f0" : C.text, fontWeight: 700 }}>marke</span><span style={{ fontWeight: 900, color: accentC }}>Trade</span>
-                </div>
-                <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, marginTop: 3 }}>{t("aiEngine")}</div>
-              </div>
+              <img src="/logo.jpeg" alt="markeTrade" style={{ height: 38, objectFit: "contain" }} />
+              <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>
             </div>
             );
           })()}
