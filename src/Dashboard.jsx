@@ -34,6 +34,7 @@ const T = {
   tabHistory:      { cz: "🕐 HISTORIE", en: "🕐 HISTORY" },
   tabFearGreed:    { cz: "😱 FEAR&GREED", en: "😱 FEAR&GREED" },
   tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST" },
+  tabEducation:    { cz: "🎓 VÝUKA", en: "🎓 EDUCATION" },
   tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE" },
   // Tabs (right panel)
   tabPairs:        { cz: "PÁRY", en: "PAIRS" },
@@ -722,6 +723,7 @@ export default function Dashboard() {
               <TabBtn label={t("tabHistory")} active={centerTab === "history"} onClick={() => setCenterTab("history")} />
               <TabBtn label={t("tabFearGreed")} active={centerTab === "feargreed"} onClick={() => setCenterTab("feargreed")} />
               <TabBtn label={t("tabBacktest")} active={centerTab === "backtest"} onClick={() => setCenterTab("backtest")} />
+              <TabBtn label={t("tabEducation")} active={centerTab === "education"} onClick={() => setCenterTab("education")} />
               <TabBtn label={t("tabGuide")} active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
 
@@ -1238,6 +1240,184 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+
+            {centerTab === "education" && (() => {
+              const Section = ({ emoji, title, children, highlight }) => (
+                <div style={{ marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid ${C.border}`, ...(highlight ? { background: `${C.accent}08`, borderRadius: 10, padding: 14, border: `1px solid ${C.accent}33` } : {}) }}>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: highlight ? C.accent : C.text, letterSpacing: 2, marginBottom: 10, fontFamily: "'Space Grotesk', sans-serif" }}>{emoji} {title}</div>
+                  {children}
+                </div>
+              );
+              const P = ({ children }) => <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.7, marginBottom: 8 }}>{children}</div>;
+              const Sub = ({ title, children }) => (
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: C.text, marginBottom: 4 }}>{title}</div>
+                  {children}
+                </div>
+              );
+              return (
+                <div style={{ fontSize: 9, lineHeight: 1.6 }}>
+
+                  <Section emoji="⭐" title={lang === "cz" ? "FRACTAL BREAK (DOPORUČENÁ TAKTIKA)" : "FRACTAL BREAK (RECOMMENDED TACTIC)"} highlight>
+                    <P>{lang === "cz"
+                      ? "Fractal break je jednoduchá a účinná taktika založená na prolomení fraktálových high/low. Fraktál je svíčka, jejíž high (nebo low) je vyšší (nižší) než 2 svíčky vlevo i vpravo."
+                      : "Fractal break is a simple and effective tactic based on breaking fractal highs/lows. A fractal is a candle whose high (or low) is higher (lower) than 2 candles on each side."}</P>
+                    <Sub title={lang === "cz" ? "Jak na to:" : "How to trade:"}>
+                      <P>{lang === "cz"
+                        ? "1. Najdi potvrzený fraktál (min. 5 svíček – 2 vlevo, pivot, 2 vpravo). 2. Počkej až cena prorazí fraktálové high (buy) nebo low (sell). 3. Entry na breakoutu, SL pod/nad fraktálem. 4. TP na další S/R úroveň nebo RRR 1:2."
+                        : "1. Find a confirmed fractal (min 5 candles – 2 left, pivot, 2 right). 2. Wait for price to break the fractal high (buy) or low (sell). 3. Entry on breakout, SL below/above the fractal. 4. TP at next S/R level or RRR 1:2."}</P>
+                    </Sub>
+                    <Sub title={lang === "cz" ? "Nejlepší timeframe:" : "Best timeframe:"}>
+                      <P>{lang === "cz" ? "H1 a H4 pro swing, M15 pro intraday. Kombinuj s EMA 50/200 pro potvrzení trendu." : "H1 and H4 for swing, M15 for intraday. Combine with EMA 50/200 for trend confirmation."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="📊" title={lang === "cz" ? "EMA (EXPONENCIÁLNÍ KLOUZAVÝ PRŮMĚR)" : "EMA (EXPONENTIAL MOVING AVERAGE)"}>
+                    <P>{lang === "cz"
+                      ? "EMA reaguje rychleji na cenu než SMA, protože dává větší váhu posledním svíčkám. Nejpoužívanější periody jsou 9, 21, 50 a 200."
+                      : "EMA reacts faster to price than SMA because it gives more weight to recent candles. Most common periods are 9, 21, 50, and 200."}</P>
+                    <Sub title={lang === "cz" ? "Základní signály:" : "Basic signals:"}>
+                      <P>{lang === "cz"
+                        ? "• Golden Cross: EMA 50 protne EMA 200 zdola → bullish signál. • Death Cross: EMA 50 protne EMA 200 shora → bearish signál. • Cena nad EMA 200 = uptrend, pod = downtrend. • EMA 9/21 crossover = krátkodobé entry signály."
+                        : "• Golden Cross: EMA 50 crosses above EMA 200 → bullish signal. • Death Cross: EMA 50 crosses below EMA 200 → bearish signal. • Price above EMA 200 = uptrend, below = downtrend. • EMA 9/21 crossover = short-term entry signals."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="🌀" title={lang === "cz" ? "FIBONACCI RETRACEMENT" : "FIBONACCI RETRACEMENT"}>
+                    <P>{lang === "cz"
+                      ? "Fibonacci úrovně (23.6%, 38.2%, 50%, 61.8%, 78.6%) ukazují potenciální zóny obratu ceny v rámci trendu. Vychází z Fibonacciho posloupnosti."
+                      : "Fibonacci levels (23.6%, 38.2%, 50%, 61.8%, 78.6%) show potential price reversal zones within a trend. Based on the Fibonacci sequence."}</P>
+                    <Sub title={lang === "cz" ? "Jak použít:" : "How to use:"}>
+                      <P>{lang === "cz"
+                        ? "1. Najdi jasný swing high a swing low. 2. Natáhni Fibo nástroj od low k high (uptrend) nebo high k low (downtrend). 3. Hledej reakci ceny na klíčových úrovních – zejména 61.8% (golden ratio) a 50%. 4. Kombinuj s S/R zónami pro silnější potvrzení."
+                        : "1. Find a clear swing high and swing low. 2. Draw the Fibo tool from low to high (uptrend) or high to low (downtrend). 3. Look for price reaction at key levels – especially 61.8% (golden ratio) and 50%. 4. Combine with S/R zones for stronger confirmation."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="🧱" title={lang === "cz" ? "SUPPORT & RESISTANCE" : "SUPPORT & RESISTANCE"}>
+                    <P>{lang === "cz"
+                      ? "S/R úrovně jsou cenové zóny, kde se cena opakovaně zastavuje. Support = podlaha (kupci), Resistance = strop (prodejci). Čím vícekrát cena úroveň testuje, tím je silnější."
+                      : "S/R levels are price zones where price repeatedly stalls. Support = floor (buyers), Resistance = ceiling (sellers). The more times price tests a level, the stronger it is."}</P>
+                    <Sub title={lang === "cz" ? "Pravidla:" : "Rules:"}>
+                      <P>{lang === "cz"
+                        ? "• Proražený support se stává resistancí a naopak (flip). • Hledej potvrzení: pin bar, engulfing, volume spike. • Čím vyšší timeframe, tím silnější úroveň. • Nezapomeň: S/R jsou zóny, ne přesné čáry."
+                        : "• Broken support becomes resistance and vice versa (flip). • Look for confirmation: pin bar, engulfing, volume spike. • Higher timeframe = stronger level. • Remember: S/R are zones, not exact lines."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="💡" title={lang === "cz" ? "SMART MONEY CONCEPT (SMC)" : "SMART MONEY CONCEPT (SMC)"}>
+                    <P>{lang === "cz"
+                      ? "SMC analyzuje, jak obchodují velcí hráči (banky, instituce). Klíčové koncepty: Order Blocks, Fair Value Gaps, Liquidity Sweeps a Break of Structure."
+                      : "SMC analyzes how big players trade (banks, institutions). Key concepts: Order Blocks, Fair Value Gaps, Liquidity Sweeps, and Break of Structure."}</P>
+                    <Sub title={lang === "cz" ? "Klíčové pojmy:" : "Key concepts:"}>
+                      <P>{lang === "cz"
+                        ? "• BOS (Break of Structure): prolomení posledního HH/LL → potvrzení trendu. • CHoCH (Change of Character): první prolomení proti trendu → možný obrat. • Order Block: poslední opačná svíčka před silným pohybem – instituce tam mají objednávky. • FVG (Fair Value Gap): mezera ve svíčkách kde cena neměla čas konsolidovat – cena se tam často vrací. • Liquidity Sweep: cena vezme stoploss nad/pod S/R a pak se otočí."
+                        : "• BOS (Break of Structure): breaking last HH/LL → trend confirmation. • CHoCH (Change of Character): first break against trend → possible reversal. • Order Block: last opposite candle before strong move – institutions have orders there. • FVG (Fair Value Gap): gap in candles where price didn't consolidate – price often returns there. • Liquidity Sweep: price takes stops above/below S/R then reverses."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="🕯️" title={lang === "cz" ? "PRICE ACTION – SVÍČKOVÉ PATERNY" : "PRICE ACTION – CANDLE PATTERNS"}>
+                    <P>{lang === "cz"
+                      ? "Čtení svíček bez indikátorů. Nejdůležitější paterny pro forex:"
+                      : "Reading candles without indicators. Most important patterns for forex:"}</P>
+                    <Sub title={lang === "cz" ? "Obrátové paterny:" : "Reversal patterns:"}>
+                      <P>{lang === "cz"
+                        ? "• Pin Bar (Hammer/Shooting Star): dlouhý knot, malé tělo → odmítnutí ceny. • Engulfing: větší svíčka kompletně pohltí předchozí → silný signál obratu. • Morning/Evening Star: 3svíčkový patern na S/R úrovni."
+                        : "• Pin Bar (Hammer/Shooting Star): long wick, small body → price rejection. • Engulfing: larger candle completely engulfs previous → strong reversal signal. • Morning/Evening Star: 3-candle pattern at S/R level."}</P>
+                    </Sub>
+                    <Sub title={lang === "cz" ? "Pokračovací paterny:" : "Continuation patterns:"}>
+                      <P>{lang === "cz"
+                        ? "• Inside Bar: svíčka uvnitř předchozí → konsolidace před breakoutem. • Three White Soldiers / Three Black Crows: 3 stejné silné svíčky v řadě."
+                        : "• Inside Bar: candle inside previous → consolidation before breakout. • Three White Soldiers / Three Black Crows: 3 strong same-direction candles in a row."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="⚖️" title={lang === "cz" ? "RISK MANAGEMENT" : "RISK MANAGEMENT"}>
+                    <P>{lang === "cz"
+                      ? "Bez risk managementu i nejlepší strategie selže. Zlatá pravidla:"
+                      : "Without risk management, even the best strategy will fail. Golden rules:"}</P>
+                    <P>{lang === "cz"
+                      ? "• Riskuj max 1–2 % účtu na obchod. • RRR (Risk Reward Ratio) minimálně 1:2 – riskuješ 20 pipů, cílíš 40+. • Vždy měj Stop Loss – nikdy neposouvej SL dál od ceny. • Position sizing: vypočítej velikost pozice podle SL vzdálenosti a % rizika. • Max 2–3 otevřené pozice najednou. • Neobchoduj po ztrátě z emocí (revenge trading)."
+                      : "• Risk max 1–2% of account per trade. • RRR (Risk Reward Ratio) minimum 1:2 – risk 20 pips, target 40+. • Always have Stop Loss – never move SL further from price. • Position sizing: calculate position size based on SL distance and risk %. • Max 2–3 open positions at a time. • Don't trade after a loss from emotions (revenge trading)."}</P>
+                  </Section>
+
+                  <Section emoji="🏦" title={lang === "cz" ? "JAK FUNGUJE FOREX TRH" : "HOW THE FOREX MARKET WORKS"}>
+                    <P>{lang === "cz"
+                      ? "Forex je největší finanční trh na světě – denní objem přes $7 bilionů. Obchoduje se 24/5 ve třech hlavních seancích: Tokio (Asia), Londýn (Europe), New York (US). Největší volatilita je v overlapu Londýn + New York."
+                      : "Forex is the world's largest financial market – daily volume over $7 trillion. Trades 24/5 in three main sessions: Tokyo (Asia), London (Europe), New York (US). Highest volatility during London + New York overlap."}</P>
+                    <P>{lang === "cz"
+                      ? "Měnové páry se skládají ze základní měny (base) a kótovací (quote). EUR/USD = kupuješ EUR za USD. Cena roste = base posiluje. Cena klesá = base oslabuje."
+                      : "Currency pairs consist of base currency and quote currency. EUR/USD = you buy EUR with USD. Price rises = base strengthens. Price falls = base weakens."}</P>
+                  </Section>
+
+                  <Section emoji="📈" title={lang === "cz" ? "CENTRÁLNÍ BANKY A ÚROKOVÉ SAZBY" : "CENTRAL BANKS & INTEREST RATES"}>
+                    <P>{lang === "cz"
+                      ? "Centrální banky (Fed, ECB, BoE, BoJ...) řídí měnovou politiku hlavně přes úrokové sazby. To je nejsilnější fundamentální faktor na forexu."
+                      : "Central banks (Fed, ECB, BoE, BoJ...) control monetary policy mainly through interest rates. This is the strongest fundamental factor in forex."}</P>
+                    <Sub title={lang === "cz" ? "Zvyšování sazeb (hawkish):" : "Rate hikes (hawkish):"}>
+                      <P>{lang === "cz"
+                        ? "• Měna posiluje – vyšší výnosy přitahují zahraniční kapitál. • Ekonomika se zpomaluje – dražší úvěry, méně investic. • Boj proti inflaci – CB zvyšuje sazby aby zbrzdila růst cen. • Příklad: Fed zvedne sazby → USD posiluje, akcie klesají."
+                        : "• Currency strengthens – higher yields attract foreign capital. • Economy slows – more expensive loans, fewer investments. • Fighting inflation – CB raises rates to slow price growth. • Example: Fed raises rates → USD strengthens, stocks fall."}</P>
+                    </Sub>
+                    <Sub title={lang === "cz" ? "Snižování sazeb (dovish):" : "Rate cuts (dovish):"}>
+                      <P>{lang === "cz"
+                        ? "• Měna oslabuje – nižší výnosy, kapitál odchází. • Ekonomika se stimuluje – levnější úvěry, více spotřeby. • Reakce na recesi nebo slabost ekonomiky. • Příklad: ECB sníží sazby → EUR oslabuje, akcie rostou."
+                        : "• Currency weakens – lower yields, capital leaves. • Economy stimulated – cheaper credit, more consumption. • Response to recession or economic weakness. • Example: ECB cuts rates → EUR weakens, stocks rise."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="🔥" title={lang === "cz" ? "INFLACE A CO S NÍ" : "INFLATION & WHAT IT MEANS"}>
+                    <P>{lang === "cz"
+                      ? "Inflace = růst cen v ekonomice. Měří se pomocí CPI (Consumer Price Index). Cíl většiny CB je 2 %."
+                      : "Inflation = rising prices in the economy. Measured by CPI (Consumer Price Index). Most CB target is 2%."}</P>
+                    <Sub title={lang === "cz" ? "Vysoká inflace:" : "High inflation:"}>
+                      <P>{lang === "cz"
+                        ? "• CB musí zvýšit sazby → měna krátkodobě posiluje. • Ale dlouhodobě vysoká inflace = slabá měna (kupní síla klesá). • CPI vyšší než očekávání = hawkish překvapení → měna roste. • CPI nižší než oček. = dovish → měna klesá."
+                        : "• CB must raise rates → currency strengthens short-term. • But long-term high inflation = weak currency (purchasing power drops). • CPI above expectations = hawkish surprise → currency rises. • CPI below expectations = dovish → currency falls."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="👷" title={lang === "cz" ? "TRH PRÁCE" : "LABOR MARKET"}>
+                    <P>{lang === "cz"
+                      ? "Zaměstnanost je klíčový ukazatel zdraví ekonomiky. Nejsledovanější report je US NFP (Non-Farm Payrolls) – vychází první pátek v měsíci."
+                      : "Employment is a key indicator of economic health. Most watched report is US NFP (Non-Farm Payrolls) – released first Friday of the month."}</P>
+                    <Sub title={lang === "cz" ? "Silný trh práce:" : "Strong labor market:"}>
+                      <P>{lang === "cz"
+                        ? "• Nízká nezaměstnanost → lidé utrácí → inflace roste → CB může zvýšit sazby → měna posiluje. • NFP beat (vyšší než oček.) → USD okamžitě roste, typicky 50–100+ pipů na velkých párech."
+                        : "• Low unemployment → people spend → inflation rises → CB may raise rates → currency strengthens. • NFP beat (above expectations) → USD jumps immediately, typically 50–100+ pips on major pairs."}</P>
+                    </Sub>
+                    <Sub title={lang === "cz" ? "Slabý trh práce:" : "Weak labor market:"}>
+                      <P>{lang === "cz"
+                        ? "• Rostoucí nezaměstnanost → méně spotřeby → recesní signál → CB sníží sazby → měna oslabuje. • NFP miss → USD padá, safe havens (JPY, CHF, zlato) rostou."
+                        : "• Rising unemployment → less spending → recession signal → CB cuts rates → currency weakens. • NFP miss → USD drops, safe havens (JPY, CHF, gold) rise."}</P>
+                    </Sub>
+                  </Section>
+
+                  <Section emoji="🌍" title={lang === "cz" ? "GDP A EKONOMICKÝ RŮST" : "GDP & ECONOMIC GROWTH"}>
+                    <P>{lang === "cz"
+                      ? "GDP (HDP) měří celkovou produkci ekonomiky. Rostoucí GDP = zdravá ekonomika, klesající = recese."
+                      : "GDP measures total economic output. Rising GDP = healthy economy, falling = recession."}</P>
+                    <P>{lang === "cz"
+                      ? "• GDP nad očekáváním → měna posiluje (ekonomika roste rychleji). • GDP pod oček. → měna oslabuje (zpomalení). • 2 po sobě jdoucí kvartály záporného GDP = technická recese → CB sníží sazby. • Sleduj i PMI (Purchasing Managers Index) – předbíhá GDP o 1–2 měsíce."
+                      : "• GDP above expectations → currency strengthens (faster growth). • GDP below expectations → currency weakens (slowdown). • 2 consecutive quarters of negative GDP = technical recession → CB cuts rates. • Watch PMI (Purchasing Managers Index) – leads GDP by 1–2 months."}</P>
+                  </Section>
+
+                  <Section emoji="🔗" title={lang === "cz" ? "JAK TO VŠE SOUVISÍ" : "HOW IT ALL CONNECTS"}>
+                    <P>{lang === "cz"
+                      ? "Inflace ↑ → CB zvyšuje sazby → měna ↑ (krátkodobě) ale ekonomika ↓. Nezaměstnanost ↑ → CB snižuje sazby → měna ↓ ale ekonomika se stimuluje. GDP ↓ → recesní strach → risk-off → JPY, CHF, USD rostou, AUD, NZD klesají."
+                      : "Inflation ↑ → CB raises rates → currency ↑ (short-term) but economy ↓. Unemployment ↑ → CB cuts rates → currency ↓ but economy stimulated. GDP ↓ → recession fear → risk-off → JPY, CHF, USD rise, AUD, NZD fall."}</P>
+                    <P>{lang === "cz"
+                      ? "Nejsilnější obchody jsou když fundamental + technická analýza ukazují stejný směr. Například: Fed hawkish + USD bullish fractal break + pozitivní NFP = silný long USD setup."
+                      : "Strongest trades are when fundamental + technical analysis point the same direction. For example: Fed hawkish + USD bullish fractal break + positive NFP = strong long USD setup."}</P>
+                  </Section>
+
+                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 4 }}>
+                    {lang === "cz" ? "Toto je vzdělávací obsah · není to investiční doporučení · vždy obchoduj na demo účtu než přejdeš na real" : "This is educational content · not investment advice · always trade on demo account before going live"}
+                  </div>
+
+                </div>
+              );
+            })()}
 
             {centerTab === "guide" && (() => {
               const Section = ({ emoji, title, children }) => (
