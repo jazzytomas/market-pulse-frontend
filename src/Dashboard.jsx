@@ -26,7 +26,7 @@ const T = {
   scanning:        { cz: (s) => `◌ ${s}s...`, en: (s) => `◌ ${s}s...` },
   backend:         { cz: "Backend:", en: "Backend:" },
   // Tabs (center)
-  tabScenarios:    { cz: "⚡ SCENARIOS", en: "⚡ SCENARIOS" },
+  tabScenarios:    { cz: "⚡ SCÉNÁŘE", en: "⚡ SCENARIOS" },
   tabEvents:       { cz: "📅 EVENTS", en: "📅 EVENTS" },
   tabCot:          { cz: "📊 COT", en: "📊 COT" },
   tabCorrelation:  { cz: "🔗 KORELACE", en: "🔗 CORRELATION" },
@@ -36,9 +36,9 @@ const T = {
   tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST" },
   tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE" },
   // Tabs (right panel)
-  tabPairs:        { cz: "PARY", en: "PAIRS" },
+  tabPairs:        { cz: "PÁRY", en: "PAIRS" },
   tabStatus:       { cz: "STATUS", en: "STATUS" },
-  tabCurrencies:   { cz: "MENY", en: "CURRENCIES" },
+  tabCurrencies:   { cz: "MĚNY", en: "CURRENCIES" },
   tabCbRates:      { cz: "CB SAZBY", en: "CB RATES" },
   tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST" },
   // Section labels
