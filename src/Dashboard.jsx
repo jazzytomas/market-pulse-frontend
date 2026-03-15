@@ -746,14 +746,13 @@ export default function Dashboard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {(() => {
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                  const newest10 = sorted.slice(0, 10);
-                  const older10 = sorted.slice(10, 20);
-                  // HIGH tab: zobraz všechna HIGH ze všech 20, ne jen z prvních 10
-                  const list = scenarioFilter === "STARŠÍ"
-                    ? older10.filter(s => s.weight === "HIGH")
-                    : scenarioFilter === "HIGH"
-                      ? sorted.filter(s => s.weight === "HIGH")
-                      : newest10.filter(s => s.weight === scenarioFilter);
+                  const allHigh = sorted.filter(s => s.weight === "HIGH");
+                  const allMed = sorted.filter(s => s.weight === "MED");
+                  const list = scenarioFilter === "HIGH"
+                    ? allHigh.slice(0, 20)
+                    : scenarioFilter === "STARŠÍ"
+                      ? allHigh.slice(20)
+                      : allMed.slice(0, 10);
                   return list.map(s => {
                     const isExp = expandedScenario === s.id;
                     const isMed = s.weight === "MED";
