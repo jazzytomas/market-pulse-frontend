@@ -563,14 +563,7 @@ export default function Dashboard() {
               <div style={{ fontFamily: "Orbitron, monospace", lineHeight: 1.1 }}>
                 <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
                 <div style={{ fontSize: 20, letterSpacing: 0.5 }}>
-                  <span style={{ color: dk ? "#e8e0f0" : C.text, fontWeight: 700 }}>marke</span><span style={{
-                    fontWeight: 900,
-                    background: dk
-                      ? "linear-gradient(135deg, #e8c840, #c9a227, #a07d1a)"
-                      : "linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                    filter: dk ? "drop-shadow(0 0 8px #c9a22766)" : "none"
-                  }}>Trade</span>
+                  <span style={{ color: dk ? "#e8e0f0" : C.text, fontWeight: 700 }}>marke</span><span style={{ fontWeight: 900, color: accentC }}>Trade</span>
                 </div>
                 <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, marginTop: 3 }}>{t("aiEngine")}</div>
               </div>
