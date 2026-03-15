@@ -276,7 +276,7 @@ export default function Dashboard() {
   const [correlationData, setCorrelationData] = useState(null);
   const [backtestData, setBacktestData] = useState(null);
   const [fearGreedData, setFearGreedData] = useState(null);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") === "dark");
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
   const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
   const [winW, setWinW] = useState(window.innerWidth);
 
@@ -550,8 +550,6 @@ export default function Dashboard() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {/* Logo icon – bar chart + arrow + purple swoosh */}
               <svg width="38" height="38" viewBox="0 0 48 48" fill="none">
-                <rect x="8" y="30" width="7" height="12" rx="1.5" fill={dk ? "#444" : "#94a3b8"} />
-                <rect x="17" y="22" width="7" height="20" rx="1.5" fill={dk ? "#777" : "#64748b"} />
                 <rect x="26" y="14" width="7" height="28" rx="1.5" fill={accentC} />
                 <path d="M12 32 L29 12 L36 12" stroke={accentC} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                 <polygon points="36,7 41,14 31,14" fill={accentC} />
@@ -561,7 +559,7 @@ export default function Dashboard() {
                   strokeDasharray="56 44" transform="rotate(-8 22 41)" opacity="0.4" />
               </svg>
               <div style={{ fontFamily: "Orbitron, monospace", lineHeight: 1.1 }}>
-                <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
+                <div style={{ fontSize: 6.5, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
                 <div style={{ fontSize: 20, letterSpacing: 0.5 }}>
                   <span style={{ color: dk ? "#e8e0f0" : C.text, fontWeight: 700 }}>marke</span><span style={{ fontWeight: 900, color: accentC }}>Trade</span>
                 </div>
