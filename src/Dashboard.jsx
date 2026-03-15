@@ -542,13 +542,41 @@ export default function Dashboard() {
       {/* Header – full width */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <div>
-          <div style={{ fontFamily: "Orbitron, monospace", fontWeight: 900, lineHeight: 1.1 }}>
-            <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 4, marginBottom: 4, textTransform: "uppercase" }}>one minute update</div>
-            <div style={{ fontSize: 20, letterSpacing: 1, display: "flex", alignItems: "baseline", gap: 0 }}>
-              <span style={{ color: C.text, fontWeight: 700 }}>marke</span>
-              <span style={{ color: C.accent, fontWeight: 900, textShadow: `0 0 12px ${C.accent}88` }}>Trade</span>
+          {(() => {
+            const dk = C.bg === "#080812";
+            const gold = "#c9a227";
+            const accentC = dk ? gold : "#2563eb";
+            return (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {/* Logo icon – bar chart + arrow + purple swoosh */}
+              <svg width="38" height="38" viewBox="0 0 48 48" fill="none">
+                <rect x="8" y="30" width="7" height="12" rx="1.5" fill={dk ? "#444" : "#94a3b8"} />
+                <rect x="17" y="22" width="7" height="20" rx="1.5" fill={dk ? "#777" : "#64748b"} />
+                <rect x="26" y="14" width="7" height="28" rx="1.5" fill={accentC} />
+                <path d="M12 32 L29 12 L36 12" stroke={accentC} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                <polygon points="36,7 41,14 31,14" fill={accentC} />
+                <ellipse cx="22" cy="40" rx="18" ry="5" stroke={dk ? "#7c3aed" : "#6d28d9"} strokeWidth="2" fill="none"
+                  strokeDasharray="56 44" transform="rotate(-8 22 40)" opacity="0.8" />
+                <ellipse cx="22" cy="40" rx="18" ry="5" stroke={dk ? "#a855f7" : "#8b5cf6"} strokeWidth="1" fill="none"
+                  strokeDasharray="56 44" transform="rotate(-8 22 41)" opacity="0.4" />
+              </svg>
+              <div style={{ fontFamily: "Orbitron, monospace", lineHeight: 1.1 }}>
+                <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
+                <div style={{ fontSize: 20, letterSpacing: 0.5 }}>
+                  <span style={{ color: dk ? "#e8e0f0" : C.text, fontWeight: 700 }}>marke</span><span style={{
+                    fontWeight: 900,
+                    background: dk
+                      ? "linear-gradient(135deg, #e8c840, #c9a227, #a07d1a)"
+                      : "linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    filter: dk ? "drop-shadow(0 0 8px #c9a22766)" : "none"
+                  }}>Trade</span>
+                </div>
+                <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, marginTop: 3 }}>{t("aiEngine")}</div>
+              </div>
             </div>
-          </div>
+            );
+          })()}
           {shockLabels.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 5 }}>
               {shockLabels.map(({ label, color }) => (
