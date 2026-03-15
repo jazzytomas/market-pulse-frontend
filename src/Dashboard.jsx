@@ -542,8 +542,13 @@ export default function Dashboard() {
       {/* Header – full width */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: 4, color: C.accent, fontFamily: "Orbitron, monospace" }}>◈ MARKET PULSE</div>
-          <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>
+          <div style={{ fontFamily: "Orbitron, monospace", fontWeight: 900, lineHeight: 1.1 }}>
+            <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 4, marginBottom: 4, textTransform: "uppercase" }}>one minute update</div>
+            <div style={{ fontSize: 20, letterSpacing: 1, display: "flex", alignItems: "baseline", gap: 0 }}>
+              <span style={{ color: C.text, fontWeight: 700 }}>marke</span>
+              <span style={{ color: C.accent, fontWeight: 900, textShadow: `0 0 12px ${C.accent}88` }}>Trade</span>
+            </div>
+          </div>
           {shockLabels.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 5 }}>
               {shockLabels.map(({ label, color }) => (
