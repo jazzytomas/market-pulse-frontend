@@ -266,6 +266,7 @@ export default function Dashboard() {
   const [selectedPair, setSelectedPair] = useState(null);
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
+  const [eduTab, setEduTab] = useState("tech");
   const [scanning, setScanning] = useState(false);
   const [scanCountdown, setScanCountdown] = useState(0);
   const [lastUpdate, setLastUpdate] = useState(() => localStorage.getItem("mp_last_scan") || "--:--:--");
@@ -1258,6 +1259,21 @@ export default function Dashboard() {
               return (
                 <div style={{ fontSize: 9, lineHeight: 1.6 }}>
 
+                  <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+                    {[{ key: "tech", cz: "📐 TECHNICKÁ ANALÝZA", en: "📐 TECHNICAL ANALYSIS" }, { key: "fund", cz: "🏦 FUNDAMENTÁLNÍ ANALÝZA", en: "🏦 FUNDAMENTAL ANALYSIS" }].map(t2 => (
+                      <button key={t2.key} onClick={() => setEduTab(t2.key)} style={{
+                        flex: 1, padding: "8px 12px", fontSize: 10, fontWeight: eduTab === t2.key ? 700 : 500,
+                        fontFamily: "'Space Grotesk', sans-serif", letterSpacing: 0.5,
+                        background: eduTab === t2.key ? `${C.accent}18` : C.bg,
+                        border: `1px solid ${eduTab === t2.key ? C.accent : C.border}`,
+                        color: eduTab === t2.key ? C.accent : C.textDim,
+                        borderRadius: 8, cursor: "pointer", transition: "all 0.15s",
+                      }}>{lang === "cz" ? t2.cz : t2.en}</button>
+                    ))}
+                  </div>
+
+                  {eduTab === "tech" && <>
+
                   <Section emoji="⭐" title={lang === "cz" ? "FRACTAL BREAK (DOPORUČENÁ TAKTIKA)" : "FRACTAL BREAK (RECOMMENDED TACTIC)"} highlight>
                     <P>{lang === "cz"
                       ? "Fractal break je jednoduchá a účinná taktika založená na prolomení fraktálových high/low. Fraktál je svíčka, jejíž high (nebo low) je vyšší (nižší) než 2 svíčky vlevo i vpravo."
@@ -1341,6 +1357,10 @@ export default function Dashboard() {
                       : "• Risk max 1–2% of account per trade. • RRR (Risk Reward Ratio) minimum 1:2 – risk 20 pips, target 40+. • Always have Stop Loss – never move SL further from price. • Position sizing: calculate position size based on SL distance and risk %. • Max 2–3 open positions at a time. • Don't trade after a loss from emotions (revenge trading)."}</P>
                   </Section>
 
+                  </>}
+
+                  {eduTab === "fund" && <>
+
                   <Section emoji="🏦" title={lang === "cz" ? "JAK FUNGUJE FOREX TRH" : "HOW THE FOREX MARKET WORKS"}>
                     <P>{lang === "cz"
                       ? "Forex je největší finanční trh na světě – denní objem přes $7 bilionů. Obchoduje se 24/5 ve třech hlavních seancích: Tokio (Asia), Londýn (Europe), New York (US). Největší volatilita je v overlapu Londýn + New York."
@@ -1410,6 +1430,8 @@ export default function Dashboard() {
                       ? "Nejsilnější obchody jsou když fundamental + technická analýza ukazují stejný směr. Například: Fed hawkish + USD bullish fractal break + pozitivní NFP = silný long USD setup."
                       : "Strongest trades are when fundamental + technical analysis point the same direction. For example: Fed hawkish + USD bullish fractal break + positive NFP = strong long USD setup."}</P>
                   </Section>
+
+                  </>}
 
                   <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 4 }}>
                     {lang === "cz" ? "Toto je vzdělávací obsah · není to investiční doporučení · vždy obchoduj na demo účtu než přejdeš na real" : "This is educational content · not investment advice · always trade on demo account before going live"}
