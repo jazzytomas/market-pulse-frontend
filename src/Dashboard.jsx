@@ -240,7 +240,7 @@ function TabBtn({ label, active, onClick }) {
       borderBottom: active ? `2px solid ${C.accent}` : "2px solid transparent",
       color: active ? C.accent : C.textDim,
       padding: "4px 10px 8px", fontSize: 9, letterSpacing: 0.8,
-      cursor: "pointer", fontFamily: "Orbitron, monospace", fontWeight: active ? 700 : 400,
+      cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif", fontWeight: active ? 700 : 500,
       textTransform: "uppercase", whiteSpace: "nowrap",
       borderRadius: "4px 4px 0 0", transition: "color 0.15s, background 0.15s",
     }}>{label}</button>
@@ -249,7 +249,7 @@ function TabBtn({ label, active, onClick }) {
 
 function SectionLabel({ children, center }) {
   const C = React.useContext(ThemeContext);
-  return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "Orbitron, monospace" }}>{children}</div>;
+  return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "'Space Grotesk', sans-serif" }}>{children}</div>;
 }
 
 export default function Dashboard() {
