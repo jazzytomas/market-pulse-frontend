@@ -548,16 +548,6 @@ export default function Dashboard() {
             const accentC = dk ? gold : "#2563eb";
             return (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {/* Logo icon – bar chart + arrow + purple swoosh */}
-              <svg width="38" height="38" viewBox="0 0 48 48" fill="none">
-                <rect x="26" y="14" width="7" height="28" rx="1.5" fill={accentC} />
-                <path d="M12 32 L29 12 L36 12" stroke={accentC} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                <polygon points="36,7 41,14 31,14" fill={accentC} />
-                <ellipse cx="22" cy="40" rx="18" ry="5" stroke={dk ? "#7c3aed" : "#6d28d9"} strokeWidth="2" fill="none"
-                  strokeDasharray="56 44" transform="rotate(-8 22 40)" opacity="0.8" />
-                <ellipse cx="22" cy="40" rx="18" ry="5" stroke={dk ? "#a855f7" : "#8b5cf6"} strokeWidth="1" fill="none"
-                  strokeDasharray="56 44" transform="rotate(-8 22 41)" opacity="0.4" />
-              </svg>
               <div style={{ fontFamily: "Orbitron, monospace", lineHeight: 1.1 }}>
                 <div style={{ fontSize: 6.5, color: C.textDim, letterSpacing: 3, marginBottom: 3 }}>one minute update</div>
                 <div style={{ fontSize: 20, letterSpacing: 0.5 }}>
