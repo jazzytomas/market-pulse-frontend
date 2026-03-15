@@ -1276,15 +1276,22 @@ export default function Dashboard() {
 
                   <Section emoji="⭐" title={lang === "cz" ? "FRACTAL BREAK (DOPORUČENÁ TAKTIKA)" : "FRACTAL BREAK (RECOMMENDED TACTIC)"} highlight>
                     <P>{lang === "cz"
-                      ? "Fractal break je jednoduchá a účinná taktika založená na prolomení fraktálových high/low. Fraktál je svíčka, jejíž high (nebo low) je vyšší (nižší) než 2 svíčky vlevo i vpravo."
-                      : "Fractal break is a simple and effective tactic based on breaking fractal highs/lows. A fractal is a candle whose high (or low) is higher (lower) than 2 candles on each side."}</P>
-                    <Sub title={lang === "cz" ? "Jak na to:" : "How to trade:"}>
+                      ? "Trh je fraktální – stejná struktura (swing highs a swing lows) se opakuje na všech timeframech. Fractal break znamená prolomení klíčového swing pointu, čímž se potvrdí pokračování nebo změna trendu."
+                      : "The market is fractal – the same structure (swing highs and swing lows) repeats on all timeframes. A fractal break means breaking a key swing point, confirming trend continuation or reversal."}</P>
+                    <Sub title={lang === "cz" ? "Klíčové pojmy:" : "Key concepts:"}>
                       <P>{lang === "cz"
-                        ? "1. Najdi potvrzený fraktál (min. 5 svíček – 2 vlevo, pivot, 2 vpravo). 2. Počkej až cena prorazí fraktálové high (buy) nebo low (sell). 3. Entry na breakoutu, SL pod/nad fraktálem. 4. TP na další S/R úroveň nebo RRR 1:2."
-                        : "1. Find a confirmed fractal (min 5 candles – 2 left, pivot, 2 right). 2. Wait for price to break the fractal high (buy) or low (sell). 3. Entry on breakout, SL below/above the fractal. 4. TP at next S/R level or RRR 1:2."}</P>
+                        ? "• Swing High = bod kde cena udělala lokální maximum a otočila se dolů. • Swing Low = bod kde cena udělala lokální minimum a otočila se nahoru. • BOS (Break of Structure) = cena prorazí poslední swing high (bullish) nebo swing low (bearish) → potvrzení trendu. • CHoCH (Change of Character) = první prolomení proti aktuálnímu trendu → signál možného obratu."
+                        : "• Swing High = point where price made a local maximum and turned down. • Swing Low = point where price made a local minimum and turned up. • BOS (Break of Structure) = price breaks last swing high (bullish) or swing low (bearish) → trend confirmation. • CHoCH (Change of Character) = first break against current trend → possible reversal signal."}</P>
                     </Sub>
-                    <Sub title={lang === "cz" ? "Nejlepší timeframe:" : "Best timeframe:"}>
-                      <P>{lang === "cz" ? "H1 a H4 pro swing, M15 pro intraday. Kombinuj s EMA 50/200 pro potvrzení trendu." : "H1 and H4 for swing, M15 for intraday. Combine with EMA 50/200 for trend confirmation."}</P>
+                    <Sub title={lang === "cz" ? "Jak obchodovat:" : "How to trade:"}>
+                      <P>{lang === "cz"
+                        ? "1. Urči bias na vyšším TF (Daily/H4) – hledej BOS pro směr trendu. 2. Počkej na BOS na nižším TF (H1/M15) ve stejném směru. 3. Po BOS nehledej entry na breakoutu – počkej na retracement do Order Blocku nebo Fair Value Gapu. 4. Entry v OB/FVG zóně, SL za swing point, TP na další strukturální úroveň nebo RRR min. 1:2."
+                        : "1. Determine bias on higher TF (Daily/H4) – look for BOS for trend direction. 2. Wait for BOS on lower TF (H1/M15) in the same direction. 3. After BOS don't enter on the breakout – wait for retracement into Order Block or Fair Value Gap. 4. Entry in OB/FVG zone, SL beyond swing point, TP at next structural level or RRR min 1:2."}</P>
+                    </Sub>
+                    <Sub title={lang === "cz" ? "Proč to funguje:" : "Why it works:"}>
+                      <P>{lang === "cz"
+                        ? "Cena nemůže změnit směr bez vytvoření swing pointu. Fractal break vynucuje disciplínu – obchoduješ pouze se strukturou, s potvrzeným biasem z vyššího TF, a vstupuješ na retracementu místo honění breakoutů."
+                        : "Price cannot reverse without forming a swing point. Fractal break forces discipline – you only trade with structure, with confirmed bias from higher TF, and enter on retracement instead of chasing breakouts."}</P>
                     </Sub>
                   </Section>
 
