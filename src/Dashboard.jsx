@@ -276,6 +276,8 @@ export default function Dashboard() {
   const [seasonalLive, setSeasonalLive] = useState([]);
   const [seasonalYears, setSeasonalYears] = useState(10);
   const [correlationData, setCorrelationData] = useState(null);
+  const [currencyCorr, setCurrencyCorr] = useState(null);
+  const [corrView, setCorrView] = useState("pairs"); // "pairs" or "currencies"
   const [backtestData, setBacktestData] = useState(null);
   const [fearGreedData, setFearGreedData] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
@@ -353,6 +355,10 @@ export default function Dashboard() {
     fetch(`${API}/api/correlation`)
       .then(r => r.json())
       .then(data => setCorrelationData(data))
+      .catch(() => {});
+    fetch(`${API}/api/currency_correlation`)
+      .then(r => r.json())
+      .then(data => setCurrencyCorr(data))
       .catch(() => {});
   }, []);
 
@@ -984,46 +990,98 @@ export default function Dashboard() {
 
             {centerTab === "corr" && (
               <div>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                  {[
+                    { key: "pairs", label: lang === "cz" ? "Páry" : "Pairs" },
+                    { key: "currencies", label: lang === "cz" ? "Měny" : "Currencies" },
+                  ].map(v => (
+                    <button key={v.key} onClick={() => setCorrView(v.key)}
+                      style={{ padding: "4px 12px", fontSize: 9, fontWeight: corrView === v.key ? 700 : 400,
+                        background: corrView === v.key ? `${C.accent}25` : "transparent",
+                        color: corrView === v.key ? C.accent : C.muted,
+                        border: `1px solid ${corrView === v.key ? C.accent : C.border}`, borderRadius: 12, cursor: "pointer" }}>
+                      {v.label}
+                    </button>
+                  ))}
+                </div>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>
                   {t("corrDesc")}
-                  {correlationData && correlationData.date && (
+                  {corrView === "pairs" && correlationData && correlationData.date && (
                     <span style={{ marginLeft: 8, color: C.muted }}>
                       · {correlationData.days}D · {lang === "cz" ? "aktuální k" : "as of"} {correlationData.date}
                     </span>
                   )}
-                  {correlationData && !correlationData.date && (
-                    <span style={{ marginLeft: 8, color: C.yellow }}> · fallback data</span>
+                  {corrView === "currencies" && currencyCorr && currencyCorr.date && (
+                    <span style={{ marginLeft: 8, color: C.muted }}>
+                      · {currencyCorr.days}D · {lang === "cz" ? "aktuální k" : "as of"} {currencyCorr.date}
+                    </span>
                   )}
                 </div>
-                {!correlationData ? (
-                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t("corrDesc")}</div>
-                ) : (
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
-                      <thead>
-                        <tr>
-                          <td style={{ padding: "4px 6px", color: C.muted }}></td>
-                          {correlationData.pairs.map(p => (
-                            <td key={p} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 8 }}>{p.replace("USD", "")}</td>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {correlationData.pairs.map((pair, i) => (
-                          <tr key={pair}>
-                            <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 8 }}>{pair.replace("USD", "")}</td>
-                            {correlationData.matrix[i].map((val, j) => (
-                              <td key={j} style={{
-                                padding: "4px 6px", textAlign: "center",
-                                background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
-                                color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
-                              }}>{val.toFixed(2)}</td>
+
+                {corrView === "pairs" && (
+                  !correlationData ? (
+                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 8 }}>
+                        <thead>
+                          <tr>
+                            <td style={{ padding: "3px 4px", color: C.muted }}></td>
+                            {correlationData.pairs.map(p => (
+                              <td key={p} style={{ padding: "3px 2px", color: C.textDim, textAlign: "center", fontSize: 7 }}>{p.replace("USD", "")}</td>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {correlationData.pairs.map((pair, i) => (
+                            <tr key={pair}>
+                              <td style={{ padding: "3px 4px", color: C.textDim, fontSize: 7, whiteSpace: "nowrap" }}>{pair.replace("USD", "")}</td>
+                              {correlationData.matrix[i].map((val, j) => (
+                                <td key={j} style={{
+                                  padding: "3px 2px", textAlign: "center", fontSize: 7,
+                                  background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
+                                  color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
+                                }}>{val.toFixed(2)}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                )}
+
+                {corrView === "currencies" && (
+                  !currencyCorr || !currencyCorr.currencies?.length ? (
+                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+                        <thead>
+                          <tr>
+                            <td style={{ padding: "4px 6px", color: C.muted }}></td>
+                            {currencyCorr.currencies.map(c => (
+                              <td key={c} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 9, fontWeight: 700 }}>{c}</td>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {currencyCorr.currencies.map((cur, i) => (
+                            <tr key={cur}>
+                              <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 9, fontWeight: 700 }}>{cur}</td>
+                              {currencyCorr.matrix[i].map((val, j) => (
+                                <td key={j} style={{
+                                  padding: "4px 6px", textAlign: "center",
+                                  background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
+                                  color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
+                                }}>{val.toFixed(2)}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
                 )}
               </div>
             )}
