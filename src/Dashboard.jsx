@@ -753,20 +753,22 @@ export default function Dashboard() {
                     const isMed = s.weight === "MED";
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
                     const rScore = s.risk_score || 0;
+                    const summaryText = lang === "cz" && s.summary_cz ? s.summary_cz : s.summary;
                     return (
                       <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
-                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "7px 10px" : "10px 12px", cursor: "pointer" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8 }}>{s.title}</div>
+                        <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "5px 10px" : "7px 12px", cursor: "pointer" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "2px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
                               <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
                           </div>
-                          <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{lang === "cz" && s.summary_cz ? s.summary_cz : s.summary}</div>
+                          {!isExp && <div style={{ fontSize: 8, color: C.muted, marginBottom: isMed ? 1 : 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{summaryText}</div>}
+                          {isExp && <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{summaryText}</div>}
                           {!isMed && <ScoreBar score={rScore} />}
-                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
                             <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
                             {s.created_at && <span style={{ fontSize: 8, color: C.muted }}>{new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
                           </div>
