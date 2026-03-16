@@ -512,22 +512,52 @@ export default function Dashboard() {
   };
 
   const ALL_PAIRS = [
+    // USD pairs
     { pair: "EUR/USD", base: "EUR", quote: "USD" },
     { pair: "GBP/USD", base: "GBP", quote: "USD" },
-    { pair: "AUD/USD", base: "AUD", quote: "USD" },
-    { pair: "NZD/USD", base: "NZD", quote: "USD" },
     { pair: "USD/JPY", base: "USD", quote: "JPY" },
+    { pair: "NZD/USD", base: "NZD", quote: "USD" },
     { pair: "USD/CHF", base: "USD", quote: "CHF" },
+    { pair: "USD/CAD", base: "USD", quote: "CAD" },
+    { pair: "AUD/USD", base: "AUD", quote: "USD" },
+    // EUR crosses
+    { pair: "EUR/NZD", base: "EUR", quote: "NZD" },
     { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
-    { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
-    { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
     { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
     { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
+    { pair: "EUR/CAD", base: "EUR", quote: "CAD" },
+    { pair: "EUR/AUD", base: "EUR", quote: "AUD" },
+    // GBP crosses
+    { pair: "GBP/AUD", base: "GBP", quote: "AUD" },
+    { pair: "GBP/NZD", base: "GBP", quote: "NZD" },
+    { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
+    { pair: "GBP/CAD", base: "GBP", quote: "CAD" },
+    { pair: "GBP/CHF", base: "GBP", quote: "CHF" },
+    // NZD crosses
+    { pair: "NZD/JPY", base: "NZD", quote: "JPY" },
+    { pair: "NZD/CHF", base: "NZD", quote: "CHF" },
+    { pair: "NZD/CAD", base: "NZD", quote: "CAD" },
+    // CHF crosses
+    { pair: "CHF/JPY", base: "CHF", quote: "JPY" },
+    // CAD crosses
     { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
+    { pair: "CAD/CHF", base: "CAD", quote: "CHF" },
+    // AUD crosses
+    { pair: "AUD/NZD", base: "AUD", quote: "NZD" },
+    { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
+    { pair: "AUD/CHF", base: "AUD", quote: "CHF" },
+    { pair: "AUD/CAD", base: "AUD", quote: "CAD" },
   ];
 
-  const pairsWithConfluence = ALL_PAIRS.map(p => ({ ...p, ...computeConfluenceForPair(p.base, p.quote) }));
-  const topSetups = [...pairsWithConfluence].sort((a, b) => b.biasCount - a.biasCount).slice(0, 4);
+  const pairsWithConfluence = ALL_PAIRS.map(p => ({ ...p, ...computeConfluenceForPair(p.base, p.quote) }))
+    .sort((a, b) => {
+      // Sort by confluence first, then by absolute score
+      if (b.biasCount !== a.biasCount) return b.biasCount - a.biasCount;
+      const scoreA = Math.abs(Math.round(currencyTotals[a.base] - currencyTotals[a.quote]));
+      const scoreB = Math.abs(Math.round(currencyTotals[b.base] - currencyTotals[b.quote]));
+      return scoreB - scoreA;
+    });
+  const topSetups = pairsWithConfluence.slice(0, 4);
 
   const corrColor = (val) => {
     if (val >= 0.7) return C.green;
@@ -1659,20 +1689,7 @@ export default function Dashboard() {
               )}
 
               {rightTab === "pairs" && (() => {
-                const PAIRS_LIST = [
-                  { pair: "EUR/USD", base: "EUR", quote: "USD" },
-                  { pair: "GBP/USD", base: "GBP", quote: "USD" },
-                  { pair: "AUD/USD", base: "AUD", quote: "USD" },
-                  { pair: "NZD/USD", base: "NZD", quote: "USD" },
-                  { pair: "USD/JPY", base: "USD", quote: "JPY" },
-                  { pair: "USD/CHF", base: "USD", quote: "CHF" },
-                  { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
-                  { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
-                  { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
-                  { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
-                  { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
-                  { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
-                ];
+                const PAIRS_LIST = pairsWithConfluence;
                 const RISK_CHAR = {
                   AUD: "risk_on", NZD: "risk_on", CAD: "risk_on",
                   EUR: "neutral", GBP: "neutral",
@@ -1925,35 +1942,31 @@ export default function Dashboard() {
                 return (
                   <div>
                     <SectionLabel>{t("pairsTitle")}</SectionLabel>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                       {pairsWithConfluence.map(({ pair, base, quote, biasCount, biasDir }) => {
                         const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
                         const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
-                        const direction = score > NEUTRAL_THRESHOLD ? "▲ LONG" : score < -NEUTRAL_THRESHOLD ? "▼ SHORT" : "→ NEUTRAL";
                         const isPerfect = biasCount === 5;
                         const perfectText = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text;
                         const perfectScore = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col;
                         return (
                           <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
-                            style={{ padding: "8px 10px",
+                            style={{ padding: "6px 8px",
                               background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0a`,
                               border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}33`,
                               borderLeft: `3px solid ${isPerfect ? PERFECT_BLUE : col}`, borderRadius: 6, cursor: "pointer",
                               animation: isPerfect ? "pulse 2s infinite" : "none" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                {isPerfect && <span style={{ fontSize: 10 }}>⚡</span>}
-                                <span style={{ fontSize: 11, fontWeight: 700, color: perfectText }}>{pair}</span>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                                {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
+                                <span style={{ fontSize: 10, fontWeight: 700, color: perfectText }}>{pair}</span>
                               </div>
-                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                <span style={{ fontSize: 8, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
-                                <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
-                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
                             </div>
-                            <div style={{ marginBottom: 5 }}><ScoreBar score={score} height={4} /></div>
+                            <div style={{ marginBottom: 3 }}><ScoreBar score={score} height={3} /></div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 8, color: col, fontWeight: 700 }}>{direction}</span>
-                              <span style={{ fontSize: 8, color: C.muted }}>
+                              <span style={{ fontSize: 7, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
+                              <span style={{ fontSize: 7, color: C.muted }}>
                                 {base} {currencyTotals[base] > 0 ? "+" : ""}{currencyTotals[base]} / {quote} {currencyTotals[quote] > 0 ? "+" : ""}{currencyTotals[quote]}
                               </span>
                             </div>
