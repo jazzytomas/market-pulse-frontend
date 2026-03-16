@@ -686,10 +686,7 @@ export default function Dashboard() {
                         <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
                       </div>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span>
-                      <span style={{ fontSize: 8, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 5px", borderRadius: 3 }}>{signal}</span>
-                    </div>
+                    <div><span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span></div>
                   </div>
                 );
               })}
@@ -2054,10 +2051,7 @@ export default function Dashboard() {
                     <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
                     <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : "▼"}{Math.abs(c.change)}%</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span>
-                    <span style={{ fontSize: 7, color: sigCol, border: `1px solid ${sigCol}44`, padding: "1px 4px", borderRadius: 3 }}>{signal}</span>
-                  </div>
+                  <div><span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span></div>
                 </div>
               );
             })}
