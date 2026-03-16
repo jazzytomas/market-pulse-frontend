@@ -1229,9 +1229,9 @@ export default function Dashboard() {
               };
               return (
                 <div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
                     <FGGauge label="FOREX" icon="💱" data={fearGreedData?.forex} />
-                    <FGGauge label="AKCIE (S&P 500)" icon="📈" data={fearGreedData?.stocks} />
+                    <FGGauge label="AKCIE" icon="📈" data={fearGreedData?.stocks} />
                     <FGGauge label="KRYPTO" icon="₿" data={fearGreedData?.crypto} />
                   </div>
                   <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px" }}>
