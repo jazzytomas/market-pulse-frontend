@@ -576,7 +576,7 @@ export default function Dashboard() {
   return (
     <LangContext.Provider value={lang}>
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, ...(isMobile ? { minHeight: "100vh" } : { height: "100vh", overflow: "hidden" }), color: C.text, fontFamily: "inherit" }}>
+    <div style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "inherit" }}>
 
       {/* Header – full width */}
       <div style={{ borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
@@ -639,13 +639,13 @@ export default function Dashboard() {
       </div>
       </div>
 
-    <div style={{ maxWidth: 1520, margin: "0 auto", ...(isMobile ? { minHeight: "100vh", overflowX: "hidden", width: "100%" } : { height: "calc(100% - 57px)", overflow: "hidden" }), padding: 14, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+    <div style={{ maxWidth: 1520, margin: "0 auto", padding: 14, boxSizing: "border-box", ...(isMobile ? { overflowX: "hidden", width: "100%" } : {}) }}>
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? { width: "100%", minWidth: 0 } : { flex: 1, minHeight: 0 }) }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? { width: "100%", minWidth: 0 } : {}) }}>
 
         {/* LEFT – desktop sidebar */}
         {!isMobile && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14 }}>
               <SectionLabel center>{t("riskSentiment")}</SectionLabel>
               <RiskMeter score={sentiment.total_score} />
@@ -675,7 +675,7 @@ export default function Dashboard() {
               </div>
             </div>
             {/* Commodities – back in desktop sidebar */}
-            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 12px", flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 12px" }}>
               <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 3 }}>{t("komodity")}</div>
               <div style={{ fontSize: 7, color: C.muted, marginBottom: 8 }}>{lang === "cz" ? "měny = korelované · dnes = signál" : "currencies = correlated · today = signal"}</div>
               {commodities.length === 0 ? (
@@ -702,7 +702,7 @@ export default function Dashboard() {
         )}
 
         {/* RIGHT / mobile-full */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0, ...(isMobile ? {} : { minHeight: 0 }) }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
 
         {/* Mobile: Risk Sentiment strip – gauge vlevo, VIX nahoře + měny dole vpravo */}
         {isMobile && (
@@ -743,7 +743,7 @@ export default function Dashboard() {
         )}
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, display: "flex", flexDirection: "column", ...(isMobile ? { minHeight: 400, order: 2 } : { flex: 1, minHeight: 0 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabScenarios")} active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label={t("tabEvents")} active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -757,7 +757,7 @@ export default function Dashboard() {
               <TabBtn label={t("tabGuide")} active={centerTab === "guide"} onClick={() => setCenterTab("guide")} />
             </div>
 
-            <div style={{ ...(isMobile ? {} : { flex: 1, overflowY: "auto", minHeight: 0 }) }}>
+            <div>
 
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1671,7 +1671,7 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 210 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden" }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabPairs")} active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label={t("tabStatus")} active={rightTab === "status"} onClick={() => setRightTab("status")} />
@@ -1680,7 +1680,7 @@ export default function Dashboard() {
               <TabBtn label={t("tabWatchlist")} active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
             </div>
 
-            <div style={{ padding: 14, ...(isMobile ? {} : { flex: 1, overflowY: "auto", minHeight: 0 }) }}>
+            <div style={{ padding: 14 }}>
 
               {rightTab === "status" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
