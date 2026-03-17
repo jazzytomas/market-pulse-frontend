@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" fill="none">
+  <!-- Bar chart -->
+  <rect x="18" y="70" width="16" height="40" rx="2" fill="#8a8a9a"/>
+  <rect x="38" y="52" width="16" height="58" rx="2" fill="#5a5a6a"/>
+  <rect x="58" y="34" width="16" height="76" rx="2" fill="#b8941e"/>
+  <rect x="78" y="16" width="16" height="94" rx="2" fill="#d4b020"/>
+
+  <!-- Arrow going up -->
+  <path d="M30 85 L50 65 L70 45 L88 22" stroke="#d4b020" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <polygon points="82,12 98,18 88,28" fill="#d4b020"/>
+
+  <!-- Purple/magenta swoosh under bars -->
+  <ellipse cx="55" cy="108" rx="52" ry="10" fill="none" stroke="url(#swoosh-l)" stroke-width="3.5"/>
+  <defs>
+    <linearGradient id="swoosh-l" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#b8941e"/>
+      <stop offset="30%" stop-color="#d03858"/>
+      <stop offset="60%" stop-color="#8020e0"/>
+      <stop offset="100%" stop-color="#3a1570"/>
+    </linearGradient>
+    <linearGradient id="gold-l" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4b020"/>
+      <stop offset="100%" stop-color="#a07d1a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- markeTrade text -->
+  <text x="115" y="82" font-family="'Segoe UI', Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="-1">
+    <tspan fill="#2a2a3a">marke</tspan><tspan fill="url(#gold-l)" font-weight="900" font-style="italic">Trade</tspan>
+  </text>
+</svg>

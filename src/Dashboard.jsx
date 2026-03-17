@@ -122,7 +122,7 @@ const T = {
 
 const LangContext = React.createContext("cz");
 
-const NEUTRAL_THRESHOLD = 20;
+const NEUTRAL_THRESHOLD = 5;
 const CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD", "NZD"];
 const API = "https://market-pulse-fdgb.onrender.com";
 
@@ -177,7 +177,8 @@ function computeCurrencyTotals(list) {
 
 function ScoreBar({ score, height = 6 }) {
   const C = React.useContext(ThemeContext);
-  const pct = ((score + 100) / 200) * 100;
+  const clampedScore = Math.max(-30, Math.min(30, score));
+  const pct = ((clampedScore + 30) / 60) * 100;
   const color = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   return (
     <div style={{ width: "100%", height, background: C.border, borderRadius: 3, overflow: "hidden", position: "relative" }}>
@@ -1652,7 +1653,7 @@ export default function Dashboard() {
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
                 const isPerfect = p.biasCount === 5;
                 const PERFECT_BLUE = "#1864dc";
-                const isDark = C.bg === "#0a0a12";
+                const isDark = C.bg === "#080812";
                 return (
                   <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
                     style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
@@ -1670,7 +1671,7 @@ export default function Dashboard() {
           </div>
 
           {/* BOTTOM tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 300 }) }}>
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden", display: "flex", flexDirection: "column", ...(isMobile ? {} : { flexShrink: 0, height: 210 }) }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabPairs")} active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label={t("tabStatus")} active={rightTab === "status"} onClick={() => setRightTab("status")} />
@@ -1993,7 +1994,7 @@ export default function Dashboard() {
                 }
 
                 const PERFECT_BLUE = "#1864dc";
-                const isDark = C.bg === "#0a0a12";
+                const isDark = C.bg === "#080812";
                 return (
                   <div>
                     <SectionLabel>{t("pairsTitle")}</SectionLabel>
@@ -2036,23 +2037,19 @@ export default function Dashboard() {
               {rightTab === "cb" && (
                 <div>
                   <SectionLabel>{t("cbTitle")}</SectionLabel>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                     {centralBanks.map(cb => {
                       const biasCol = cb.bias === "hawkish" ? C.green : cb.bias === "dovish" ? C.red : C.yellow;
                       return (
-                        <div key={cb.bank} style={{ padding: "8px 10px", background: `${biasCol}08`, border: `1px solid ${biasCol}22`, borderRadius: 6 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{cb.bank}</span>
-                              <span style={{ fontSize: 8, color: C.textDim }}>({cb.currency})</span>
-                            </div>
-                            <span style={{ fontSize: 12, fontWeight: 900, color: biasCol }}>{cb.rate}</span>
+                        <div key={cb.bank} style={{ padding: "5px 7px", background: `${biasCol}08`, border: `1px solid ${biasCol}22`, borderRadius: 5 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cb.currency}</span>
+                            <span style={{ fontSize: 10, fontWeight: 900, color: biasCol }}>{cb.rate}</span>
                           </div>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ fontSize: 8, color: C.accent }}>Next: {cb.nextMeeting}</span>
-                            <span style={{ fontSize: 8, color: biasCol, border: `1px solid ${biasCol}44`, padding: "1px 5px", borderRadius: 3 }}>{cb.bias}</span>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 7, color: C.muted }}>{cb.bank}</span>
+                            <span style={{ fontSize: 7, color: biasCol, border: `1px solid ${biasCol}44`, padding: "0px 4px", borderRadius: 2 }}>{cb.bias}</span>
                           </div>
-                          <div style={{ fontSize: 8, color: C.muted, marginTop: 3 }}>{lang === "cz" ? "Posledni:" : "Last:"} {cb.lastChange}</div>
                         </div>
                       );
                     })}
