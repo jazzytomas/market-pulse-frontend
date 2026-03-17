@@ -268,6 +268,7 @@ export default function Dashboard() {
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scenarioPage, setScenarioPage] = useState(1);
+  const [eventDay, setEventDay] = useState(null);
   const [eduTab, setEduTab] = useState("tech");
   const [scanning, setScanning] = useState(false);
   const [scanCountdown, setScanCountdown] = useState(0);
@@ -857,44 +858,70 @@ export default function Dashboard() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {(() => {
                   const now = new Date();
-                  const todayStr = now.toDateString();
                   const sorted = [...events].sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
-                  let shownPast = false, shownToday = false, shownUpcoming = false;
-                  return sorted.map((ev, i) => {
-                    const evDate = new Date(ev.event_time);
-                    const isPast = evDate < now;
-                    const isToday = evDate.toDateString() === todayStr;
-                    const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
-                    const hasActual = ev.actual && ev.actual.trim() !== "";
-                    const actualColor = (() => {
-                      if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
-                      const a = parseFloat(ev.actual); const f = parseFloat(ev.forecast);
-                      if (isNaN(a) || isNaN(f)) return C.text;
-                      return a > f ? C.green : a < f ? C.red : C.yellow;
-                    })();
-                    const fmtTime = (() => {
-                      try {
-                        const d = new Date(ev.event_time);
-                        if (isNaN(d)) return ev.event_time;
-                        const day = d.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" });
-                        const time = d.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
-                        return `${day} ${time}`;
-                      } catch { return ev.event_time; }
-                    })();
-                    const score = ev.score;
-                    const scoreColor = score == null ? null : score > 0 ? C.green : score < 0 ? C.red : C.yellow;
-                    let sectionHeader = null;
-                    if (isPast && !isToday && !shownPast) { shownPast = true; sectionHeader = lang === "cz" ? "PROBĚHLÉ" : "PAST"; }
-                    else if (isToday && !shownToday) { shownToday = true; sectionHeader = lang === "cz" ? "DNES" : "TODAY"; }
-                    else if (!isToday && !isPast && !shownUpcoming) { shownUpcoming = true; sectionHeader = lang === "cz" ? "NADCHÁZEJÍCÍ" : "UPCOMING"; }
-                    return (
-                      <React.Fragment key={i}>
-                        {sectionHeader && (
-                          <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, color: C.accent, borderBottom: `1px solid ${C.border}`, paddingBottom: 4, marginTop: i > 0 ? 8 : 0 }}>
-                            {sectionHeader}
-                          </div>
-                        )}
-                        <div style={{ border: `1px solid ${isPast ? C.border : col + "55"}`, borderLeft: `3px solid ${isPast ? C.muted : col}`, borderRadius: 6, padding: "10px 12px", opacity: isPast ? 0.45 : 1 }}>
+                  // Group by day
+                  const dayMap = {};
+                  sorted.forEach(ev => {
+                    const d = new Date(ev.event_time);
+                    const key = d.toISOString().slice(0, 10);
+                    if (!dayMap[key]) dayMap[key] = [];
+                    dayMap[key].push(ev);
+                  });
+                  const days = Object.keys(dayMap).sort();
+                  const todayKey = now.toISOString().slice(0, 10);
+                  const activeDay = eventDay && days.includes(eventDay) ? eventDay : (days.includes(todayKey) ? todayKey : days[0]);
+                  const dayEvents = dayMap[activeDay] || [];
+                  const DAY_NAMES_CZ = ["Ne","Po","Út","St","Čt","Pá","So"];
+                  const DAY_NAMES_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+                  return (<>
+                    {/* Day tabs */}
+                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 4 }}>
+                      {days.map(day => {
+                        const d = new Date(day + "T12:00:00");
+                        const dn = lang === "cz" ? DAY_NAMES_CZ[d.getDay()] : DAY_NAMES_EN[d.getDay()];
+                        const dd = d.getDate();
+                        const isToday = day === todayKey;
+                        const isActive = day === activeDay;
+                        const highCount = (dayMap[day] || []).filter(e => e.impact === "HIGH").length;
+                        return (
+                          <button key={day} onClick={() => setEventDay(day)} style={{
+                            fontSize: 9, padding: "4px 10px", borderRadius: 4, cursor: "pointer",
+                            fontWeight: isActive ? 700 : 400,
+                            background: isActive ? C.accent : C.border,
+                            color: isActive ? "#000" : C.textDim,
+                            border: isActive ? `1px solid ${C.accent}` : isToday ? `1px solid ${C.accent}88` : `1px solid ${C.border}`,
+                            position: "relative"
+                          }}>
+                            {dn} {dd}
+                            {highCount > 0 && <span style={{ fontSize: 7, color: isActive ? "#600" : C.red, marginLeft: 3 }}>{highCount}H</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Events for selected day */}
+                    {dayEvents.map((ev, i) => {
+                      const evDate = new Date(ev.event_time);
+                      const isPast = evDate < now;
+                      const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
+                      const hasActual = ev.actual && ev.actual.trim() !== "";
+                      const actualColor = (() => {
+                        if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
+                        const a = parseFloat(ev.actual); const f = parseFloat(ev.forecast);
+                        if (isNaN(a) || isNaN(f)) return C.text;
+                        return a > f ? C.green : a < f ? C.red : C.yellow;
+                      })();
+                      const time = (() => {
+                        try {
+                          const d = new Date(ev.event_time);
+                          return d.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
+                        } catch { return ""; }
+                      })();
+                      const score = ev.score;
+                      const scoreColor = score == null ? null : score > 0 ? C.green : score < 0 ? C.red : C.yellow;
+                      return (
+                        <div key={i} style={{ border: `1px solid ${isPast ? C.border : col + "55"}`, borderLeft: `3px solid ${isPast ? C.muted : col}`, borderRadius: 6, padding: "10px 12px", opacity: isPast ? 0.45 : 1 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                               <span style={{ width: 7, height: 7, borderRadius: "50%", background: isPast ? C.muted : col, display: "inline-block" }} />
@@ -907,7 +934,7 @@ export default function Dashboard() {
                                   {score > 0 ? "+" : ""}{score}
                                 </span>
                               )}
-                              <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{fmtTime}</span>
+                              <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{time}</span>
                             </div>
                           </div>
                           <div style={{ display: "flex", gap: 14 }}>
@@ -925,9 +952,10 @@ export default function Dashboard() {
                             </div>
                           </div>
                         </div>
-                      </React.Fragment>
-                    );
-                  });
+                      );
+                    })}
+                    {dayEvents.length === 0 && <div style={{ fontSize: 9, color: C.muted }}>{t("noEvents")}</div>}
+                  </>);
                 })()}
                 <div style={{ marginTop: 8, borderTop: `1px solid ${C.border}`, paddingTop: 12 }}>
                   <SectionLabel>{t("volWindows")}</SectionLabel>
