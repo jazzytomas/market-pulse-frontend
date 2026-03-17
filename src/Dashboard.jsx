@@ -267,6 +267,7 @@ export default function Dashboard() {
   const [selectedPair, setSelectedPair] = useState(null);
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
+  const [scenarioPage, setScenarioPage] = useState(1);
   const [eduTab, setEduTab] = useState("tech");
   const [scanning, setScanning] = useState(false);
   const [scanCountdown, setScanCountdown] = useState(0);
@@ -762,27 +763,28 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
-                  {[{ key: "HIGH", label: t("filterHigh") }, { key: "MED", label: t("filterMed") }, { key: "STARŠÍ", label: t("filterOld") }].map(f => (
-                    <button key={f.key} onClick={() => setScenarioFilter(f.key)} style={{
+                  {[{ key: "HIGH", label: t("filterHigh") }, { key: "MED", label: t("filterMed") }].map(f => (
+                    <button key={f.key} onClick={() => { setScenarioFilter(f.key); setScenarioPage(1); }} style={{
                       fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f.key ? 700 : 400,
-                      background: scenarioFilter === f.key ? (f.key === "STARŠÍ" ? C.border : C.accent) : C.border,
-                      color: scenarioFilter === f.key ? (f.key === "STARŠÍ" ? C.textDim : "#000") : C.textDim,
-                      border: `1px solid ${scenarioFilter === f.key ? (f.key === "STARŠÍ" ? C.textDim : C.accent) : C.border}`
+                      background: scenarioFilter === f.key ? C.accent : C.border,
+                      color: scenarioFilter === f.key ? "#000" : C.textDim,
+                      border: `1px solid ${scenarioFilter === f.key ? C.accent : C.border}`
                     }}>{f.label}</button>
                   ))}
                   <span style={{ fontSize: 9, color: C.textDim, alignSelf: "center", marginLeft: 4 }}>{t("clickDetail")}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {(() => {
+                  const PER_PAGE = 5;
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                  const allHigh = sorted.filter(s => s.weight === "HIGH");
-                  const allMed = sorted.filter(s => s.weight === "MED");
-                  const list = scenarioFilter === "HIGH"
-                    ? allHigh.slice(0, 20)
-                    : scenarioFilter === "STARŠÍ"
-                      ? allHigh.slice(20)
-                      : allMed.slice(0, 10);
-                  return list.map(s => {
+                  const fullList = scenarioFilter === "HIGH"
+                    ? sorted.filter(s => s.weight === "HIGH")
+                    : sorted.filter(s => s.weight === "MED");
+                  const totalPages = Math.max(1, Math.ceil(fullList.length / PER_PAGE));
+                  const safePage = Math.min(scenarioPage, totalPages);
+                  const list = fullList.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+                  return (<>
+                  {list.map(s => {
                     const isExp = expandedScenario === s.id;
                     const isMed = s.weight === "MED";
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
@@ -832,7 +834,20 @@ export default function Dashboard() {
                         )}
                       </div>
                     );
-                  });
+                  })}
+                  {totalPages > 1 && (
+                    <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 4 }}>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                        <button key={p} onClick={() => setScenarioPage(p)} style={{
+                          fontSize: 9, width: 26, height: 26, borderRadius: 4, cursor: "pointer", fontWeight: p === safePage ? 700 : 400,
+                          background: p === safePage ? C.accent : C.border,
+                          color: p === safePage ? "#000" : C.textDim,
+                          border: `1px solid ${p === safePage ? C.accent : C.border}`
+                        }}>{p}</button>
+                      ))}
+                    </div>
+                  )}
+                  </>);
                 })()}
                 </div>
               </div>
