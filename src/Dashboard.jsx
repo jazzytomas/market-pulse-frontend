@@ -241,7 +241,7 @@ function TabBtn({ label, active, onClick }) {
       border: "none",
       borderBottom: active ? `2px solid ${C.accent}` : "2px solid transparent",
       color: active ? C.accent : C.textDim,
-      padding: "5px 10px 8px", fontSize: 10, letterSpacing: 0.8,
+      padding: "6px 12px 9px", fontSize: 13, letterSpacing: 1,
       cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif", fontWeight: active ? 700 : 600,
       textTransform: "uppercase", whiteSpace: "nowrap",
       borderRadius: "4px 4px 0 0", transition: "color 0.15s, background 0.15s",
@@ -772,7 +772,7 @@ export default function Dashboard() {
             {centerTab === "scenarios" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
-                  {[{ key: "HIGH", label: t("filterHigh") }, { key: "MED", label: t("filterMed") }].map(f => (
+                  {[{ key: "HIGH", label: t("filterHigh") }, { key: "MED", label: t("filterMed") }, { key: "OLD", label: t("filterOld") }].map(f => (
                     <button key={f.key} onClick={() => { setScenarioFilter(f.key); setScenarioPage(1); }} style={{
                       fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f.key ? 700 : 400,
                       background: scenarioFilter === f.key ? C.accent : C.border,
@@ -786,8 +786,11 @@ export default function Dashboard() {
                 {(() => {
                   const PER_PAGE = 5;
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                  const now48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
                   const fullList = scenarioFilter === "HIGH"
-                    ? sorted.filter(s => s.weight === "HIGH")
+                    ? sorted.filter(s => s.weight === "HIGH" && new Date(s.created_at + "Z") >= now48h)
+                    : scenarioFilter === "OLD"
+                    ? sorted.filter(s => s.weight === "HIGH" && new Date(s.created_at + "Z") < now48h)
                     : sorted.filter(s => s.weight === "MED");
                   const totalPages = Math.max(1, Math.ceil(fullList.length / PER_PAGE));
                   const safePage = Math.min(scenarioPage, totalPages);
@@ -803,7 +806,7 @@ export default function Dashboard() {
                       <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
                         <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "5px 10px" : "7px 12px", cursor: "pointer" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                            <div style={{ fontSize: isMed ? 14 : 18, fontWeight: isMed ? 600 : 800, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 }}>{s.title}</div>
+                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
                               <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
@@ -991,45 +994,37 @@ export default function Dashboard() {
                 {(() => {
                   const maxVal = Math.max(1, ...cotData.map(c => Math.max(c.long || 0, c.short || 0)));
                   return (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5 }}>
                       {cotData.map(c => {
                         const col = c.sentiment === "bullish" ? C.green : C.red;
                         const longPct = Math.round(((c.long || 0) / maxVal) * 100);
                         const shortPct = Math.round(((c.short || 0) / maxVal) * 100);
-                        const dateStr = c.date ? c.date.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3.$2") : "";
                         return (
-                          <div key={c.currency} style={{ padding: "10px 12px", background: `${col}08`, border: `1px solid ${col}33`, borderRadius: 6 }}>
-                            {/* Header */}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                                <span style={{ fontSize: 13, fontWeight: 900, color: col }}>{c.currency}</span>
-                                <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3 }}>{c.sentiment}</span>
-                              </div>
-                              <span style={{ fontSize: 8, color: C.muted }}>{dateStr}</span>
+                          <div key={c.currency} style={{ padding: "6px 8px", background: `${col}08`, border: `1px solid ${col}33`, borderRadius: 5 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                              <span style={{ fontSize: 10, fontWeight: 900, color: col }}>{c.currency}</span>
+                              <span style={{ fontSize: 7, color: col }}>{c.sentiment}</span>
                             </div>
-                            {/* Long bar */}
-                            <div style={{ marginBottom: 5 }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                                <span style={{ fontSize: 8, color: C.green }}>LONG</span>
-                                <span style={{ fontSize: 8, color: C.green }}>{((c.long || 0) / 1000).toFixed(0)}K</span>
+                            <div style={{ marginBottom: 3 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: 7, color: C.green }}>L</span>
+                                <span style={{ fontSize: 7, color: C.green }}>{((c.long || 0) / 1000).toFixed(0)}K</span>
                               </div>
-                              <div style={{ width: "100%", height: 5, background: C.border, borderRadius: 3 }}>
+                              <div style={{ width: "100%", height: 4, background: C.border, borderRadius: 3 }}>
                                 <div style={{ width: `${longPct}%`, height: "100%", background: C.green, borderRadius: 3 }} />
                               </div>
                             </div>
-                            {/* Short bar */}
-                            <div style={{ marginBottom: 7 }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                                <span style={{ fontSize: 8, color: C.red }}>SHORT</span>
-                                <span style={{ fontSize: 8, color: C.red }}>{((c.short || 0) / 1000).toFixed(0)}K</span>
+                            <div style={{ marginBottom: 4 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: 7, color: C.red }}>S</span>
+                                <span style={{ fontSize: 7, color: C.red }}>{((c.short || 0) / 1000).toFixed(0)}K</span>
                               </div>
-                              <div style={{ width: "100%", height: 5, background: C.border, borderRadius: 3 }}>
+                              <div style={{ width: "100%", height: 4, background: C.border, borderRadius: 3 }}>
                                 <div style={{ width: `${shortPct}%`, height: "100%", background: C.red, borderRadius: 3 }} />
                               </div>
                             </div>
-                            {/* Net */}
-                            <div style={{ fontSize: 9, fontWeight: 700, color: col, textAlign: "center", borderTop: `1px solid ${C.border}`, paddingTop: 5 }}>
-                              NET {c.net > 0 ? "+" : ""}{(c.net || 0).toLocaleString()}
+                            <div style={{ fontSize: 8, fontWeight: 700, color: col, textAlign: "center", borderTop: `1px solid ${C.border}`, paddingTop: 3 }}>
+                              {c.net > 0 ? "+" : ""}{(c.net || 0).toLocaleString()}
                             </div>
                           </div>
                         );
@@ -1252,10 +1247,10 @@ export default function Dashboard() {
                 const ex = cx + r * Math.cos(angle);
                 const ey = cy - r * Math.sin(angle); // SVG y je dolů, proto minus
                 return (
-                  <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
+                  <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center", minHeight: 160 }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
                     <div style={{ fontSize: 9, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
-                    <svg width="140" height="82" viewBox="0 0 140 82" style={{ overflow: "visible" }}>
+                    <svg width="120" height="72" viewBox="0 0 140 82" style={{ overflow: "visible" }}>
                       {/* Background arc: vlevo → vpravo, po směru hodinových ručiček = nahoře */}
                       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
                         fill="none" stroke={C.border} strokeWidth={sw} strokeLinecap="round" />
@@ -1643,7 +1638,7 @@ export default function Dashboard() {
                 </div>
               );
               return (
-                <div style={{ fontSize: 9, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 9, lineHeight: 1.6, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 6 }}>
 
                   <AccSection id="risk" emoji="🌡️" title="RISK SENTIMENT">
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Celkové nálada trhu vůči riziku. Vypočítává se jako vážený průměr AI skóre zpráv + VIX index." : "Overall market risk mood. Calculated as weighted average of AI news scores + VIX index."} />
@@ -1708,7 +1703,7 @@ export default function Dashboard() {
                     <Row label={lang === "cz" ? "Risk ON/OFF" : "Risk ON/OFF"} desc={lang === "cz" ? "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP." : "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP."} />
                   </AccSection>
 
-                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 8 }}>
+                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 8, gridColumn: isMobile ? "1" : "1 / -1" }}>
                     {lang === "cz" ? "Data se aktualizují automaticky · COT každý pátek · Sezónnost každých 24h" : "Data updates automatically · COT every Friday · Seasonality every 24h"}
                   </div>
 
