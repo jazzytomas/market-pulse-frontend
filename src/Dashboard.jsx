@@ -1247,24 +1247,20 @@ export default function Dashboard() {
                 const ex = cx + r * Math.cos(angle);
                 const ey = cy - r * Math.sin(angle); // SVG y je dolů, proto minus
                 return (
-                  <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center", minHeight: 160 }}>
+                  <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center", height: 170, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
                     <div style={{ fontSize: 9, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
                     <svg width="120" height="72" viewBox="0 0 140 82" style={{ overflow: "visible" }}>
-                      {/* Background arc: vlevo → vpravo, po směru hodinových ručiček = nahoře */}
                       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
                         fill="none" stroke={C.border} strokeWidth={sw} strokeLinecap="round" />
-                      {/* Value arc: vždy large=0, sweep=1 (po hodinových ručičkách = nahoru) */}
                       {pct > 0 && <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${ex.toFixed(2)} ${ey.toFixed(2)}`}
                         fill="none" stroke={col} strokeWidth={sw} strokeLinecap="round" />}
-                      {/* Value text */}
                       <text x={cx} y={cy - 6} textAnchor="middle" fill={col} fontSize="22" fontWeight="900" fontFamily="monospace">{pct}</text>
-                      {/* Labels */}
                       <text x={cx - r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
                       <text x={cx + r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
                     </svg>
                     <div style={{ fontSize: 12, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
-                    {data.vix && <div style={{ fontSize: 8, color: C.muted, marginTop: 4 }}>VIX {data.vix}</div>}
+                    <div style={{ fontSize: 8, color: C.muted, marginTop: 4, minHeight: 14 }}>{data.vix ? `VIX ${data.vix}` : ""}</div>
                   </div>
                 );
               };
