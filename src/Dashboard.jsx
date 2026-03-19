@@ -786,11 +786,11 @@ export default function Dashboard() {
                 {(() => {
                   const PER_PAGE = 5;
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                  const now48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
+                  const allHigh = sorted.filter(s => s.weight === "HIGH");
                   const fullList = scenarioFilter === "HIGH"
-                    ? sorted.filter(s => s.weight === "HIGH" && new Date(s.created_at + "Z") >= now48h)
+                    ? allHigh.slice(0, 10)
                     : scenarioFilter === "OLD"
-                    ? sorted.filter(s => s.weight === "HIGH" && new Date(s.created_at + "Z") < now48h)
+                    ? allHigh.slice(10)
                     : sorted.filter(s => s.weight === "MED");
                   const totalPages = Math.max(1, Math.ceil(fullList.length / PER_PAGE));
                   const safePage = Math.min(scenarioPage, totalPages);
