@@ -265,6 +265,8 @@ export default function Dashboard() {
   const [centerTab, setCenterTab] = useState("scenarios");
   const [rightTab, setRightTab] = useState("pairs");
   const [selectedPair, setSelectedPair] = useState(null);
+  const [pairNewsFilter, setPairNewsFilter] = useState("HIGH");
+  const [openGuide, setOpenGuide] = useState(null);
   const [expandedScenario, setExpandedScenario] = useState(null);
   const [scenarioFilter, setScenarioFilter] = useState("HIGH");
   const [scenarioPage, setScenarioPage] = useState(1);
@@ -282,7 +284,9 @@ export default function Dashboard() {
   const [currencyCorr, setCurrencyCorr] = useState(null);
   const [corrView, setCorrView] = useState("pairs"); // "pairs" or "currencies"
   const [backtestData, setBacktestData] = useState(null);
+  const [btPage, setBtPage] = useState(1);
   const [fearGreedData, setFearGreedData] = useState(null);
+  const [fgHistory, setFgHistory] = useState([]);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
   const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
   const [winW, setWinW] = useState(window.innerWidth);
@@ -376,6 +380,10 @@ export default function Dashboard() {
     fetch(`${API}/api/fear_greed`)
       .then(r => r.json())
       .then(data => setFearGreedData(data))
+      .catch(() => {});
+    fetch(`${API}/api/fg_history`)
+      .then(r => r.json())
+      .then(data => setFgHistory(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
 
@@ -795,7 +803,7 @@ export default function Dashboard() {
                       <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
                         <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "5px 10px" : "7px 12px", cursor: "pointer" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
+                            <div style={{ fontSize: isMed ? 14 : 18, fontWeight: isMed ? 600 : 800, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
                               <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
                               <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
@@ -983,7 +991,7 @@ export default function Dashboard() {
                 {(() => {
                   const maxVal = Math.max(1, ...cotData.map(c => Math.max(c.long || 0, c.short || 0)));
                   return (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                       {cotData.map(c => {
                         const col = c.sentiment === "bullish" ? C.green : C.red;
                         const longPct = Math.round(((c.long || 0) / maxVal) * 100);
@@ -1034,36 +1042,21 @@ export default function Dashboard() {
 
             {centerTab === "corr" && (
               <div>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                  {[
-                    { key: "pairs", label: lang === "cz" ? "Páry" : "Pairs" },
-                    { key: "currencies", label: lang === "cz" ? "Měny" : "Currencies" },
-                  ].map(v => (
-                    <button key={v.key} onClick={() => setCorrView(v.key)}
-                      style={{ padding: "4px 12px", fontSize: 9, fontWeight: corrView === v.key ? 700 : 400,
-                        background: corrView === v.key ? `${C.accent}25` : "transparent",
-                        color: corrView === v.key ? C.accent : C.muted,
-                        border: `1px solid ${corrView === v.key ? C.accent : C.border}`, borderRadius: 12, cursor: "pointer" }}>
-                      {v.label}
-                    </button>
-                  ))}
-                </div>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>
                   {t("corrDesc")}
-                  {corrView === "pairs" && correlationData && correlationData.date && (
-                    <span style={{ marginLeft: 8, color: C.muted }}>
-                      · {correlationData.days}D · {lang === "cz" ? "aktuální k" : "as of"} {correlationData.date}
-                    </span>
-                  )}
-                  {corrView === "currencies" && currencyCorr && currencyCorr.date && (
-                    <span style={{ marginLeft: 8, color: C.muted }}>
-                      · {currencyCorr.days}D · {lang === "cz" ? "aktuální k" : "as of"} {currencyCorr.date}
-                    </span>
-                  )}
                 </div>
 
-                {corrView === "pairs" && (
-                  !correlationData ? (
+                {/* PÁRY */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
+                    {lang === "cz" ? "KORELACE PÁRŮ" : "PAIR CORRELATION"}
+                    {correlationData && correlationData.date && (
+                      <span style={{ fontSize: 8, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
+                        {correlationData.days}D · {lang === "cz" ? "k" : "as of"} {correlationData.date}
+                      </span>
+                    )}
+                  </div>
+                  {!correlationData ? (
                     <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
                   ) : (
                     <div style={{ overflowX: "auto" }}>
@@ -1092,11 +1085,20 @@ export default function Dashboard() {
                         </tbody>
                       </table>
                     </div>
-                  )
-                )}
+                  )}
+                </div>
 
-                {corrView === "currencies" && (
-                  !currencyCorr || !currencyCorr.currencies?.length ? (
+                {/* MĚNY */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
+                    {lang === "cz" ? "KORELACE MĚN" : "CURRENCY CORRELATION"}
+                    {currencyCorr && currencyCorr.date && (
+                      <span style={{ fontSize: 8, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
+                        {currencyCorr.days}D · {lang === "cz" ? "k" : "as of"} {currencyCorr.date}
+                      </span>
+                    )}
+                  </div>
+                  {!currencyCorr || !currencyCorr.currencies?.length ? (
                     <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
                   ) : (
                     <div style={{ overflowX: "auto" }}>
@@ -1125,8 +1127,8 @@ export default function Dashboard() {
                         </tbody>
                       </table>
                     </div>
-                  )
-                )}
+                  )}
+                </div>
               </div>
             )}
 
@@ -1274,9 +1276,37 @@ export default function Dashboard() {
               return (
                 <div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
-                    <FGGauge label="FOREX" icon="💱" data={fearGreedData?.forex} />
-                    <FGGauge label="AKCIE" icon="📈" data={fearGreedData?.stocks} />
-                    <FGGauge label="KRYPTO" icon="₿" data={fearGreedData?.crypto} />
+                    {[
+                      { label: "FOREX", icon: "💱", data: fearGreedData?.forex, histKey: "forex" },
+                      { label: lang === "cz" ? "AKCIE" : "STOCKS", icon: "📈", data: fearGreedData?.stocks, histKey: "stocks" },
+                      { label: "KRYPTO", icon: "₿", data: fearGreedData?.crypto, histKey: "crypto" },
+                    ].map(fg => (
+                      <div key={fg.label}>
+                        <FGGauge label={fg.label} icon={fg.icon} data={fg.data} />
+                        {fgHistory.length > 1 && (
+                          <div style={{ marginTop: 6, padding: "6px 8px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6 }}>
+                            <div style={{ fontSize: 7, color: C.muted, marginBottom: 4, textAlign: "center" }}>{lang === "cz" ? "HISTORIE" : "HISTORY"}</div>
+                            <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 28 }}>
+                              {[...fgHistory].reverse().map((h, i) => {
+                                const val = h[fg.histKey];
+                                if (val == null) return <div key={i} style={{ flex: 1 }} />;
+                                const barH = Math.max(3, (val / 100) * 26);
+                                const col = fgColor(val);
+                                return (
+                                  <div key={i} title={`${h.date}: ${val}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: 28 }}>
+                                    <div style={{ width: "100%", height: barH, background: col, borderRadius: 2, opacity: 0.85, minWidth: 3 }} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+                              <span style={{ fontSize: 6, color: C.muted }}>{fgHistory[fgHistory.length - 1]?.date?.slice(5)}</span>
+                              <span style={{ fontSize: 6, color: C.muted }}>{fgHistory[0]?.date?.slice(5)}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                   <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
@@ -1338,11 +1368,17 @@ export default function Dashboard() {
                       </div>
                     )}
                     {/* Recent predictions */}
-                    {backtestData.recent && backtestData.recent.length > 0 && (
+                    {backtestData.recent && backtestData.recent.length > 0 && (() => {
+                      const BT_PER_PAGE = 5;
+                      const BT_MAX_PAGES = 10;
+                      const totalBtPages = Math.min(BT_MAX_PAGES, Math.max(1, Math.ceil(backtestData.recent.length / BT_PER_PAGE)));
+                      const safeBtPage = Math.min(btPage, totalBtPages);
+                      const btList = backtestData.recent.slice((safeBtPage - 1) * BT_PER_PAGE, safeBtPage * BT_PER_PAGE);
+                      return (
                       <div>
                         <SectionLabel>{t("btRecent")}</SectionLabel>
                         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                          {backtestData.recent.slice(0, 15).map((r, i) => {
+                          {btList.map((r, i) => {
                             const aiCol = r.ai_score > 0 ? C.green : C.red;
                             const resCol = r.correct === 1 ? C.green : C.red;
                             const resEmoji = r.correct === 1 ? "✅" : "❌";
@@ -1360,8 +1396,21 @@ export default function Dashboard() {
                             );
                           })}
                         </div>
+                        {totalBtPages > 1 && (
+                          <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
+                            {Array.from({ length: totalBtPages }, (_, i) => i + 1).map(p => (
+                              <button key={p} onClick={() => setBtPage(p)} style={{
+                                fontSize: 9, width: 26, height: 26, borderRadius: 4, cursor: "pointer", fontWeight: p === safeBtPage ? 700 : 400,
+                                background: p === safeBtPage ? C.accent : C.border,
+                                color: p === safeBtPage ? "#000" : C.textDim,
+                                border: `1px solid ${p === safeBtPage ? C.accent : C.border}`
+                              }}>{p}</button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -1574,12 +1623,19 @@ export default function Dashboard() {
             })()}
 
             {centerTab === "guide" && (() => {
-              const Section = ({ emoji, title, children }) => (
-                <div style={{ marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 10 }}>{emoji} {title}</div>
-                  {children}
-                </div>
-              );
+              const AccSection = ({ id, emoji, title, children }) => {
+                const isOpen = openGuide === id;
+                return (
+                  <div style={{ marginBottom: 6, border: `1px solid ${isOpen ? C.accent + "44" : C.border}`, borderRadius: 8, overflow: "hidden" }}>
+                    <div onClick={() => setOpenGuide(isOpen ? null : id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isOpen ? `${C.accent}0a` : "transparent" }}>
+                      <span style={{ fontSize: 18 }}>{emoji}</span>
+                      <span style={{ fontSize: 11, fontWeight: 900, color: isOpen ? C.accent : C.text, letterSpacing: 2, flex: 1 }}>{title}</span>
+                      <span style={{ fontSize: 12, color: C.muted, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
+                    </div>
+                    {isOpen && <div style={{ padding: "0 14px 14px" }}>{children}</div>}
+                  </div>
+                );
+              };
               const Row = ({ label, desc }) => (
                 <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
                   <span style={{ fontSize: 9, fontWeight: 700, color: C.text, minWidth: 110, flexShrink: 0 }}>{label}</span>
@@ -1589,95 +1645,71 @@ export default function Dashboard() {
               return (
                 <div style={{ fontSize: 9, lineHeight: 1.6 }}>
 
-                  <Section emoji="🌡️" title="RISK SENTIMENT">
+                  <AccSection id="risk" emoji="🌡️" title="RISK SENTIMENT">
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Celkové nálada trhu vůči riziku. Vypočítává se jako vážený průměr AI skóre zpráv + VIX index." : "Overall market risk mood. Calculated as weighted average of AI news scores + VIX index."} />
                     <Row label={lang === "cz" ? "Škála" : "Scale"} desc={lang === "cz" ? "+100 = maximální Risk ON (trhy rostou, investoři kupují riziková aktiva). −100 = maximální Risk OFF (strach, útěk do bezpečí)." : "+100 = max Risk ON (markets rising, investors buying risky assets). −100 = max Risk OFF (fear, flight to safety)."} />
                     <Row label="VIX" desc={lang === "cz" ? "Index strachu. VIX nad 25 = strach na trhu (Risk OFF). VIX pod 15 = klid (Risk ON). Váha 2× HIGH zpráva." : "Fear index. VIX above 25 = market fear (Risk OFF). VIX below 15 = calm (Risk ON). Weight = 2× HIGH news."} />
                     <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Risk ON → sleduj AUD, NZD, CAD. Risk OFF → sleduj USD, JPY, CHF. Neutral → čekej na potvrzení." : "Risk ON → watch AUD, NZD, CAD. Risk OFF → watch USD, JPY, CHF. Neutral → wait for confirmation."} />
-                  </Section>
+                  </AccSection>
 
-                  <Section emoji="⚡" title={lang === "cz" ? "SCÉNÁŘE" : "SCENARIOS"}>
+                  <AccSection id="scenarios" emoji="⚡" title={lang === "cz" ? "SCÉNÁŘE" : "SCENARIOS"}>
                     <Row label={lang === "cz" ? "Co to jsou" : "What they are"} desc={lang === "cz" ? "AI (Claude Haiku) ohodnotí každou forex-relevantní zprávu skóre a dopadem na každou měnu." : "AI (Claude Haiku) scores every forex-relevant news item and calculates impact on each currency."} />
                     <Row label="Risk score" desc={lang === "cz" ? "−100 až +100. Kladné = pozitivní pro trhy (Risk ON). Záporné = negativní (Risk OFF)." : "−100 to +100. Positive = good for markets (Risk ON). Negative = bad (Risk OFF)."} />
                     <Row label={lang === "cz" ? "HIGH váha" : "HIGH weight"} desc={lang === "cz" ? "Market-moving zprávy: NFP, rozhodnutí CB, geopolitické šoky. Počítají se 3× do sentimentu." : "Market-moving news: NFP, CB decisions, geopolitical shocks. Count 3× in sentiment."} />
                     <Row label={lang === "cz" ? "MED váha" : "MED weight"} desc={lang === "cz" ? "Důležité ale ne market-moving: komentáře CB, regionální data. Počítají se 1× do sentimentu." : "Important but not market-moving: CB comments, regional data. Count 1× in sentiment."} />
-                    <Row label={lang === "cz" ? "LOW váha" : "LOW weight"} desc={lang === "cz" ? "Pozadí a kontext. Do risk sentimentu se nezapočítávají." : "Background and context. Not counted in risk sentiment."} />
-                    <Row label={lang === "cz" ? "Filtr" : "Filter"} desc={lang === "cz" ? "Tlačítka HIGH / MED přepínají seznam. Kliknutím na zprávu zobrazíš dopad na každou měnu." : "HIGH / MED buttons switch the list. Click a news item to see impact on each currency."} />
-                  </Section>
+                  </AccSection>
 
-                  <Section emoji="📅" title={lang === "cz" ? "EVENTS (EKONOMICKÝ KALENDÁŘ)" : "EVENTS (ECONOMIC CALENDAR)"}>
+                  <AccSection id="events" emoji="📅" title={lang === "cz" ? "EVENTS (KALENDÁŘ)" : "EVENTS (CALENDAR)"}>
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Ekonomické události z ForexFactory pro aktuální týden. Aktualizuje se každou hodinu." : "Economic events from ForexFactory for the current week. Updates every hour."} />
-                    <Row label="🔴 HIGH" desc={lang === "cz" ? "Silně market-moving: NFP, CPI, rozhodnutí Fedu/ECB/BOJ, HDP. Očekávej velké pohyby (50+ pips)." : "Strong market-movers: NFP, CPI, Fed/ECB/BOJ decisions, GDP. Expect large moves (50+ pips)."} />
-                    <Row label="🟡 MED" desc={lang === "cz" ? "Střední dopad: PMI, obchodní bilance, výroky bankéřů. Pohyby 10–30 pips." : "Medium impact: PMI, trade balance, CB speeches. Moves 10–30 pips."} />
-                    <Row label={lang === "cz" ? "Volatilita oken" : "Volatility windows"} desc={lang === "cz" ? "Typická volatilita podle obchodní seance (Tokio, Londýn, NY). Nejsilnější = overlap Londýn+NY (13–17h CET)." : "Typical volatility by trading session (Tokyo, London, NY). Strongest = London+NY overlap (1–5pm CET)."} />
-                  </Section>
+                    <Row label="🔴 HIGH" desc={lang === "cz" ? "Silně market-moving: NFP, CPI, rozhodnutí Fedu/ECB/BOJ, HDP." : "Strong market-movers: NFP, CPI, Fed/ECB/BOJ decisions, GDP."} />
+                    <Row label="🟡 MED" desc={lang === "cz" ? "Střední dopad: PMI, obchodní bilance, výroky bankéřů." : "Medium impact: PMI, trade balance, CB speeches."} />
+                  </AccSection>
 
-                  <Section emoji="📊" title="COT (COMMITMENTS OF TRADERS)">
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Týdenní report CFTC o pozicích velkých hráčů (hedge fondy = Leveraged Money) na futures trzích." : "Weekly CFTC report on positions of large players (hedge funds = Leveraged Money) in futures markets."} />
-                    <Row label={lang === "cz" ? "Datum" : "Date"} desc={lang === "cz" ? "Datum = úterý reportovacího týdne (kdy se data uzavřou). CFTC publikuje v pátek, stahujeme automaticky." : "Date = Tuesday of the reporting week (when data closes). CFTC publishes Friday, we fetch automatically."} />
-                    <Row label="LONG" desc={lang === "cz" ? "Počet long kontraktů (sázka na posílení měny)." : "Number of long contracts (bet on currency strengthening)."} />
-                    <Row label="SHORT" desc={lang === "cz" ? "Počet short kontraktů (sázka na oslabení měny)." : "Number of short contracts (bet on currency weakening)."} />
-                    <Row label="NET" desc={lang === "cz" ? "Long − Short. Kladný NET = trh sází na posílení. Záporný = slabost. Extrémní hodnoty = možný obrat." : "Long − Short. Positive NET = market bets on strength. Negative = weakness. Extremes = possible reversal."} />
-                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Sleduj trend NET pozic. Extrémy (velmi high/low) signalizují přeprodanost. USD je syntetický (inverzní součet ostatních)." : "Watch NET position trend. Extremes (very high/low) signal oversaturation. USD is synthetic (inverse sum of others)."} />
-                  </Section>
+                  <AccSection id="cot" emoji="📊" title="COT (COMMITMENTS OF TRADERS)">
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Týdenní report CFTC o pozicích velkých hráčů (hedge fondy) na futures trzích." : "Weekly CFTC report on positions of large players (hedge funds) in futures markets."} />
+                    <Row label="NET" desc={lang === "cz" ? "Long − Short. Kladný = sázka na posílení. Záporný = slabost. Extrémní hodnoty = možný obrat." : "Long − Short. Positive = bet on strength. Negative = weakness. Extremes = possible reversal."} />
+                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Sleduj trend NET pozic. USD je syntetický (inverzní součet ostatních)." : "Watch NET position trend. USD is synthetic (inverse sum of others)."} />
+                  </AccSection>
 
-                  <Section emoji="🔗" title={lang === "cz" ? "KORELACE" : "CORRELATION"}>
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "30denní Pearsonova korelace mezi 6 hlavními páry. Live data z yfinance." : "30-day Pearson correlation between 6 major pairs. Live data from yfinance."} />
-                    <Row label="+1.0" desc={lang === "cz" ? "Páry se pohybují identicky. Přidáním obou otevíráš dvojnásobné riziko." : "Pairs move identically. Adding both doubles your risk."} />
-                    <Row label="−1.0" desc={lang === "cz" ? "Páry jdou přesně opačně. Hedge: long jeden, short druhý = minimální riziko." : "Pairs move opposite. Hedge: long one, short the other = minimal risk."} />
-                    <Row label="0.0" desc={lang === "cz" ? "Žádná korelace. Páry se pohybují nezávisle." : "No correlation. Pairs move independently."} />
-                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Nekumuluj vysoce korelované pozice (EUR/USD + GBP/USD). Inverzní korelace (EUR/USD + USD/JPY) lze hedgovat." : "Don't accumulate highly correlated positions (EUR/USD + GBP/USD). Inverse correlation (EUR/USD + USD/JPY) can be hedged."} />
-                  </Section>
+                  <AccSection id="corr" emoji="🔗" title={lang === "cz" ? "KORELACE" : "CORRELATION"}>
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "30denní Pearsonova korelace mezi páry a měnami. Live data z yfinance." : "30-day Pearson correlation between pairs and currencies. Live data from yfinance."} />
+                    <Row label="+1.0 / −1.0" desc={lang === "cz" ? "Identický / inverzní pohyb. Nekumuluj vysoce korelované pozice." : "Identical / inverse movement. Don't accumulate highly correlated positions."} />
+                  </AccSection>
 
-                  <Section emoji="📈" title={lang === "cz" ? "SEZÓNNOST" : "SEASONALITY"}>
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Průměrný měsíční výnos měn za zvolené období (1/3/5/10 let). Historický vzor opakující se každý rok." : "Average monthly currency returns for selected period (1/3/5/10 years). Historical pattern repeating each year."} />
-                    <Row label={lang === "cz" ? "🟢 Zelená" : "🟢 Green"} desc={lang === "cz" ? "Měna historicky v daném měsíci posilovala (kladný průměrný výnos)." : "Currency historically strengthened in this month (positive average return)."} />
-                    <Row label={lang === "cz" ? "🔴 Červená" : "🔴 Red"} desc={lang === "cz" ? "Měna historicky v daném měsíci oslabovala (záporný průměrný výnos)." : "Currency historically weakened in this month (negative average return)."} />
-                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Sezónnost je doplňkový nástroj. Silný sezónní vzor + potvrzení od COT + sentimentu = silnější signál." : "Seasonality is a supplementary tool. Strong seasonal pattern + COT confirmation + sentiment = stronger signal."} />
-                    <Row label={lang === "cz" ? "Pozor" : "Note"} desc={lang === "cz" ? "Minulé výnosy nezaručují budoucí. Sezónnost funguje nejlépe jako filtr, ne jako hlavní signál." : "Past returns don't guarantee future returns. Seasonality works best as a filter, not as the main signal."} />
-                  </Section>
+                  <AccSection id="seasonal" emoji="📈" title={lang === "cz" ? "SEZÓNNOST" : "SEASONALITY"}>
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Průměrný měsíční výnos měn za zvolené období (1/3/5/10 let)." : "Average monthly currency returns for selected period (1/3/5/10 years)."} />
+                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Sezónnost je doplňkový nástroj. Silný vzor + potvrzení od COT + sentimentu = silnější signál." : "Seasonality is supplementary. Strong pattern + COT confirmation + sentiment = stronger signal."} />
+                  </AccSection>
 
-                  <Section emoji="🕐" title={lang === "cz" ? "HISTORIE SENTIMENTU" : "SENTIMENT HISTORY"}>
+                  <AccSection id="history" emoji="🕐" title={lang === "cz" ? "HISTORIE SENTIMENTU" : "SENTIMENT HISTORY"}>
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "7denní přehled denního risk sentimentu. Ukládá se do DB každý den." : "7-day overview of daily risk sentiment. Saved to DB every day."} />
                     <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Sleduj trend. Pokud sentiment klesá 3+ dny po sobě → Risk OFF trend. Rychlý obrat → možný sentiment shift." : "Watch the trend. If sentiment drops 3+ days in a row → Risk OFF trend. Quick reversal → possible sentiment shift."} />
-                  </Section>
+                  </AccSection>
 
-                  <Section emoji="😱" title="FEAR & GREED INDEX">
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Kompozitní index strachu a chamtivosti trhu na škále 0–100. Nízká hodnota = strach, vysoká = chamtivost." : "Composite market fear and greed index on a 0–100 scale. Low = fear, high = greed."} />
-                    <Row label="💱 Forex F&G" desc={lang === "cz" ? "Vypočítán z našeho AI sentimentu (65%) + VIX (35%). Normalizován na 0–100." : "Calculated from our AI sentiment (65%) + VIX (35%). Normalized to 0–100."} />
-                    <Row label="📈 Stocks F&G" desc={lang === "cz" ? "VIX index strachu (60%) + S&P 500 momentum vůči 125dennímu průměru (40%)." : "VIX fear index (60%) + S&P 500 momentum vs. 125-day average (40%)."} />
-                    <Row label="₿ Crypto F&G" desc={lang === "cz" ? "Oficiální index z alternative.me. Zahrnuje volatilitu, momentum, sociální média a dominanci Bitcoinu." : "Official index from alternative.me. Includes volatility, momentum, social media, and Bitcoin dominance."} />
-                    <Row label="0–20 Extreme Fear" desc={lang === "cz" ? "Trh v panice. Historicky dobrá příležitost k nákupu (contrarian)." : "Market in panic. Historically a good buying opportunity (contrarian)."} />
-                    <Row label="80–100 Extreme Greed" desc={lang === "cz" ? "Trh přehřátý, investoři příliš optimistični. Zvýšené riziko korekce." : "Market overheated, investors too optimistic. Increased correction risk."} />
-                    <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Porovnej Fear&Greed napříč trhy. Pokud krypto Extreme Fear ale Forex Greed → diverzifikace signálů." : "Compare Fear&Greed across markets. If crypto Extreme Fear but Forex Greed → divergence signals."} />
-                  </Section>
+                  <AccSection id="fg" emoji="😱" title="FEAR & GREED INDEX">
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Kompozitní index strachu a chamtivosti trhu na škále 0–100." : "Composite market fear and greed index on 0–100 scale."} />
+                    <Row label="💱 Forex" desc={lang === "cz" ? "AI sentiment (65%) + VIX (35%)." : "AI sentiment (65%) + VIX (35%)."} />
+                    <Row label="📈 Stocks" desc={lang === "cz" ? "VIX (60%) + S&P 500 momentum (40%)." : "VIX (60%) + S&P 500 momentum (40%)."} />
+                    <Row label="₿ Crypto" desc={lang === "cz" ? "Z alternative.me." : "From alternative.me."} />
+                  </AccSection>
 
-                  <Section emoji="🛢️" title={lang === "cz" ? "KOMODITY" : "COMMODITIES"}>
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Live ceny 7 komodit z yfinance. Aktualizuje se každých 5 minut." : "Live prices of 7 commodities from yfinance. Updates every 5 minutes."} />
-                    <Row label={lang === "cz" ? "▲/▼ % změna" : "▲/▼ % change"} desc={lang === "cz" ? "Dnešní procentuální pohyb ceny komodity oproti předchozímu dni." : "Today's percentage price movement compared to previous day."} />
-                    <Row label={lang === "cz" ? "koreluje:" : "correlates:"} desc={lang === "cz" ? "Měny, které historicky reagují na pohyb dané komodity. Např. CAD ↑ = když roste WTI ropa, CAD má tendenci posilovat (Kanada je exportér ropy)." : "Currencies that historically react to this commodity's moves. E.g. CAD ↑ = when WTI oil rises, CAD tends to strengthen (Canada is oil exporter)."} />
-                    <Row label={lang === "cz" ? "dnes: risk on/off" : "today: risk on/off"} desc={lang === "cz" ? "Risk signál odvozený z dnešního pohybu ceny. Ropa ↑ = risk on (ekonomika roste, chuť riskovat). Zlato ↑ = risk off (trh hledá bezpečí). Neutral = pohyb je nevýrazný." : "Risk signal derived from today's price move. Oil ↑ = risk on (economy growing). Gold ↑ = risk off (market seeking safety). Neutral = move is minor."} />
-                  </Section>
+                  <AccSection id="commodities" emoji="🛢️" title={lang === "cz" ? "KOMODITY" : "COMMODITIES"}>
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Live ceny 7 komodit z yfinance. Aktualizuje se každých 5 minut." : "Live prices of 7 commodities from yfinance. Updates every 5 min."} />
+                    <Row label={lang === "cz" ? "koreluje:" : "correlates:"} desc={lang === "cz" ? "Měny reagující na pohyb komodity. CAD ↑ = ropa roste." : "Currencies reacting to commodity moves. CAD ↑ = oil rising."} />
+                  </AccSection>
 
-                  <Section emoji="🎯" title={lang === "cz" ? "BACKTEST" : "BACKTEST"}>
-                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Zpětný test přesnosti AI signálů. Porovnává minulé predikce (bias měny) se skutečným pohybem kurzu." : "Accuracy backtest of AI signals. Compares past currency bias predictions against actual price moves."} />
-                    <Row label={lang === "cz" ? "Přesnost %" : "Accuracy %"} desc={lang === "cz" ? "Kolik procent predikcí bylo správně. Nad 55 % = slibný signál. Nad 65 % = silný edge. Pod 45 % = nespolehlivý." : "Percentage of correct predictions. Above 55% = promising signal. Above 65% = strong edge. Below 45% = unreliable."} />
-                    <Row label={lang === "cz" ? "Správně / Chybně" : "Correct / Wrong"} desc={lang === "cz" ? "Počet správných a chybných predikcí za posledních 7 dní. Čím více vzorků, tím statisticky spolehlivější výsledek." : "Count of correct and wrong predictions over the last 7 days. More samples = statistically more reliable result."} />
-                    <Row label={lang === "cz" ? "Jak funguje" : "How it works"} desc={lang === "cz" ? "Systém uloží bias měny v čas scénáře. Po 4 hodinách porovná, zda se kurz posunul ve správném směru. Long bias = měna měla posílit." : "System records currency bias at scenario time. After 4 hours it checks if the rate moved in the predicted direction. Long bias = currency was expected to strengthen."} />
-                    <Row label={lang === "cz" ? "Omezení" : "Limitations"} desc={lang === "cz" ? "Backtest pokrývá pouze 7 dní dat. Krátkodobé pohyby jsou ovlivněny mnoha faktory mimo AI model (data surprisy, geopolitika). Berte jako orientační metriku, ne garancimu." : "Backtest covers only 7 days of data. Short-term moves are affected by many factors outside the AI model (data surprises, geopolitics). Treat as indicative metric, not a guarantee."} />
-                    <Row label={lang === "cz" ? "Nejlepší měny" : "Best currencies"} desc={lang === "cz" ? "Graf ukazuje přesnost per měna. Měny s konzistentně vysokou přesností (60 %+) jsou ty, kde AI fundamental analýza funguje nejlépe." : "Chart shows accuracy per currency. Currencies with consistently high accuracy (60%+) are where AI fundamental analysis works best."} />
-                  </Section>
+                  <AccSection id="backtest" emoji="🎯" title="BACKTEST">
+                    <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Zpětný test přesnosti AI signálů. Porovnává predikce se skutečným pohybem." : "Accuracy backtest of AI signals vs actual price moves."} />
+                    <Row label={lang === "cz" ? "Jak funguje" : "How it works"} desc={lang === "cz" ? "Uloží bias měny, po 4h porovná se skutečným pohybem kurzu." : "Records currency bias, checks against actual move after 4h."} />
+                  </AccSection>
 
-                  <Section emoji="💱" title={lang === "cz" ? "MĚNOVÝ BIAS A PÁRY" : "CURRENCY BIAS & PAIRS"}>
-                    <Row label={lang === "cz" ? "Celkový bias" : "Overall bias"} desc={lang === "cz" ? "Vážený průměr AI dopadů posledních zpráv na každou měnu. Novější zprávy mají větší váhu (exponenciální decay)." : "Weighted average of AI impacts from recent news on each currency. Newer news has higher weight (exponential decay)."} />
-                    <Row label={lang === "cz" ? "Páry (Pary tab)" : "Pairs tab"} desc={lang === "cz" ? "Skóre páru = bias základní měny − bias kótovací měny. Kladné = buy signál, záporné = sell signál." : "Pair score = base currency bias − quote currency bias. Positive = buy signal, negative = sell signal."} />
-                    <Row label={lang === "cz" ? "Risk ON měny" : "Risk ON currencies"} desc={lang === "cz" ? "AUD, NZD, CAD — posilují při dobré náladě trhů (risk appetite)." : "AUD, NZD, CAD — strengthen when market mood is positive (risk appetite)."} />
-                    <Row label={lang === "cz" ? "Risk OFF měny" : "Risk OFF currencies"} desc={lang === "cz" ? "USD, JPY, CHF — safe haven, posilují při strachu a nejistotě." : "USD, JPY, CHF — safe haven, strengthen during fear and uncertainty."} />
-                    <Row label="Neutral" desc={lang === "cz" ? "EUR, GBP — smíšené charakteristiky, závisí na domácí ekonomice." : "EUR, GBP — mixed characteristics, depends on domestic economy."} />
-                  </Section>
+                  <AccSection id="pairs" emoji="💱" title={lang === "cz" ? "MĚNOVÝ BIAS A PÁRY" : "CURRENCY BIAS & PAIRS"}>
+                    <Row label={lang === "cz" ? "Skóre páru" : "Pair score"} desc={lang === "cz" ? "Bias base − bias quote. Kladné = buy, záporné = sell." : "Base bias − quote bias. Positive = buy, negative = sell."} />
+                    <Row label={lang === "cz" ? "Risk ON/OFF" : "Risk ON/OFF"} desc={lang === "cz" ? "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP." : "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP."} />
+                  </AccSection>
 
-                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 4 }}>
-                    {lang === "cz" ? "Data se aktualizují automaticky každou hodinu · COT každý pátek · Sezónnost každých 24h" : "Data updates automatically every hour · COT every Friday · Seasonality every 24h"}
+                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 8 }}>
+                    {lang === "cz" ? "Data se aktualizují automaticky · COT každý pátek · Sezónnost každých 24h" : "Data updates automatically · COT every Friday · Seasonality every 24h"}
                   </div>
 
                 </div>
@@ -1971,13 +2003,26 @@ export default function Dashboard() {
                       {/* ZPRÁVY (News) */}
                       {(() => {
                         const relevant = scenarios.filter(s => {
+                          if (s.weight !== pairNewsFilter) return false;
                           const ci = typeof s.currency_impact === 'string' ? JSON.parse(s.currency_impact) : (s.currency_impact || {});
                           return (ci[base] && ci[base].score !== 0) || (ci[quote] && ci[quote].score !== 0);
-                        }).slice(0, 4);
-                        if (relevant.length === 0) return null;
+                        }).slice(0, 5);
                         return (
                           <div style={{ marginTop: 10 }}>
-                            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>{lang === "cz" ? "POSLEDNÍ ZPRÁVY" : "RECENT NEWS"}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                              <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim }}>{lang === "cz" ? "ZPRÁVY" : "NEWS"}</span>
+                              {["HIGH", "MED"].map(f => (
+                                <button key={f} onClick={() => setPairNewsFilter(f)} style={{
+                                  fontSize: 8, padding: "2px 8px", borderRadius: 4, cursor: "pointer", fontWeight: pairNewsFilter === f ? 700 : 400,
+                                  background: pairNewsFilter === f ? C.accent : C.border,
+                                  color: pairNewsFilter === f ? "#000" : C.textDim,
+                                  border: `1px solid ${pairNewsFilter === f ? C.accent : C.border}`
+                                }}>{f}</button>
+                              ))}
+                            </div>
+                            {relevant.length === 0 ? (
+                              <div style={{ fontSize: 8, color: C.muted, padding: "8px 0" }}>{lang === "cz" ? `Žádné ${pairNewsFilter} zprávy pro tento pár.` : `No ${pairNewsFilter} news for this pair.`}</div>
+                            ) : (
                             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                               {relevant.map(s => {
                                 const ci = typeof s.currency_impact === 'string' ? JSON.parse(s.currency_impact) : (s.currency_impact || {});
@@ -2001,6 +2046,7 @@ export default function Dashboard() {
                                 );
                               })}
                             </div>
+                            )}
                           </div>
                         );
                       })()}
