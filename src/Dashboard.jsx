@@ -787,10 +787,12 @@ export default function Dashboard() {
                   const PER_PAGE = 5;
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                   const allHigh = sorted.filter(s => s.weight === "HIGH");
+                  const activeHigh = allHigh.filter(s => !s.demoted_at);
+                  const demotedHigh = allHigh.filter(s => s.demoted_at).map(s => ({ ...s, risk_score: Math.round((s.risk_score || 0) * 0.4) }));
                   const fullList = scenarioFilter === "HIGH"
-                    ? allHigh.slice(0, 20)
+                    ? activeHigh
                     : scenarioFilter === "OLD"
-                    ? allHigh.slice(20).map(s => ({ ...s, risk_score: Math.round((s.risk_score || 0) * 0.4) }))
+                    ? demotedHigh
                     : sorted.filter(s => s.weight === "MED");
                   const totalPages = Math.max(1, Math.ceil(fullList.length / PER_PAGE));
                   const safePage = Math.min(scenarioPage, totalPages);
