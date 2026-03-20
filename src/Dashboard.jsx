@@ -788,9 +788,9 @@ export default function Dashboard() {
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                   const allHigh = sorted.filter(s => s.weight === "HIGH");
                   const fullList = scenarioFilter === "HIGH"
-                    ? allHigh.slice(0, 10)
+                    ? allHigh.slice(0, 20)
                     : scenarioFilter === "OLD"
-                    ? allHigh.slice(10)
+                    ? allHigh.slice(20).map(s => ({ ...s, risk_score: Math.round((s.risk_score || 0) * 0.4) }))
                     : sorted.filter(s => s.weight === "MED");
                   const totalPages = Math.max(1, Math.ceil(fullList.length / PER_PAGE));
                   const safePage = Math.min(scenarioPage, totalPages);
