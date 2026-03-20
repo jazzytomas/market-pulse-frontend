@@ -177,8 +177,8 @@ function computeCurrencyTotals(list) {
 
 function ScoreBar({ score, height = 6 }) {
   const C = React.useContext(ThemeContext);
-  const clampedScore = Math.max(-30, Math.min(30, score));
-  const pct = ((clampedScore + 30) / 60) * 100;
+  const clampedScore = Math.max(-100, Math.min(100, score));
+  const pct = ((clampedScore + 100) / 200) * 100;
   const color = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
   return (
     <div style={{ width: "100%", height, background: C.border, borderRadius: 3, overflow: "hidden", position: "relative" }}>
