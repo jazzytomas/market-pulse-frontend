@@ -35,7 +35,6 @@ const T = {
   tabFearGreed:    { cz: "😱 FEAR&GREED", en: "😱 FEAR&GREED" },
   tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST" },
   tabEducation:    { cz: "🎓 VÝUKA", en: "🎓 EDUCATION" },
-  tabGmail:        { cz: "📧 GMAIL", en: "📧 GMAIL" },
   tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE" },
   // Tabs (right panel)
   tabPairs:        { cz: "PÁRY", en: "PAIRS" },
@@ -59,10 +58,6 @@ const T = {
   clickDetail:     { cz: "Klikni pro detail ▼", en: "Click for detail ▼" },
   noScenarios:     { cz: "Žádné scénáře.", en: "No scenarios." },
   currencyImpact:  { cz: "DOPAD NA MENY", en: "CURRENCY IMPACT" },
-  // Gmail Events
-  gmailNoData:     { cz: "Žádné Gmail eventy.", en: "No Gmail events." },
-  gmailScore:      { cz: "Skóre", en: "Score" },
-  gmailPairs:      { cz: "Dotčené páry", en: "Affected pairs" },
   // Events
   noEvents:        { cz: "Žádné eventy.", en: "No events." },
   volWindows:      { cz: "VOLATILITA OKEN (EST)", en: "VOLATILITY WINDOWS (EST)" },
@@ -290,7 +285,6 @@ export default function Dashboard() {
   const [corrView, setCorrView] = useState("pairs"); // "pairs" or "currencies"
   const [backtestData, setBacktestData] = useState(null);
   const [btPage, setBtPage] = useState(1);
-  const [gmailEvents, setGmailEvents] = useState([]);
   const [fearGreedData, setFearGreedData] = useState(null);
   const [fgHistory, setFgHistory] = useState([]);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
@@ -326,13 +320,6 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((data) => setBackendStatus(data.status))
       .catch(() => setBackendStatus("OFFLINE"));
-  }, []);
-
-  useEffect(() => {
-    fetch(`${API}/api/events/latest`)
-      .then(r => r.json())
-      .then(data => setGmailEvents(Array.isArray(data) ? data : []))
-      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -769,7 +756,6 @@ export default function Dashboard() {
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
             <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabScenarios")} active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
-              <TabBtn label={t("tabGmail")} active={centerTab === "gmail"} onClick={() => setCenterTab("gmail")} />
               <TabBtn label={t("tabEvents")} active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
               <TabBtn label={t("tabCot")} active={centerTab === "cot"} onClick={() => setCenterTab("cot")} />
               <TabBtn label={t("tabCorrelation")} active={centerTab === "corr"} onClick={() => setCenterTab("corr")} />
@@ -876,50 +862,6 @@ export default function Dashboard() {
                   </>);
                 })()}
                 </div>
-              </div>
-            )}
-
-            {centerTab === "gmail" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {gmailEvents.length === 0 && <div style={{ fontSize: 11, color: C.textDim, textAlign: "center", padding: 20 }}>{t("gmailNoData")}</div>}
-                {gmailEvents.map((ev, i) => {
-                  const sc = (ev.score || 0) > 0 ? C.green : (ev.score || 0) < 0 ? C.red : C.yellow;
-                  const impactColor = ev.impact === "High" ? C.red : ev.impact === "Medium" ? C.orange : C.muted;
-                  const pairs = Array.isArray(ev.affected_pairs) ? ev.affected_pairs : [];
-                  return (
-                    <div key={i} style={{ border: `1px solid ${sc}44`, borderLeft: `3px solid ${sc}`, borderRadius: 6, background: `${sc}06`, padding: "8px 12px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: C.text, flex: 1, paddingRight: 8 }}>{ev.event_name}</div>
-                        <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                          {ev.currency && <span style={{ fontSize: 9, background: C.border, color: C.textDim, padding: "1px 5px", borderRadius: 3, fontWeight: 600 }}>{ev.currency}</span>}
-                          {ev.impact && <span style={{ fontSize: 8, color: impactColor, fontWeight: 600 }}>{ev.impact}</span>}
-                          <span style={{ fontSize: 13, fontWeight: 700, color: sc }}>{(ev.score || 0) > 0 ? "+" : ""}{ev.score || 0}</span>
-                        </div>
-                      </div>
-                      {/* Actual / Forecast / Previous */}
-                      {(ev.actual || ev.forecast || ev.previous) && (
-                        <div style={{ display: "flex", gap: 12, fontSize: 9, marginBottom: 4 }}>
-                          {ev.actual && <span style={{ color: C.text }}><span style={{ color: C.textDim }}>{t("actual")}:</span> <b>{ev.actual}</b></span>}
-                          {ev.forecast && <span style={{ color: C.textDim }}>{t("forecast")}: {ev.forecast}</span>}
-                          {ev.previous && <span style={{ color: C.textDim }}>{t("previous")}: {ev.previous}</span>}
-                        </div>
-                      )}
-                      {/* Explanation */}
-                      {ev.explanation_cz && <div style={{ fontSize: 9, color: C.muted, marginBottom: 4, lineHeight: 1.4 }}>{ev.explanation_cz}</div>}
-                      {/* Affected pairs */}
-                      {pairs.length > 0 && (
-                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 4 }}>
-                          {pairs.map((p, j) => <span key={j} style={{ fontSize: 8, background: `${C.accent}22`, color: C.accent, padding: "1px 5px", borderRadius: 3 }}>{p}</span>)}
-                        </div>
-                      )}
-                      {/* Timestamp */}
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: C.muted }}>
-                        <span>Gmail Scanner</span>
-                        {ev.scanned_at && <span>{new Date(ev.scanned_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             )}
 
