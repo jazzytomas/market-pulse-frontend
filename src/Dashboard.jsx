@@ -276,6 +276,9 @@ export default function Dashboard() {
   const [scanCountdown, setScanCountdown] = useState(0);
   const [lastUpdate, setLastUpdate] = useState(() => localStorage.getItem("mp_last_scan") || "--:--:--");
   const [commodities, setCommodities] = useState([]);
+  const [stocksData, setStocksData] = useState([]);
+  const [cryptoData, setCryptoData] = useState([]);
+  const [marketTab, setMarketTab] = useState("commodities");
   const [historyData, setHistoryData] = useState([]);
   const [watchlistData, setWatchlistData] = useState([]);
   const [seasonalLive, setSeasonalLive] = useState([]);
@@ -331,8 +334,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchCommodities = () => fetch(`${API}/api/commodities`).then(r => r.json()).then(data => setCommodities(data)).catch(() => {});
-    fetchCommodities();
-    const id = setInterval(fetchCommodities, 300000);
+    const fetchStocks = () => fetch(`${API}/api/stocks`).then(r => r.json()).then(data => setStocksData(data)).catch(() => {});
+    const fetchCrypto = () => fetch(`${API}/api/crypto`).then(r => r.json()).then(data => setCryptoData(data)).catch(() => {});
+    fetchCommodities(); fetchStocks(); fetchCrypto();
+    const id = setInterval(() => { fetchCommodities(); fetchStocks(); fetchCrypto(); }, 300000);
     return () => clearInterval(id);
   }, []);
 
@@ -523,7 +528,7 @@ export default function Dashboard() {
     const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
     const longCount = factors.filter(f => f.aligns === "long").length;
     const shortCount = factors.filter(f => f.aligns === "short").length;
-    const biasDir = pairScore > NEUTRAL_THRESHOLD ? "long" : pairScore < -NEUTRAL_THRESHOLD ? "short" : "neutral";
+    const biasDir = pairScore > 0 ? "long" : pairScore < 0 ? "short" : "neutral";
     const biasCount = biasDir === "long" ? longCount : biasDir === "short" ? shortCount : Math.max(longCount, shortCount);
     return { pairScore, biasDir, biasCount, longCount, shortCount, total: 5 };
   };
@@ -684,29 +689,42 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-            {/* Commodities – back in desktop sidebar */}
+            {/* Markets – Commodities / Stocks / Crypto tabs */}
             <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 12px" }}>
-              <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 3 }}>{t("komodity")}</div>
-              <div style={{ fontSize: 7, color: C.muted, marginBottom: 8 }}>{lang === "cz" ? "měny = korelované · dnes = signál" : "currencies = correlated · today = signal"}</div>
-              {commodities.length === 0 ? (
-                <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
-              ) : commodities.map(c => {
-                const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
-                const signal = c.signal || "neutral";
-                const sigCol = signal === "risk on" ? C.green : signal === "risk off" ? C.red : C.yellow;
-                return (
-                  <div key={c.name} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${C.border}` }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
-                      <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                        <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : "▼"} {Math.abs(c.change)}%</span>
-                        <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
-                      </div>
-                    </div>
-                    <div><span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span></div>
+              <div style={{ display: "flex", gap: 0, marginBottom: 8, borderBottom: `1px solid ${C.border}` }}>
+                {[
+                  { key: "commodities", label: lang === "cz" ? "Komodity" : "Commodities" },
+                  { key: "stocks", label: lang === "cz" ? "Akcie" : "Stocks" },
+                  { key: "crypto", label: "Krypto" },
+                ].map(tab => (
+                  <div key={tab.key} onClick={() => setMarketTab(tab.key)}
+                    style={{ padding: "4px 10px", fontSize: 9, fontWeight: marketTab === tab.key ? 700 : 400,
+                      color: marketTab === tab.key ? C.accent : C.muted, cursor: "pointer",
+                      borderBottom: marketTab === tab.key ? `2px solid ${C.accent}` : "2px solid transparent",
+                      letterSpacing: 1 }}>
+                    {tab.label}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+              {(() => {
+                const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
+                if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>;
+                return items.map(c => {
+                  const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
+                  return (
+                    <div key={c.name} style={{ marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
+                        <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                          <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"} {Math.abs(c.change)}%</span>
+                          <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
+                        </div>
+                      </div>
+                      {c.currencies && <div><span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span></div>}
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         )}
@@ -1043,46 +1061,49 @@ export default function Dashboard() {
                   {t("corrDesc")}
                 </div>
 
-                {/* PÁRY */}
+                {/* TOP PÁRY */}
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
-                    {lang === "cz" ? "KORELACE PÁRŮ" : "PAIR CORRELATION"}
-                    {correlationData && correlationData.date && (
-                      <span style={{ fontSize: 8, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
-                        {correlationData.days}D · {lang === "cz" ? "k" : "as of"} {correlationData.date}
-                      </span>
-                    )}
+                    {lang === "cz" ? "NEJLEPŠÍ PÁRY" : "TOP PAIRS"}
                   </div>
-                  {!correlationData ? (
-                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
-                  ) : (
-                    <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 8 }}>
-                        <thead>
-                          <tr>
-                            <td style={{ padding: "3px 4px", color: C.muted }}></td>
-                            {correlationData.pairs.map(p => (
-                              <td key={p} style={{ padding: "3px 2px", color: C.textDim, textAlign: "center", fontSize: 7 }}>{p.replace("USD", "")}</td>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {correlationData.pairs.map((pair, i) => (
-                            <tr key={pair}>
-                              <td style={{ padding: "3px 4px", color: C.textDim, fontSize: 7, whiteSpace: "nowrap" }}>{pair.replace("USD", "")}</td>
-                              {correlationData.matrix[i].map((val, j) => (
-                                <td key={j} style={{
-                                  padding: "3px 2px", textAlign: "center", fontSize: 7,
-                                  background: i === j ? `${C.accent}15` : val > 0.7 ? `${C.green}20` : val < -0.7 ? `${C.red}20` : "transparent",
-                                  color: corrColor(val), fontWeight: Math.abs(val) > 0.7 ? 700 : 400,
-                                }}>{val.toFixed(2)}</td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  {(() => {
+                    const PERFECT_BLUE_CORR = "#1864dc";
+                    const isDarkCorr = C.bg === "#080812";
+                    return (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                        {pairsWithConfluence.slice(0, 12).map(({ pair, base, quote, biasCount, biasDir }) => {
+                          const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
+                          const col = score > 0 ? C.green : score < 0 ? C.red : C.yellow;
+                          const isPerfect = biasCount === 5;
+                          const perfectText = isPerfect ? (isDarkCorr ? "#ffffff" : PERFECT_BLUE_CORR) : C.text;
+                          const perfectScore = isPerfect ? (isDarkCorr ? "#ffffff" : PERFECT_BLUE_CORR) : col;
+                          return (
+                            <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
+                              style={{ padding: "6px 8px",
+                                background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0a`,
+                                border: isPerfect ? `1.5px solid ${PERFECT_BLUE_CORR}` : `1px solid ${col}33`,
+                                borderLeft: `3px solid ${isPerfect ? PERFECT_BLUE_CORR : col}`, borderRadius: 6, cursor: "pointer",
+                                animation: isPerfect ? "pulse 2s infinite" : "none" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                                  {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: perfectText }}>{pair}</span>
+                                </div>
+                                <span style={{ fontSize: 11, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
+                              </div>
+                              <div style={{ marginBottom: 3 }}><ScoreBar score={score} height={3} /></div>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <span style={{ fontSize: 7, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
+                                <span style={{ fontSize: 7, color: C.muted }}>
+                                  {biasDir === "long" ? "▲ Long" : biasDir === "short" ? "▼ Short" : "→ Neutral"}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* MĚNY */}
@@ -1742,7 +1763,6 @@ export default function Dashboard() {
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden" }}>
             <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabPairs")} active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
-              <TabBtn label={t("tabStatus")} active={rightTab === "status"} onClick={() => setRightTab("status")} />
               <TabBtn label={t("tabCurrencies")} active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
               <TabBtn label={t("tabCbRates")} active={rightTab === "cb"} onClick={() => setRightTab("cb")} />
               <TabBtn label={t("tabWatchlist")} active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
@@ -1750,33 +1770,6 @@ export default function Dashboard() {
 
             <div style={{ padding: 14 }}>
 
-              {rightTab === "status" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <div style={{ background: `${riskColor}12`, border: `1px solid ${riskColor}44`, borderRadius: 12, padding: 14 }}>
-                    <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 8 }}>{t("currentState")}</div>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: riskColor, letterSpacing: 3 }}>{riskLabel}</div>
-                    <div style={{ fontSize: 9, color: C.textDim, marginTop: 8, lineHeight: 1.6 }}>
-                      {sentiment.total_score > NEUTRAL_THRESHOLD
-                        ? (lang === "cz" ? "Trh preferuje risk assets. AUD, NZD supported." : "Market prefers risk assets. AUD, NZD supported.")
-                        : sentiment.total_score < -NEUTRAL_THRESHOLD
-                        ? (lang === "cz" ? "Risk aversion. JPY, CHF, Gold outperformuji." : "Risk aversion. JPY, CHF, Gold outperforming.")
-                        : (lang === "cz" ? "Smisene signaly. Cekej na potvrzeni." : "Mixed signals. Wait for confirmation.")}
-                    </div>
-                  </div>
-                  <div style={{ background: `${C.red}08`, border: `1px solid ${C.red}33`, borderRadius: 12, padding: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <div style={{ fontSize: 9, letterSpacing: 2, color: C.red }}>⚠ RISK EVENTS</div>
-                      <div style={{ fontSize: 8, color: C.textDim, background: C.border, padding: "2px 6px", borderRadius: 3 }}>{lang === "cz" ? "pristich 48h" : "next 48h"}</div>
-                    </div>
-                    {events.filter(e => e.impact === "HIGH").slice(0, 3).map((ev, i) => (
-                      <div key={i} style={{ background: `${C.red}12`, border: `1px solid ${C.red}33`, borderRadius: 6, padding: "8px 10px", marginBottom: 6 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: C.red }}>{ev.name}</div>
-                        <div style={{ fontSize: 9, color: C.textDim, marginTop: 3 }}>{ev.event_time}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {rightTab === "currencies" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -1824,8 +1817,8 @@ export default function Dashboard() {
                 if (selectedPair) {
                   const { pair, base, quote } = selectedPair;
                   const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
-                  const pairCol = pairScore > NEUTRAL_THRESHOLD ? C.green : pairScore < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
-                  const pairBias = pairScore > NEUTRAL_THRESHOLD ? (lang === "cz" ? "▲ NÁKUP (Long)" : "▲ BUY (Long)") : pairScore < -NEUTRAL_THRESHOLD ? (lang === "cz" ? "▼ PRODEJ (Short)" : "▼ SELL (Short)") : (lang === "cz" ? "→ NEUTRÁLNÍ (Neutral)" : "→ NEUTRAL");
+                  const pairCol = pairScore > 0 ? C.green : pairScore < 0 ? C.red : C.yellow;
+                  const pairBias = pairScore > 0 ? (lang === "cz" ? "▲ NÁKUP (Long)" : "▲ BUY (Long)") : pairScore < 0 ? (lang === "cz" ? "▼ PRODEJ (Short)" : "▼ SELL (Short)") : (lang === "cz" ? "→ NEUTRÁLNÍ (Neutral)" : "→ NEUTRAL");
 
                   const baseCOT = cotData.find(c => c.currency === base);
                   const quoteCOT = cotData.find(c => c.currency === quote);
@@ -1902,7 +1895,7 @@ export default function Dashboard() {
 
                   const longCount = factors.filter(f => f.aligns === "long").length;
                   const shortCount = factors.filter(f => f.aligns === "short").length;
-                  const biasCount = pairScore > NEUTRAL_THRESHOLD ? longCount : pairScore < -NEUTRAL_THRESHOLD ? shortCount : Math.max(longCount, shortCount);
+                  const biasCount = pairScore > 0 ? longCount : pairScore < 0 ? shortCount : Math.max(longCount, shortCount);
                   const confluenceCol = biasCount >= 4 ? C.green : biasCount >= 3 ? C.yellow : C.red;
 
                   return (
@@ -2083,7 +2076,7 @@ export default function Dashboard() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                       {pairsWithConfluence.map(({ pair, base, quote, biasCount, biasDir }) => {
                         const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
-                        const col = score > NEUTRAL_THRESHOLD ? C.green : score < -NEUTRAL_THRESHOLD ? C.red : C.yellow;
+                        const col = score > 0 ? C.green : score < 0 ? C.red : C.yellow;
                         const isPerfect = biasCount === 5;
                         const perfectText = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text;
                         const perfectScore = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col;
@@ -2171,29 +2164,43 @@ export default function Dashboard() {
         </div>{/* end RIGHT column */}
       </div>{/* end grid */}
 
-      {/* Commodities – bottom strip (mobile only; desktop shows them in sidebar) */}
+      {/* Markets – bottom strip (mobile only) */}
       {isMobile && <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "8px 12px", marginTop: 12, flexShrink: 0 }}>
-        <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 6 }}>{t("komodity")}</div>
-        {commodities.length === 0 ? (
-          <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 6 }}>
-            {commodities.map(c => {
-              const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
-              const signal = c.signal || "neutral";
-              const sigCol = signal === "risk on" ? C.green : signal === "risk off" ? C.red : C.yellow;
-              return (
-                <div key={c.name} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
-                    <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : "▼"}{Math.abs(c.change)}%</span>
+        <div style={{ display: "flex", gap: 0, marginBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+          {[
+            { key: "commodities", label: lang === "cz" ? "Komodity" : "Commodities" },
+            { key: "stocks", label: lang === "cz" ? "Akcie" : "Stocks" },
+            { key: "crypto", label: "Krypto" },
+          ].map(tab => (
+            <div key={tab.key} onClick={() => setMarketTab(tab.key)}
+              style={{ padding: "3px 8px", fontSize: 9, fontWeight: marketTab === tab.key ? 700 : 400,
+                color: marketTab === tab.key ? C.accent : C.muted, cursor: "pointer",
+                borderBottom: marketTab === tab.key ? `2px solid ${C.accent}` : "2px solid transparent",
+                letterSpacing: 1 }}>
+              {tab.label}
+            </div>
+          ))}
+        </div>
+        {(() => {
+          const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
+          if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>;
+          return (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 6 }}>
+              {items.map(c => {
+                const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
+                return (
+                  <div key={c.name} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
+                      <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"}{Math.abs(c.change)}%</span>
+                    </div>
+                    {c.currencies && <div><span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span></div>}
                   </div>
-                  <div><span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span></div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>}
 
       <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
