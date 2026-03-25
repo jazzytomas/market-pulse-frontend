@@ -1050,50 +1050,6 @@ export default function Dashboard() {
                   {t("corrDesc")}
                 </div>
 
-                {/* TOP PÁRY */}
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
-                    {lang === "cz" ? "NEJLEPŠÍ PÁRY" : "TOP PAIRS"}
-                  </div>
-                  {(() => {
-                    const PERFECT_BLUE_CORR = "#1864dc";
-                    const isDarkCorr = C.bg === "#080812";
-                    return (
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                        {pairsWithConfluence.slice(0, 12).map(({ pair, base, quote, biasCount, biasDir }) => {
-                          const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
-                          const col = score > 0 ? C.green : score < 0 ? C.red : C.yellow;
-                          const isPerfect = biasCount === 5;
-                          const perfectText = isPerfect ? (isDarkCorr ? "#ffffff" : PERFECT_BLUE_CORR) : C.text;
-                          const perfectScore = isPerfect ? (isDarkCorr ? "#ffffff" : PERFECT_BLUE_CORR) : col;
-                          return (
-                            <div key={pair} onClick={() => setSelectedPair({ pair, base, quote })}
-                              style={{ padding: "6px 8px",
-                                background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0a`,
-                                border: isPerfect ? `1.5px solid ${PERFECT_BLUE_CORR}` : `1px solid ${col}33`,
-                                borderLeft: `3px solid ${isPerfect ? PERFECT_BLUE_CORR : col}`, borderRadius: 6, cursor: "pointer",
-                                animation: isPerfect ? "pulse 2s infinite" : "none" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                                  {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
-                                  <span style={{ fontSize: 10, fontWeight: 700, color: perfectText }}>{pair}</span>
-                                </div>
-                                <span style={{ fontSize: 11, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
-                              </div>
-                              <div style={{ marginBottom: 3 }}><ScoreBar score={score} height={3} /></div>
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <span style={{ fontSize: 7, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
-                                <span style={{ fontSize: 7, color: C.muted }}>
-                                  {biasDir === "long" ? "▲ Long" : biasDir === "short" ? "▼ Short" : "→ Neutral"}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()}
-                </div>
 
                 {/* MĚNY */}
                 <div>
