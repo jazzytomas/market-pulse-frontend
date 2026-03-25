@@ -1227,7 +1227,7 @@ export default function Dashboard() {
                       <text x={cx - r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
                       <text x={cx + r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
                     </svg>
-                    <div style={{ fontSize: 8, color: C.muted, marginTop: 0, minHeight: 14 }}>{data.vix ? `VIX ${data.vix}` : ""}</div>
+                    <div style={{ fontSize: 12, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
                   </div>
                 );
               };
