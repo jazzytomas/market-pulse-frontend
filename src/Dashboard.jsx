@@ -936,13 +936,6 @@ export default function Dashboard() {
                       const evDate = new Date(ev.event_time);
                       const isPast = evDate < now;
                       const col = ev.impact === "HIGH" ? C.red : ev.impact === "MED" ? C.orange : C.muted;
-                      const hasActual = ev.actual && ev.actual.trim() !== "";
-                      const actualColor = (() => {
-                        if (!hasActual || !ev.forecast || ev.forecast.trim() === "") return C.text;
-                        const a = parseFloat(ev.actual); const f = parseFloat(ev.forecast);
-                        if (isNaN(a) || isNaN(f)) return C.text;
-                        return a > f ? C.green : a < f ? C.red : C.yellow;
-                      })();
                       const time = (() => {
                         try {
                           const d = new Date(ev.event_time);
@@ -972,10 +965,6 @@ export default function Dashboard() {
                             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                               <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
                               <span style={{ fontSize: 10, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>ACTUAL</span>
-                              <span style={{ fontSize: 10, fontWeight: hasActual ? 700 : 400, color: hasActual ? actualColor : C.muted }}>{hasActual ? ev.actual : "—"}</span>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                               <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
