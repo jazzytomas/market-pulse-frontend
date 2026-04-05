@@ -995,11 +995,20 @@ export default function Dashboard() {
 
             {centerTab === "cot" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>
+                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 4 }}>
                   {lang === "cz"
                     ? "CFTC Commitments of Traders — Leveraged Money pozice · stahuje se každý pátek · datum = reportovací týden (úterý)"
                     : "CFTC Commitments of Traders — Leveraged Money positions · fetched every Friday · date = reporting week (Tuesday)"}
                 </div>
+                {cotData.length > 0 && (() => {
+                  const dates = cotData.filter(c => c.date && !c.date.endsWith("*")).map(c => c.date);
+                  const latestDate = dates.length > 0 ? dates.sort().reverse()[0] : null;
+                  return latestDate ? (
+                    <div style={{ fontSize: 9, color: C.accent, fontFamily: "'Orbitron',sans-serif", marginBottom: 12 }}>
+                      {lang === "cz" ? `📅 Report: ${latestDate}` : `📅 Report: ${latestDate}`}
+                    </div>
+                  ) : null;
+                })()}
                 {(() => {
                   const maxVal = Math.max(1, ...cotData.map(c => Math.max(c.long || 0, c.short || 0)));
                   return (
