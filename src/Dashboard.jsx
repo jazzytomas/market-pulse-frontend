@@ -255,7 +255,8 @@ function SectionLabel({ children, center }) {
 }
 
 export default function Dashboard() {
-  const isAdmin = typeof window !== "undefined" && window.location.search.includes("admin");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const adminTokenRef = React.useRef("");
   const [backendStatus, setBackendStatus] = useState("checking...");
   const [centralBanks, setCentralBanks] = useState([]);
   const [scenarios, setScenarios] = useState([]);
@@ -323,6 +324,18 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((data) => setBackendStatus(data.status))
       .catch(() => setBackendStatus("OFFLINE"));
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("admin");
+    if (token) {
+      adminTokenRef.current = token;
+      fetch(`${API}/api/verify_admin?token=${encodeURIComponent(token)}`)
+        .then(r => r.json())
+        .then(data => { if (data.admin) setIsAdmin(true); })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -438,7 +451,7 @@ export default function Dashboard() {
 
   const runScan = () => {
     setScanning(true);
-    fetch(`${API}/api/rescan?token=mp-admin-2026`).catch(() => {});
+    fetch(`${API}/api/rescan?token=${encodeURIComponent(adminTokenRef.current)}`).catch(() => {});
     // Odpočet viditelný pro uživatele
     let secs = 40;
     setScanCountdown(secs);
