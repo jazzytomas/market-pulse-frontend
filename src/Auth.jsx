@@ -78,8 +78,8 @@ export default function Auth() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: font, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ cursor: "pointer", fontFamily: fontTitle, fontSize: 18, color: GOLD, letterSpacing: 2, marginBottom: 40 }} onClick={() => navigate("/")}>
-        MARKET PULSE
+      <div style={{ cursor: "pointer", marginBottom: 40 }} onClick={() => navigate("/")}>
+        <img src="/logo.svg" alt="MarkeTrade" style={{ height: 42, objectFit: "contain" }} />
       </div>
 
       <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 32, width: "100%", maxWidth: 400 }}>
