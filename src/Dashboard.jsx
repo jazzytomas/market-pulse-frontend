@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
 
 const LIGHT = {
   bg: "#f1f5f9", panel: "#ffffff", border: "#e2e8f0",
@@ -663,6 +664,11 @@ export default function Dashboard() {
             color: C.textDim, padding: "6px 9px", fontSize: 14,
             cursor: "pointer", borderRadius: 4, lineHeight: 1,
           }}>{darkMode ? "☀️" : "🌙"}</button>
+          <button onClick={() => supabase.auth.signOut()} title="Log out" style={{
+            background: "none", border: `1px solid ${C.border}`,
+            color: C.textDim, padding: "6px 9px", fontSize: 11,
+            cursor: "pointer", borderRadius: 4, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif",
+          }}>⏻</button>
         </div>
       </div>
       </div>
