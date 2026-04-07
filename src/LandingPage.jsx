@@ -154,7 +154,7 @@ export default function LandingPage() {
         <p style={{ color: DIM, fontSize: 17, lineHeight: 1.7, maxWidth: 600, margin: "0 auto 32px" }}>
           {t(T.hero.desc)}
         </p>
-        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#080812", border: "none", padding: "14px 36px", borderRadius: 10, fontFamily: fontTitle, fontSize: 14, letterSpacing: 1, cursor: "pointer", fontWeight: 700 }}>
+        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#080812", border: "none", padding: "14px 36px", borderRadius: 10, fontFamily: font, fontSize: 15, letterSpacing: 0.5, cursor: "pointer", fontWeight: 700 }}>
           {t(T.hero.cta)}
         </button>
         <div style={{ color: DIM, fontSize: 12, marginTop: 10 }}>{t(T.hero.sub)}</div>
@@ -169,7 +169,7 @@ export default function LandingPage() {
               onMouseEnter={e => e.currentTarget.style.borderColor = GOLD}
               onMouseLeave={e => e.currentTarget.style.borderColor = BORDER}>
               <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
-              <div style={{ fontFamily: fontTitle, fontSize: 13, letterSpacing: 1, marginBottom: 8, color: TEXT }}>{t(f.title)}</div>
+              <div style={{ fontFamily: font, fontSize: 15, fontWeight: 700, marginBottom: 8, color: TEXT }}>{t(f.title)}</div>
               <div style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>{t(f.desc)}</div>
             </div>
           ))}
