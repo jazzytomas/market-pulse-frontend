@@ -180,7 +180,7 @@ export default function LandingPage() {
       <section id="pricing" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
         <div style={{ fontFamily: fontTitle, fontSize: 11, letterSpacing: 4, color: GOLD, textAlign: "center", marginBottom: 12 }}>{t(T.sections.pricing)}</div>
         <p style={{ textAlign: "center", color: DIM, fontSize: 15, marginBottom: 40 }}>{t(T.sections.pricingSub)}</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, alignItems: "stretch" }}>
           {T.plans.map((p, i) => (
             <div key={i} style={{
               background: PANEL,
@@ -188,18 +188,19 @@ export default function LandingPage() {
               borderRadius: 12,
               padding: 28,
               position: "relative",
-              transform: p.popular ? "scale(1.03)" : "none",
+              display: "flex",
+              flexDirection: "column",
             }}>
               {p.popular && (
-                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#080812", fontFamily: fontTitle, fontSize: 10, letterSpacing: 2, padding: "4px 16px", borderRadius: 20, fontWeight: 700 }}>{t(T.popular)}</div>
+                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#080812", fontFamily: font, fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: "4px 16px", borderRadius: 20 }}>{t(T.popular)}</div>
               )}
-              <div style={{ fontFamily: fontTitle, fontSize: 12, letterSpacing: 2, color: DIM, marginBottom: 12 }}>{t(p.name)}</div>
+              <div style={{ fontFamily: font, fontSize: 13, fontWeight: 700, letterSpacing: 1, color: DIM, marginBottom: 12, textTransform: "uppercase" }}>{t(p.name)}</div>
               <div style={{ marginBottom: 8 }}>
-                <span style={{ fontFamily: fontTitle, fontSize: 36, color: TEXT }}>{p.price}</span>
+                <span style={{ fontFamily: font, fontSize: 36, fontWeight: 700, color: TEXT }}>{p.price}</span>
                 <span style={{ color: DIM, fontSize: 15 }}>{t(p.period)}</span>
               </div>
               <div style={{ color: DIM, fontSize: 13, marginBottom: 20 }}>{t(p.desc)}</div>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px" }}>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", flex: 1 }}>
                 {t(p.features).map((f, j) => (
                   <li key={j} style={{ color: TEXT, fontSize: 14, padding: "5px 0", display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ color: GREEN, fontSize: 14 }}>✓</span> {f}
@@ -213,11 +214,10 @@ export default function LandingPage() {
                 border: p.popular ? "none" : `1px solid ${GOLD}`,
                 padding: "12px 0",
                 borderRadius: 8,
-                fontFamily: fontTitle,
-                fontSize: 12,
-                letterSpacing: 1,
-                cursor: "pointer",
+                fontFamily: font,
+                fontSize: 13,
                 fontWeight: 700,
+                cursor: "pointer",
               }}>{t(p.cta)}</button>
             </div>
           ))}
