@@ -126,7 +126,7 @@ const T = {
 export default function LandingPage() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
-  const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
+  const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "en");
 
   const t = (obj) => obj[lang] || obj.en;
   const goAuth = (plan) => navigate("/auth", { state: { plan } });
