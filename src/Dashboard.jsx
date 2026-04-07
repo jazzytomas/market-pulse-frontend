@@ -19,105 +19,110 @@ const DARK = {
 
 const ThemeContext = React.createContext(LIGHT);
 
+const LANGS = ["cz", "en", "es"];
+const LANG_FLAGS = { cz: "cz", en: "us", es: "es" };
+const LANG_LABELS = { cz: "CZ", en: "EN", es: "ES" };
+
 const T = {
   // Header
-  aiEngine:        { cz: "AI FUNDAMENTAL SENTIMENT ENGINE", en: "AI FUNDAMENTAL SENTIMENT ENGINE" },
-  lastScan:        { cz: "LAST SCAN", en: "LAST SCAN" },
-  rescan:          { cz: "⟳ RESCAN", en: "⟳ RESCAN" },
-  scanning:        { cz: (s) => `◌ ${s}s...`, en: (s) => `◌ ${s}s...` },
-  backend:         { cz: "Backend:", en: "Backend:" },
+  aiEngine:        { cz: "AI FUNDAMENTAL SENTIMENT ENGINE", en: "AI FUNDAMENTAL SENTIMENT ENGINE", es: "MOTOR DE SENTIMIENTO FUNDAMENTAL IA" },
+  lastScan:        { cz: "LAST SCAN", en: "LAST SCAN", es: "ÚLTIMO ESCANEO" },
+  rescan:          { cz: "⟳ RESCAN", en: "⟳ RESCAN", es: "⟳ REESCANEAR" },
+  scanning:        { cz: (s) => `◌ ${s}s...`, en: (s) => `◌ ${s}s...`, es: (s) => `◌ ${s}s...` },
+  backend:         { cz: "Backend:", en: "Backend:", es: "Backend:" },
   // Tabs (center)
-  tabScenarios:    { cz: "⚡ SCÉNÁŘE", en: "⚡ SCENARIOS" },
-  tabEvents:       { cz: "📅 EVENTS", en: "📅 EVENTS" },
-  tabCot:          { cz: "📊 COT", en: "📊 COT" },
-  tabCorrelation:  { cz: "🔗 KORELACE", en: "🔗 CORRELATION" },
-  tabSeasonal:     { cz: "📈 SEZÓNA", en: "📈 SEASONAL" },
-  tabHistory:      { cz: "🕐 HISTORIE", en: "🕐 HISTORY" },
-  tabFearGreed:    { cz: "😱 FEAR&GREED", en: "😱 FEAR&GREED" },
-  tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST" },
-  tabEducation:    { cz: "🎓 VÝUKA", en: "🎓 EDUCATION" },
-  tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE" },
+  tabScenarios:    { cz: "⚡ SCÉNÁŘE", en: "⚡ SCENARIOS", es: "⚡ ESCENARIOS" },
+  tabEvents:       { cz: "📅 EVENTS", en: "📅 EVENTS", es: "📅 EVENTOS" },
+  tabCot:          { cz: "📊 COT", en: "📊 COT", es: "📊 COT" },
+  tabCorrelation:  { cz: "🔗 KORELACE", en: "🔗 CORRELATION", es: "🔗 CORRELACIÓN" },
+  tabSeasonal:     { cz: "📈 SEZÓNA", en: "📈 SEASONAL", es: "📈 ESTACIONAL" },
+  tabHistory:      { cz: "🕐 HISTORIE", en: "🕐 HISTORY", es: "🕐 HISTORIAL" },
+  tabFearGreed:    { cz: "😱 FEAR&GREED", en: "😱 FEAR&GREED", es: "😱 MIEDO&CODICIA" },
+  tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST", es: "🎯 BACKTEST" },
+  tabEducation:    { cz: "🎓 VÝUKA", en: "🎓 EDUCATION", es: "🎓 EDUCACIÓN" },
+  tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE", es: "📖 GUÍA" },
   // Tabs (right panel)
-  tabPairs:        { cz: "PÁRY", en: "PAIRS" },
-  tabStatus:       { cz: "STATUS", en: "STATUS" },
-  tabCurrencies:   { cz: "MĚNY", en: "CURRENCIES" },
-  tabCbRates:      { cz: "CB SAZBY", en: "CB RATES" },
-  tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST" },
+  tabPairs:        { cz: "PÁRY", en: "PAIRS", es: "PARES" },
+  tabStatus:       { cz: "STATUS", en: "STATUS", es: "ESTADO" },
+  tabCurrencies:   { cz: "MĚNY", en: "CURRENCIES", es: "DIVISAS" },
+  tabCbRates:      { cz: "CB SAZBY", en: "CB RATES", es: "TASAS BC" },
+  tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST", es: "WATCHLIST" },
   // Section labels
-  riskSentiment:   { cz: "RISK SENTIMENT", en: "RISK SENTIMENT" },
-  menovy:          { cz: "MĚNOVÝ PŘEHLED", en: "CURRENCY OVERVIEW" },
-  komodity:        { cz: "KOMODITY", en: "COMMODITIES" },
-  riskOn:          { cz: "Risk ON", en: "Risk ON" },
-  riskOff:         { cz: "Risk OFF", en: "Risk OFF" },
-  neutral:         { cz: "Neutral", en: "Neutral" },
-  vixLabel:        { cz: "ztráta", en: "loss" },
-  vixGain:         { cz: "zisk", en: "gain" },
+  riskSentiment:   { cz: "RISK SENTIMENT", en: "RISK SENTIMENT", es: "SENTIMIENTO DE RIESGO" },
+  menovy:          { cz: "MĚNOVÝ PŘEHLED", en: "CURRENCY OVERVIEW", es: "RESUMEN DE DIVISAS" },
+  komodity:        { cz: "KOMODITY", en: "COMMODITIES", es: "MATERIAS PRIMAS" },
+  riskOn:          { cz: "Risk ON", en: "Risk ON", es: "Risk ON" },
+  riskOff:         { cz: "Risk OFF", en: "Risk OFF", es: "Risk OFF" },
+  neutral:         { cz: "Neutral", en: "Neutral", es: "Neutral" },
+  vixLabel:        { cz: "ztráta", en: "loss", es: "pérdida" },
+  vixGain:         { cz: "zisk", en: "gain", es: "ganancia" },
   // Scenarios
-  filterHigh:      { cz: "HIGH", en: "HIGH" },
-  filterMed:       { cz: "MED", en: "MED" },
-  filterOld:       { cz: "STARŠÍ", en: "OLDER" },
-  clickDetail:     { cz: "Klikni pro detail ▼", en: "Click for detail ▼" },
-  noScenarios:     { cz: "Žádné scénáře.", en: "No scenarios." },
-  currencyImpact:  { cz: "DOPAD NA MENY", en: "CURRENCY IMPACT" },
+  filterHigh:      { cz: "HIGH", en: "HIGH", es: "ALTO" },
+  filterMed:       { cz: "MED", en: "MED", es: "MED" },
+  filterOld:       { cz: "STARŠÍ", en: "OLDER", es: "ANTERIORES" },
+  clickDetail:     { cz: "Klikni pro detail ▼", en: "Click for detail ▼", es: "Clic para detalle ▼" },
+  noScenarios:     { cz: "Žádné scénáře.", en: "No scenarios.", es: "Sin escenarios." },
+  currencyImpact:  { cz: "DOPAD NA MENY", en: "CURRENCY IMPACT", es: "IMPACTO EN DIVISAS" },
   // Events
-  noEvents:        { cz: "Žádné eventy.", en: "No events." },
-  volWindows:      { cz: "VOLATILITA OKEN (EST)", en: "VOLATILITY WINDOWS (EST)" },
-  forecast:        { cz: "Forecast", en: "Forecast" },
-  actual:          { cz: "Actual", en: "Actual" },
-  previous:        { cz: "Previous", en: "Previous" },
+  noEvents:        { cz: "Žádné eventy.", en: "No events.", es: "Sin eventos." },
+  volWindows:      { cz: "VOLATILITA OKEN (EST)", en: "VOLATILITY WINDOWS (EST)", es: "VENTANAS DE VOLATILIDAD (EST)" },
+  forecast:        { cz: "Forecast", en: "Forecast", es: "Pronóstico" },
+  actual:          { cz: "Actual", en: "Actual", es: "Real" },
+  previous:        { cz: "Previous", en: "Previous", es: "Anterior" },
   // COT
-  cotTitle:        { cz: "CFTC COT – NET POZICE (tis. kontraktů)", en: "CFTC COT – NET POSITIONS (k contracts)" },
-  cotLong:         { cz: "Long", en: "Long" },
-  cotShort:        { cz: "Short", en: "Short" },
-  cotNet:          { cz: "Net", en: "Net" },
-  cotDate:         { cz: "Datum:", en: "Date:" },
-  cotSynthetic:    { cz: "syntetický", en: "synthetic" },
-  cotNoData:       { cz: "Žádná COT data.", en: "No COT data." },
+  cotTitle:        { cz: "CFTC COT – NET POZICE (tis. kontraktů)", en: "CFTC COT – NET POSITIONS (k contracts)", es: "CFTC COT – POSICIONES NETAS (miles de contratos)" },
+  cotLong:         { cz: "Long", en: "Long", es: "Long" },
+  cotShort:        { cz: "Short", en: "Short", es: "Short" },
+  cotNet:          { cz: "Net", en: "Net", es: "Neto" },
+  cotDate:         { cz: "Datum:", en: "Date:", es: "Fecha:" },
+  cotSynthetic:    { cz: "syntetický", en: "synthetic", es: "sintético" },
+  cotNoData:       { cz: "Žádná COT data.", en: "No COT data.", es: "Sin datos COT." },
   // Correlation
-  corrTitle:       { cz: "30D ROLLING KORELACE", en: "30D ROLLING CORRELATION" },
-  corrDesc:        { cz: "Pearson korelace z posledních 30 dní (živá data z yfinance)", en: "Pearson correlation last 30 days (live yfinance data)" },
+  corrTitle:       { cz: "30D ROLLING KORELACE", en: "30D ROLLING CORRELATION", es: "CORRELACIÓN RODANTE 30D" },
+  corrDesc:        { cz: "Pearson korelace z posledních 30 dní (živá data z yfinance)", en: "Pearson correlation last 30 days (live yfinance data)", es: "Correlación Pearson últimos 30 días (datos en vivo de yfinance)" },
   // Seasonal
-  seasTitle:       { cz: "SEZÓNNÍ PRŮMĚRNÉ VÝNOSY", en: "SEASONAL AVERAGE RETURNS" },
-  seasDesc:        { cz: (y) => `Průměrné měsíční výnosy za posledních ${y} let`, en: (y) => `Average monthly returns last ${y} years` },
-  seasNoData:      { cz: "Načítám sezónní data...", en: "Loading seasonal data..." },
+  seasTitle:       { cz: "SEZÓNNÍ PRŮMĚRNÉ VÝNOSY", en: "SEASONAL AVERAGE RETURNS", es: "RENDIMIENTOS PROMEDIO ESTACIONALES" },
+  seasDesc:        { cz: (y) => `Průměrné měsíční výnosy za posledních ${y} let`, en: (y) => `Average monthly returns last ${y} years`, es: (y) => `Rendimientos mensuales promedio últimos ${y} años` },
+  seasNoData:      { cz: "Načítám sezónní data...", en: "Loading seasonal data...", es: "Cargando datos estacionales..." },
   // History
-  histTitle:       { cz: "POSLEDNICH 7 DNI", en: "LAST 7 DAYS" },
-  histNoData:      { cz: "Žádná historická data.", en: "No historical data." },
+  histTitle:       { cz: "POSLEDNICH 7 DNI", en: "LAST 7 DAYS", es: "ÚLTIMOS 7 DÍAS" },
+  histNoData:      { cz: "Žádná historická data.", en: "No historical data.", es: "Sin datos históricos." },
   // Status
-  currentState:    { cz: "CURRENT STATE", en: "CURRENT STATE" },
-  upcomingEvents:  { cz: "NADCHÁZEJÍCÍ HIGH IMPACT EVENTY", en: "UPCOMING HIGH IMPACT EVENTS" },
-  noUpcoming:      { cz: "Žádné nadcházející high-impact eventy.", en: "No upcoming high-impact events." },
+  currentState:    { cz: "CURRENT STATE", en: "CURRENT STATE", es: "ESTADO ACTUAL" },
+  upcomingEvents:  { cz: "NADCHÁZEJÍCÍ HIGH IMPACT EVENTY", en: "UPCOMING HIGH IMPACT EVENTS", es: "PRÓXIMOS EVENTOS DE ALTO IMPACTO" },
+  noUpcoming:      { cz: "Žádné nadcházející high-impact eventy.", en: "No upcoming high-impact events.", es: "Sin próximos eventos de alto impacto." },
   // Pairs
-  pairsTitle:      { cz: "SKÓRE PÁR — klikni pro Confluence detail", en: "PAIR SCORES — click for Confluence detail" },
-  topSetups:       { cz: "TOP SETUPY:", en: "TOP SETUPS:" },
+  pairsTitle:      { cz: "SKÓRE PÁR — klikni pro Confluence detail", en: "PAIR SCORES — click for Confluence detail", es: "PUNTUACIÓN DE PARES — clic para detalle Confluence" },
+  topSetups:       { cz: "TOP SETUPY:", en: "TOP SETUPS:", es: "TOP CONFIGURACIONES:" },
   // CB Rates
-  cbTitle:         { cz: "CENTRAL BANK TRACKER", en: "CENTRAL BANK TRACKER" },
-  cbRate:          { cz: "Sazba", en: "Rate" },
-  cbBank:          { cz: "Centrální banka", en: "Central Bank" },
-  cbCountry:       { cz: "Země", en: "Country" },
+  cbTitle:         { cz: "CENTRAL BANK TRACKER", en: "CENTRAL BANK TRACKER", es: "SEGUIMIENTO BANCOS CENTRALES" },
+  cbRate:          { cz: "Sazba", en: "Rate", es: "Tasa" },
+  cbBank:          { cz: "Centrální banka", en: "Central Bank", es: "Banco Central" },
+  cbCountry:       { cz: "Země", en: "Country", es: "País" },
   // Watchlist
-  watchNoData:     { cz: "Načítám watchlist...", en: "Loading watchlist..." },
+  watchNoData:     { cz: "Načítám watchlist...", en: "Loading watchlist...", es: "Cargando watchlist..." },
   // Currencies/Meny
-  currBias:        { cz: "CURRENCY BIAS", en: "CURRENCY BIAS" },
+  currBias:        { cz: "CURRENCY BIAS", en: "CURRENCY BIAS", es: "SESGO DE DIVISAS" },
   // Backtest
-  btTitle:         { cz: "BACKTEST VÝSLEDKY", en: "BACKTEST RESULTS" },
-  btAccuracy:      { cz: "PŘESNOST PER MĚNA", en: "ACCURACY PER CURRENCY" },
-  btRecent:        { cz: "POSLEDNÍ PREDIKCE", en: "RECENT PREDICTIONS" },
-  btCorrect:       { cz: "správně", en: "correct" },
-  btWrong:         { cz: "chybně", en: "wrong" },
-  btNoData:        { cz: "Backtest data nejsou k dispozici.", en: "Backtest data not available." },
+  btTitle:         { cz: "BACKTEST VÝSLEDKY", en: "BACKTEST RESULTS", es: "RESULTADOS BACKTEST" },
+  btAccuracy:      { cz: "PŘESNOST PER MĚNA", en: "ACCURACY PER CURRENCY", es: "PRECISIÓN POR DIVISA" },
+  btRecent:        { cz: "POSLEDNÍ PREDIKCE", en: "RECENT PREDICTIONS", es: "PREDICCIONES RECIENTES" },
+  btCorrect:       { cz: "správně", en: "correct", es: "correcto" },
+  btWrong:         { cz: "chybně", en: "wrong", es: "incorrecto" },
+  btNoData:        { cz: "Backtest data nejsou k dispozici.", en: "Backtest data not available.", es: "Datos de backtest no disponibles." },
   // Fear & Greed
-  fgTitle:         { cz: "FEAR & GREED INDEX", en: "FEAR & GREED INDEX" },
-  fgNoData:        { cz: "Načítám Fear & Greed...", en: "Loading Fear & Greed..." },
+  fgTitle:         { cz: "FEAR & GREED INDEX", en: "FEAR & GREED INDEX", es: "ÍNDICE DE MIEDO Y CODICIA" },
+  fgNoData:        { cz: "Načítám Fear & Greed...", en: "Loading Fear & Greed...", es: "Cargando Fear & Greed..." },
   // Guide
-  guideTitle:      { cz: "PRŮVODCE APLIKACÍ", en: "APP GUIDE" },
+  guideTitle:      { cz: "PRŮVODCE APLIKACÍ", en: "APP GUIDE", es: "GUÍA DE LA APP" },
   // Footer
-  footerSources:   { cz: "AI scanning: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT", en: "AI scanning: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT" },
-  footerDisclaimer:{ cz: "NOT FINANCIAL ADVICE · INFORMATIONAL ONLY", en: "NOT FINANCIAL ADVICE · INFORMATIONAL ONLY" },
+  footerSources:   { cz: "AI scanning: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT", en: "AI scanning: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT", es: "Escaneo IA: ForexLive · FXStreet · MarketWatch · BBC · Investing.com · FT" },
+  footerDisclaimer:{ cz: "NOT FINANCIAL ADVICE · INFORMATIONAL ONLY", en: "NOT FINANCIAL ADVICE · INFORMATIONAL ONLY", es: "NO ES ASESORAMIENTO FINANCIERO · SOLO INFORMATIVO" },
   // Volatility windows
   volSessions: {
     cz: { "Overlap": "Vsechny pary", "NY Close": "USD pary", "Weekend": "Pa 17:00-Ne 17:00", gapRisk: "GAP riziko" },
     en: { "Overlap": "All pairs", "NY Close": "USD pairs", "Weekend": "Fri 17:00-Sun 17:00", gapRisk: "GAP risk" },
+    es: { "Overlap": "Todos los pares", "NY Close": "Pares USD", "Weekend": "Vie 17:00-Dom 17:00", gapRisk: "Riesgo GAP" },
   },
 };
 
@@ -653,11 +658,12 @@ export default function Dashboard() {
               }}>{scanning ? t("scanning", scanCountdown) : t("rescan")}</button>
             </>
           )}
-          <button onClick={() => { const next = lang === "cz" ? "en" : "cz"; setLang(next); localStorage.setItem("mp_lang", next); }} title={lang === "cz" ? "Switch to English" : "Přepnout do češtiny"} style={{
+          <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
             background: "none", border: `1px solid ${C.border}`,
-            padding: "3px 6px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center",
+            padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
           }}>
-            <img src={lang === "cz" ? "https://flagcdn.com/24x18/us.png" : "https://flagcdn.com/24x18/cz.png"} width="24" height="18" alt={lang === "cz" ? "EN" : "CZ"} style={{ display: "block", borderRadius: 2 }} />
+            <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="24" height="18" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
+            <span style={{ color: C.textDim, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif" }}>{LANG_LABELS[lang]}</span>
           </button>
           <button onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem("mp_theme", next ? "dark" : "light"); }} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
