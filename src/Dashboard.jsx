@@ -297,6 +297,7 @@ export default function Dashboard() {
   const [btPage, setBtPage] = useState(1);
   const [fearGreedData, setFearGreedData] = useState(null);
   const [fgHistory, setFgHistory] = useState([]);
+  const [dxy, setDxy] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
   const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
   const [winW, setWinW] = useState(window.innerWidth);
@@ -375,6 +376,13 @@ export default function Dashboard() {
       .then(r => r.json())
       .then(data => setHistoryData(data || []))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const fetchDxy = () => fetch(`${API}/api/dxy`).then(r => r.json()).then(data => setDxy(data)).catch(() => {});
+    fetchDxy();
+    const id = setInterval(fetchDxy, 300000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -563,41 +571,30 @@ export default function Dashboard() {
   };
 
   const ALL_PAIRS = [
-    // USD pairs
+    // USD majors
     { pair: "EUR/USD", base: "EUR", quote: "USD" },
     { pair: "GBP/USD", base: "GBP", quote: "USD" },
-    { pair: "USD/JPY", base: "USD", quote: "JPY" },
     { pair: "NZD/USD", base: "NZD", quote: "USD" },
-    { pair: "USD/CHF", base: "USD", quote: "CHF" },
     { pair: "USD/CAD", base: "USD", quote: "CAD" },
+    { pair: "USD/CHF", base: "USD", quote: "CHF" },
     { pair: "AUD/USD", base: "AUD", quote: "USD" },
+    { pair: "USD/JPY", base: "USD", quote: "JPY" },
     // EUR crosses
-    { pair: "EUR/NZD", base: "EUR", quote: "NZD" },
-    { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
-    { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
-    { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
-    { pair: "EUR/CAD", base: "EUR", quote: "CAD" },
     { pair: "EUR/AUD", base: "EUR", quote: "AUD" },
+    { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
+    { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
+    { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
     // GBP crosses
     { pair: "GBP/AUD", base: "GBP", quote: "AUD" },
-    { pair: "GBP/NZD", base: "GBP", quote: "NZD" },
-    { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
     { pair: "GBP/CAD", base: "GBP", quote: "CAD" },
-    { pair: "GBP/CHF", base: "GBP", quote: "CHF" },
-    // NZD crosses
-    { pair: "NZD/JPY", base: "NZD", quote: "JPY" },
-    { pair: "NZD/CHF", base: "NZD", quote: "CHF" },
-    { pair: "NZD/CAD", base: "NZD", quote: "CAD" },
-    // CHF crosses
-    { pair: "CHF/JPY", base: "CHF", quote: "JPY" },
-    // CAD crosses
-    { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
-    { pair: "CAD/CHF", base: "CAD", quote: "CHF" },
-    // AUD crosses
-    { pair: "AUD/NZD", base: "AUD", quote: "NZD" },
-    { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
-    { pair: "AUD/CHF", base: "AUD", quote: "CHF" },
+    { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
+    { pair: "GBP/NZD", base: "GBP", quote: "NZD" },
+    // Other crosses
     { pair: "AUD/CAD", base: "AUD", quote: "CAD" },
+    { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
+    { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
+    { pair: "CHF/JPY", base: "CHF", quote: "JPY" },
+    { pair: "NZD/JPY", base: "NZD", quote: "JPY" },
   ];
 
   const pairsWithConfluence = ALL_PAIRS.map(p => ({ ...p, ...computeConfluenceForPair(p.base, p.quote) }))
@@ -700,6 +697,33 @@ export default function Dashboard() {
                   <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
                 </div>
               )}
+              {dxy && dxy.price && (
+                <div style={{ marginTop: 10, padding: "8px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: C.text, letterSpacing: 1.5, fontFamily: "Orbitron, monospace" }}>DXY</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{dxy.price}</span>
+                      <span style={{ fontSize: 9, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"} {Math.abs(dxy.change)}%</span>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[
+                      { label: "D1", trend: dxy.daily },
+                      { label: "4H", trend: dxy.h4 },
+                      { label: "1H", trend: dxy.h1 },
+                    ].map(tf => {
+                      const col = tf.trend === "bullish" ? C.green : tf.trend === "bearish" ? C.red : C.yellow;
+                      const arrow = tf.trend === "bullish" ? "▲" : tf.trend === "bearish" ? "▼" : "—";
+                      return (
+                        <div key={tf.label} style={{ flex: 1, textAlign: "center", padding: "4px 0", background: `${col}12`, border: `1px solid ${col}33`, borderRadius: 4 }}>
+                          <div style={{ fontSize: 8, color: C.textDim, marginBottom: 2 }}>{tf.label}</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: col }}>{arrow} {tf.trend === "bullish" ? "BULL" : tf.trend === "bearish" ? "BEAR" : "FLAT"}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                 <SectionLabel>{t("menovy")}</SectionLabel>
                 {[
@@ -776,6 +800,21 @@ export default function Dashboard() {
                   <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1 }}>VIX</span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
                   <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
+                </div>
+              )}
+              {dxy && dxy.price && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                  <span style={{ fontSize: 8, fontWeight: 700, color: C.text, letterSpacing: 1, fontFamily: "Orbitron, monospace" }}>DXY</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{dxy.price}</span>
+                  <span style={{ fontSize: 8, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"}{Math.abs(dxy.change)}%</span>
+                  {[
+                    { label: "D1", trend: dxy.daily },
+                    { label: "4H", trend: dxy.h4 },
+                    { label: "1H", trend: dxy.h1 },
+                  ].map(tf => {
+                    const col = tf.trend === "bullish" ? C.green : tf.trend === "bearish" ? C.red : C.yellow;
+                    return <span key={tf.label} style={{ fontSize: 7, color: col, fontWeight: 700 }}>{tf.label}{tf.trend === "bullish" ? "▲" : tf.trend === "bearish" ? "▼" : "—"}</span>;
+                  })}
                 </div>
               )}
               <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
