@@ -941,7 +941,7 @@ export default function Dashboard() {
                                       <div style={{ flex: 1 }}><ScoreBar score={imp.score} height={4} /></div>
                                       <span style={{ width: 32, textAlign: "right", fontSize: 9, color: col }}>{imp.score > 0 ? "+" : ""}{imp.score}</span>
                                     </div>
-                                    <div style={{ fontSize: 8, color: C.muted, paddingLeft: 31, lineHeight: 1.4, marginBottom: 3 }}>{imp.reason}</div>
+                                    <div style={{ fontSize: 8, color: C.muted, paddingLeft: 31, lineHeight: 1.4, marginBottom: 3 }}>{lang === "cz" && imp.reason_cz ? imp.reason_cz : imp.reason}</div>
                                   </div>
                                 );
                               })}
