@@ -332,6 +332,8 @@ export default function Dashboard() {
 
   const isMobile = winW < 1024;
   const C = darkMode ? DARK : LIGHT;
+  // Helper: commodity name can be string or {cz, en, es} object
+  const cName = (n) => typeof n === "object" && n !== null ? (n[lang] || n.en || "") : (n || "");
 
   useEffect(() => {
     fetch(`${API}/api/health`)
@@ -498,7 +500,7 @@ export default function Dashboard() {
       labels.push({ label: L("NABÍDKOVÝ ŠOK", "SUPPLY SHOCK", "SHOCK DE OFERTA"), color: "#9b59b6" });
     if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
       labels.push({ label: L("OBCHODNÍ VÁLKA", "TRADE WAR", "GUERRA COMERCIAL"), color: "#e67e22" });
-    const wti = commodities.find(c => c.name && c.name.toLowerCase().includes("wti"));
+    const wti = commodities.find(c => c.name && cName(c.name).toLowerCase().includes("wti"));
     if (wti && wti.change && wti.price) {
       const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
       const prev = priceNum - wti.change;
@@ -739,9 +741,9 @@ export default function Dashboard() {
                 return items.map(c => {
                   const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
                   return (
-                    <div key={c.name} style={{ marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    <div key={cName(c.name)} style={{ marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
                         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
                           <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"} {Math.abs(c.change)}%</span>
                           <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
@@ -2172,9 +2174,9 @@ export default function Dashboard() {
               {items.map(c => {
                 const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
                 return (
-                  <div key={c.name} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px" }}>
+                  <div key={cName(c.name)} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{c.name}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
                       <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"}{Math.abs(c.change)}%</span>
                     </div>
                     {c.currencies && <div><span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span></div>}
