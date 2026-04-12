@@ -132,24 +132,26 @@ export default function LandingPage() {
   const goAuth = (plan) => navigate("/auth", { state: { plan } });
 
   return (
-    <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: font }}>
+    <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: font, overflowX: "hidden", maxWidth: "100vw" }}>
       {/* NAV */}
-      <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 32px", borderBottom: `1px solid ${BORDER}`, maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <nav style={{ padding: "18px 16px", borderBottom: `1px solid ${BORDER}`, maxWidth: 1200, margin: "0 auto", boxSizing: "border-box" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <img src="/logo.svg" alt="MarkeTrade" style={{ height: 36, objectFit: "contain" }} />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
+              background: "none", border: `1px solid ${BORDER}`,
+              padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
+            }}>
+              <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="24" height="18" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
+              <span style={{ color: DIM, fontSize: 11, fontFamily: font }}>{LANG_LABELS[lang]}</span>
+            </button>
+            <button onClick={() => navigate("/auth")} style={{ background: "transparent", border: `1px solid ${GOLD}`, color: GOLD, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontFamily: fontTitle, fontSize: 12, letterSpacing: 1 }}>{t(T.nav.login)}</button>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <a href="#features" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.features)}</a>
-          <a href="#pricing" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.pricing)}</a>
-          <a href="#faq" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.faq)}</a>
-          <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
-            background: "none", border: `1px solid ${BORDER}`,
-            padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
-          }}>
-            <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="24" height="18" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
-            <span style={{ color: DIM, fontSize: 11, fontFamily: font }}>{LANG_LABELS[lang]}</span>
-          </button>
-          <button onClick={() => navigate("/auth")} style={{ background: "transparent", border: `1px solid ${GOLD}`, color: GOLD, padding: "8px 20px", borderRadius: 8, cursor: "pointer", fontFamily: fontTitle, fontSize: 12, letterSpacing: 1 }}>{t(T.nav.login)}</button>
+        <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
+          <a href="#features" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.features)}</a>
+          <a href="#pricing" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.pricing)}</a>
+          <a href="#faq" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.faq)}</a>
         </div>
       </nav>
 
@@ -172,7 +174,7 @@ export default function LandingPage() {
       {/* FEATURES */}
       <section id="features" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
         <div style={{ fontFamily: fontTitle, fontSize: 11, letterSpacing: 4, color: GOLD, textAlign: "center", marginBottom: 40 }}>{t(T.sections.features)}</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))", gap: 20 }}>
           {T.features.map((f, i) => (
             <div key={i} style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 24, transition: "border-color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor = GOLD}
@@ -189,7 +191,7 @@ export default function LandingPage() {
       <section id="pricing" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
         <div style={{ fontFamily: fontTitle, fontSize: 11, letterSpacing: 4, color: GOLD, textAlign: "center", marginBottom: 12 }}>{t(T.sections.pricing)}</div>
         <p style={{ textAlign: "center", color: DIM, fontSize: 15, marginBottom: 40 }}>{t(T.sections.pricingSub)}</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, alignItems: "stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(250px, 100%), 1fr))", gap: 20, alignItems: "stretch" }}>
           {T.plans.map((p, i) => (
             <div key={i} style={{
               background: PANEL,

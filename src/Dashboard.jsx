@@ -306,12 +306,20 @@ export default function Dashboard() {
     return typeof val === "function" ? val(...args) : (val ?? key);
   };
 
+  const L = (cz, en, es) => lang === "cz" ? cz : lang === "es" ? es : en;
+
   const translatePairs = (p) => {
     if (lang === "en") {
       return p.replace("Vsechny pary", "All pairs")
               .replace("USD pary", "USD pairs")
               .replace("Pa 17:00-Ne 17:00", "Fri 17:00-Sun 17:00")
               .replace("GAP riziko", "GAP risk");
+    }
+    if (lang === "es") {
+      return p.replace("Vsechny pary", "Todos los pares")
+              .replace("USD pary", "Pares USD")
+              .replace("Pa 17:00-Ne 17:00", "Vie 17:00-Dom 17:00")
+              .replace("GAP riziko", "Riesgo GAP");
     }
     return p;
   };
@@ -483,20 +491,20 @@ export default function Dashboard() {
     const highScenarios = scenarios.filter(s => s.weight === "HIGH");
     const allText = highScenarios.map(s => (s.title + " " + (s.summary || "")).toLowerCase()).join(" ");
     if (["iran","war","conflict","missile","attack","military","sanction","nato","nuclear","troops","strike","invasion","blockade","hormuz","weapon"].some(kw => allText.includes(kw)))
-      labels.push({ label: lang === "cz" ? "GEOPOLITICKÝ ŠOK" : "GEOPOLITICAL SHOCK", color: "#e74c3c" });
+      labels.push({ label: L("GEOPOLITICKÝ ŠOK", "GEOPOLITICAL SHOCK", "SHOCK GEOPOLÍTICO"), color: "#e74c3c" });
     if (["inflation"," cpi"," ppi","stagflat","price surge","price shock","overheating"].some(kw => allText.includes(kw)))
-      labels.push({ label: lang === "cz" ? "INFLAČNÍ ŠOK" : "INFLATION SHOCK", color: "#1abc9c" });
+      labels.push({ label: L("INFLAČNÍ ŠOK", "INFLATION SHOCK", "SHOCK INFLACIONARIO"), color: "#1abc9c" });
     if (["supply chain","shortage","embargo","export ban","port clos","supply shock","mines in strait"].some(kw => allText.includes(kw)))
-      labels.push({ label: lang === "cz" ? "NABÍDKOVÝ ŠOK" : "SUPPLY SHOCK", color: "#9b59b6" });
+      labels.push({ label: L("NABÍDKOVÝ ŠOK", "SUPPLY SHOCK", "SHOCK DE OFERTA"), color: "#9b59b6" });
     if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
-      labels.push({ label: lang === "cz" ? "OBCHODNÍ VÁLKA" : "TRADE WAR", color: "#e67e22" });
+      labels.push({ label: L("OBCHODNÍ VÁLKA", "TRADE WAR", "GUERRA COMERCIAL"), color: "#e67e22" });
     const wti = commodities.find(c => c.name && c.name.toLowerCase().includes("wti"));
     if (wti && wti.change && wti.price) {
       const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
       const prev = priceNum - wti.change;
       const pct = prev !== 0 ? (wti.change / prev) * 100 : 0;
-      if (pct > 3) labels.push({ label: lang === "cz" ? "ROPNÝ SKOK" : "OIL SPIKE", color: "#f1c40f" });
-      else if (pct < -3) labels.push({ label: lang === "cz" ? "PÁD ROPY" : "OIL DROP", color: "#2ecc71" });
+      if (pct > 3) labels.push({ label: L("ROPNÝ SKOK", "OIL SPIKE", "SUBIDA DEL PETRÓLEO"), color: "#f1c40f" });
+      else if (pct < -3) labels.push({ label: L("PÁD ROPY", "OIL DROP", "CAÍDA DEL PETRÓLEO"), color: "#2ecc71" });
     }
     return labels;
   }, [scenarios, commodities, lang]);
@@ -610,7 +618,7 @@ export default function Dashboard() {
   return (
     <LangContext.Provider value={lang}>
     <ThemeContext.Provider value={C}>
-    <div style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "inherit" }}>
+    <div style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "inherit", overflowX: "hidden", maxWidth: "100vw" }}>
 
       {/* Header – full width */}
       <div style={{ borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
@@ -693,7 +701,7 @@ export default function Dashboard() {
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 4, marginBottom: 2 }}>
                   <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>VIX</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
-                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? (lang === "cz" ? "▲ strach" : "▲ fear") : sentiment.vix < 15 ? (lang === "cz" ? "▼ klid" : "▼ calm") : "— neutral"}</span>
+                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
                 </div>
               )}
               <div style={{ marginTop: 12, padding: "10px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
@@ -718,9 +726,9 @@ export default function Dashboard() {
             <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 12px" }}>
               <div style={{ display: "flex", gap: 0, marginBottom: 8, borderBottom: `1px solid ${C.border}` }}>
                 {[
-                  { key: "commodities", label: lang === "cz" ? "Komodity" : "Commodities" },
-                  { key: "stocks", label: lang === "cz" ? "Akcie" : "Stocks" },
-                  { key: "crypto", label: "Krypto" },
+                  { key: "commodities", label: L("Komodity", "Commodities", "Materias Primas") },
+                  { key: "stocks", label: L("Akcie", "Stocks", "Acciones") },
+                  { key: "crypto", label: L("Krypto", "Crypto", "Cripto") },
                 ].map(tab => (
                   <div key={tab.key} onClick={() => setMarketTab(tab.key)}
                     style={{ padding: "4px 10px", fontSize: 9, fontWeight: marketTab === tab.key ? 700 : 400,
@@ -733,7 +741,7 @@ export default function Dashboard() {
               </div>
               {(() => {
                 const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
-                if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>;
+                if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
                 return items.map(c => {
                   const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
                   return (
@@ -771,7 +779,7 @@ export default function Dashboard() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                   <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1 }}>VIX</span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
-                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? (lang === "cz" ? "▲ strach" : "▲ fear") : sentiment.vix < 15 ? (lang === "cz" ? "▼ klid" : "▼ calm") : "— neutral"}</span>
+                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
                 </div>
               )}
               <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
@@ -846,7 +854,7 @@ export default function Dashboard() {
                     const isMed = s.weight === "MED";
                     const sc = (s.risk_score || 0) > 0 ? C.green : C.red;
                     const rScore = s.risk_score || 0;
-                    const summaryText = lang === "cz" && s.summary_cz ? s.summary_cz : s.summary;
+                    const summaryText = (lang === "cz" && s.summary_cz) ? s.summary_cz : s.summary;
                     return (
                       <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
                         <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "5px 10px" : "7px 12px", cursor: "pointer" }}>
@@ -929,13 +937,14 @@ export default function Dashboard() {
                   const dayEvents = dayMap[activeDay] || [];
                   const DAY_NAMES_CZ = ["Ne","Po","Út","St","Čt","Pá","So"];
                   const DAY_NAMES_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+                  const DAY_NAMES_ES = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 
                   return (<>
                     {/* Day tabs */}
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 4 }}>
                       {days.map(day => {
                         const d = new Date(day + "T12:00:00");
-                        const dn = lang === "cz" ? DAY_NAMES_CZ[d.getDay()] : DAY_NAMES_EN[d.getDay()];
+                        const dn = L(DAY_NAMES_CZ, DAY_NAMES_EN, DAY_NAMES_ES)[d.getDay()];
                         const dd = d.getDate();
                         const isToday = day === todayKey;
                         const isActive = day === activeDay;
@@ -1021,16 +1030,17 @@ export default function Dashboard() {
             {centerTab === "cot" && (
               <div>
                 <div style={{ fontSize: 9, color: C.textDim, marginBottom: 4 }}>
-                  {lang === "cz"
-                    ? "CFTC Commitments of Traders — Leveraged Money pozice · stahuje se každý pátek · datum = reportovací týden (úterý)"
-                    : "CFTC Commitments of Traders — Leveraged Money positions · fetched every Friday · date = reporting week (Tuesday)"}
+                  {L(
+                    "CFTC Commitments of Traders — Leveraged Money pozice · stahuje se každý pátek · datum = reportovací týden (úterý)",
+                    "CFTC Commitments of Traders — Leveraged Money positions · fetched every Friday · date = reporting week (Tuesday)",
+                    "CFTC Commitments of Traders — Posiciones Leveraged Money · se obtiene cada viernes · fecha = semana del reporte (martes)")}
                 </div>
                 {cotData.length > 0 && (() => {
                   const dates = cotData.filter(c => c.date && !c.date.endsWith("*")).map(c => c.date);
                   const latestDate = dates.length > 0 ? dates.sort().reverse()[0] : null;
                   return latestDate ? (
                     <div style={{ fontSize: 9, color: C.accent, fontFamily: "'Orbitron',sans-serif", marginBottom: 12 }}>
-                      {lang === "cz" ? `📅 Report: ${latestDate}` : `📅 Report: ${latestDate}`}
+                      {`📅 Report: ${latestDate}`}
                     </div>
                   ) : null;
                 })()}
@@ -1088,15 +1098,15 @@ export default function Dashboard() {
                 {/* MĚNY */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
-                    {lang === "cz" ? "KORELACE MĚN" : "CURRENCY CORRELATION"}
+                    {L("KORELACE MĚN", "CURRENCY CORRELATION", "CORRELACIÓN DE DIVISAS")}
                     {currencyCorr && currencyCorr.date && (
                       <span style={{ fontSize: 8, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
-                        {currencyCorr.days}D · {lang === "cz" ? "k" : "as of"} {currencyCorr.date}
+                        {currencyCorr.days}D · {L("k", "as of", "al")} {currencyCorr.date}
                       </span>
                     )}
                   </div>
                   {!currencyCorr || !currencyCorr.currencies?.length ? (
-                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
+                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
                   ) : (
                     <div style={{ overflowX: "auto" }}>
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
@@ -1132,7 +1142,7 @@ export default function Dashboard() {
             {centerTab === "seasonal" && (
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                  <span style={{ fontSize: 9, color: C.textDim }}>{lang === "cz" ? "Průměrný měsíční výnos za posledních" : "Average monthly return last"}</span>
+                  <span style={{ fontSize: 9, color: C.textDim }}>{L("Průměrný měsíční výnos za posledních", "Average monthly return last", "Rendimiento mensual promedio últimos")}</span>
                   {[1, 3, 5, 10].map(y => (
                     <button key={y} onClick={() => setSeasonalYears(y)} style={{
                       fontSize: 9, padding: "2px 8px", borderRadius: 4, cursor: "pointer",
@@ -1197,9 +1207,10 @@ export default function Dashboard() {
                         </tbody>
                       </table>
                       <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>
-                        {lang === "cz"
-                          ? `* hodnoty v %, průměr ${seasonalYears} ${seasonalYears === 1 ? "rok" : seasonalYears < 5 ? "roky" : "let"} · zdroj: yfinance`
-                          : `* values in %, average ${seasonalYears} ${seasonalYears === 1 ? "year" : "years"} · source: yfinance`}
+                        {L(
+                          `* hodnoty v %, průměr ${seasonalYears} ${seasonalYears === 1 ? "rok" : seasonalYears < 5 ? "roky" : "let"} · zdroj: yfinance`,
+                          `* values in %, average ${seasonalYears} ${seasonalYears === 1 ? "year" : "years"} · source: yfinance`,
+                          `* valores en %, promedio ${seasonalYears} ${seasonalYears === 1 ? "año" : "años"} · fuente: yfinance`)}
                       </div>
                     </div>
                   );
@@ -1221,7 +1232,7 @@ export default function Dashboard() {
                           <span style={{ fontSize: 10, color: C.textDim, width: 36 }}>{h.date}</span>
                           <span style={{ fontSize: 11, fontWeight: 900, color: col, width: 36 }}>{h.score > 0 ? "+" : ""}{h.score}</span>
                           <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3, width: 58, textAlign: "center" }}>{h.label}</span>
-                          <span style={{ fontSize: 9, color: C.muted, flex: 1 }}>{h.count} {lang === "cz" ? "scénářů" : "scenarios"}</span>
+                          <span style={{ fontSize: 9, color: C.muted, flex: 1 }}>{h.count} {L("scénářů", "scenarios", "escenarios")}</span>
                         </div>
                       );
                     })}
@@ -1237,7 +1248,7 @@ export default function Dashboard() {
                   <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
                     <div style={{ fontSize: 10, color: C.textDim, marginBottom: 12 }}>{label}</div>
-                    <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>
+                    <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
                   </div>
                 );
                 const col = fgColor(data.value);
@@ -1270,14 +1281,14 @@ export default function Dashboard() {
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
                     {[
                       { label: "FOREX", icon: "💱", data: fearGreedData?.forex, histKey: "forex" },
-                      { label: lang === "cz" ? "AKCIE" : "STOCKS", icon: "📈", data: fearGreedData?.stocks, histKey: "stocks" },
+                      { label: L("AKCIE", "STOCKS", "ACCIONES"), icon: "📈", data: fearGreedData?.stocks, histKey: "stocks" },
                       { label: "KRYPTO", icon: "₿", data: fearGreedData?.crypto, histKey: "crypto" },
                     ].map(fg => (
                       <div key={fg.label}>
                         <FGGauge label={fg.label} icon={fg.icon} data={fg.data} />
                         {fgHistory.length > 1 && (
                           <div style={{ marginTop: 6, padding: "6px 8px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6 }}>
-                            <div style={{ fontSize: 7, color: C.muted, marginBottom: 4, textAlign: "center" }}>{lang === "cz" ? "HISTORIE" : "HISTORY"}</div>
+                            <div style={{ fontSize: 7, color: C.muted, marginBottom: 4, textAlign: "center" }}>{L("HISTORIE", "HISTORY", "HISTORIAL")}</div>
                             <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 28 }}>
                               {[...fgHistory].reverse().map((h, i) => {
                                 const val = h[fg.histKey];
@@ -1310,7 +1321,7 @@ export default function Dashboard() {
                       ))}
                     </div>
                     <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>
-                      {lang === "cz" ? "Forex = náš AI sentiment + VIX · Akcie = VIX + S&P momentum · Krypto = alternative.me · cache 15 min" : "Forex = our AI sentiment + VIX · Stocks = VIX + S&P momentum · Crypto = alternative.me · cache 15 min"}
+                      {L("Forex = náš AI sentiment + VIX · Akcie = VIX + S&P momentum · Krypto = alternative.me · cache 15 min", "Forex = our AI sentiment + VIX · Stocks = VIX + S&P momentum · Crypto = alternative.me · cache 15 min", "Forex = nuestro AI sentiment + VIX · Acciones = VIX + S&P momentum · Cripto = alternative.me · cache 15 min")}
                     </div>
                   </div>
                 </div>
@@ -1322,17 +1333,17 @@ export default function Dashboard() {
                 {!backtestData || backtestData.total === 0 ? (
                   <div style={{ fontSize: 9, color: C.muted, padding: "30px 0", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 8 }}>⏳</div>
-                    {lang === "cz" ? "Data se hromadí – backtest potřebuje min. 24h na první výsledky." : "Data is accumulating – backtest needs min. 24h for first results."}<br/>
-                    <span style={{ fontSize: 8 }}>{lang === "cz" ? "Každou hodinu se ukládají vstupní ceny, po 24h se vyhodnocuje přesnost." : "Entry prices are saved every hour, accuracy is evaluated after 24h."}</span>
+                    {L("Data se hromadí – backtest potřebuje min. 24h na první výsledky.", "Data is accumulating – backtest needs min. 24h for first results.", "Los datos se acumulan – el backtest necesita mín. 24h para los primeros resultados.")}<br/>
+                    <span style={{ fontSize: 8 }}>{L("Každou hodinu se ukládají vstupní ceny, po 24h se vyhodnocuje přesnost.", "Entry prices are saved every hour, accuracy is evaluated after 24h.", "Los precios de entrada se guardan cada hora, la precisión se evalúa después de 24h.")}</span>
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {/* Overall stats */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                       {[
-                        { label: lang === "cz" ? "CELKOVÁ PŘESNOST" : "OVERALL ACCURACY", value: `${backtestData.accuracy}%`, color: backtestData.accuracy >= 55 ? C.green : backtestData.accuracy >= 45 ? C.yellow : C.red },
-                        { label: lang === "cz" ? "SPRÁVNĚ" : "CORRECT", value: `${backtestData.correct} / ${backtestData.total}`, color: C.text },
-                        { label: lang === "cz" ? "VYHODNOCENO" : "EVALUATED", value: `${backtestData.total} ${lang === "cz" ? "predikcí" : "predictions"}`, color: C.textDim },
+                        { label: L("CELKOVÁ PŘESNOST", "OVERALL ACCURACY", "PRECISIÓN TOTAL"), value: `${backtestData.accuracy}%`, color: backtestData.accuracy >= 55 ? C.green : backtestData.accuracy >= 45 ? C.yellow : C.red },
+                        { label: L("SPRÁVNĚ", "CORRECT", "CORRECTO"), value: `${backtestData.correct} / ${backtestData.total}`, color: C.text },
+                        { label: L("VYHODNOCENO", "EVALUATED", "EVALUADO"), value: `${backtestData.total} ${L("predikcí", "predictions", "predicciones")}`, color: C.textDim },
                       ].map(s => (
                         <div key={s.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 12px", textAlign: "center" }}>
                           <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 2, marginBottom: 4 }}>{s.label}</div>
@@ -1645,7 +1656,7 @@ export default function Dashboard() {
                   </AccSection>
 
                   <AccSection id="scenarios" emoji="⚡" title={lang === "cz" ? "SCÉNÁŘE" : "SCENARIOS"}>
-                    <Row label={lang === "cz" ? "Co to jsou" : "What they are"} desc={lang === "cz" ? "AI (Claude Haiku) ohodnotí každou forex-relevantní zprávu skóre a dopadem na každou měnu." : "AI (Claude Haiku) scores every forex-relevant news item and calculates impact on each currency."} />
+                    <Row label={lang === "cz" ? "Co to jsou" : "What they are"} desc={lang === "cz" ? "AI (Claude Sonnet) ohodnotí každou forex-relevantní zprávu skóre a dopadem na každou měnu." : "AI (Claude Sonnet) scores every forex-relevant news item and calculates impact on each currency."} />
                     <Row label="Risk score" desc={lang === "cz" ? "−100 až +100. Kladné = pozitivní pro trhy (Risk ON). Záporné = negativní (Risk OFF)." : "−100 to +100. Positive = good for markets (Risk ON). Negative = bad (Risk OFF)."} />
                     <Row label={lang === "cz" ? "HIGH váha" : "HIGH weight"} desc={lang === "cz" ? "Market-moving zprávy: NFP, rozhodnutí CB, geopolitické šoky. Počítají se 3× do sentimentu." : "Market-moving news: NFP, CB decisions, geopolitical shocks. Count 3× in sentiment."} />
                     <Row label={lang === "cz" ? "MED váha" : "MED weight"} desc={lang === "cz" ? "Důležité ale ne market-moving: komentáře CB, regionální data. Počítají se 1× do sentimentu." : "Important but not market-moving: CB comments, regional data. Count 1× in sentiment."} />
@@ -2161,7 +2172,7 @@ export default function Dashboard() {
         </div>
         {(() => {
           const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
-          if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Načítám..." : "Loading..."}</div>;
+          if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
           return (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 6 }}>
               {items.map(c => {
