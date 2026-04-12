@@ -44,7 +44,7 @@ const T = {
   plans: [
     {
       name: { cz: "MĚSÍČNÍ", en: "MONTHLY", es: "MENSUAL" },
-      price: "$19",
+      price: "$14.9",
       period: { cz: "/měs", en: "/mo", es: "/mes" },
       desc: { cz: "Plný přístup, zrušit kdykoliv", en: "Full access, cancel anytime", es: "Acceso completo, cancela cuando quieras" },
       features: {
@@ -57,13 +57,13 @@ const T = {
     },
     {
       name: { cz: "ROČNÍ", en: "YEARLY", es: "ANUAL" },
-      price: "$190",
+      price: "$119",
       period: { cz: "/rok", en: "/yr", es: "/año" },
-      desc: { cz: "Ušetřete 17 % oproti měsíčnímu", en: "Save 17% vs monthly", es: "Ahorra 17% vs mensual" },
+      desc: { cz: "Ušetřete 33 % oproti měsíčnímu", en: "Save 33% vs monthly", es: "Ahorra 33% vs mensual" },
       features: {
-        cz: ["Vše z měsíčního plánu", "Prioritní podpora", "Přednostní přístup k novinkám", "Ušetříte $38 ročně"],
-        en: ["Everything in Monthly", "Priority support", "Early access to new features", "Save $38 per year"],
-        es: ["Todo lo del plan mensual", "Soporte prioritario", "Acceso anticipado a nuevas funciones", "Ahorra $38 al año"],
+        cz: ["Vše z měsíčního plánu", "Prioritní podpora", "Přednostní přístup k novinkám", "Ušetříte $60 ročně"],
+        en: ["Everything in Monthly", "Priority support", "Early access to new features", "Save $60 per year"],
+        es: ["Todo lo del plan mensual", "Soporte prioritario", "Acceso anticipado a nuevas funciones", "Ahorra $60 al año"],
       },
       cta: { cz: "Vyzkoušet zdarma", en: "Start Free Trial", es: "Empezar prueba gratis" },
       popular: true,
