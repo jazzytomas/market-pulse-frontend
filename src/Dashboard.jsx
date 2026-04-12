@@ -622,37 +622,15 @@ export default function Dashboard() {
 
       {/* Header – full width */}
       <div style={{ borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", maxWidth: 1520, margin: "0 auto", boxSizing: "border-box" }}>
-        <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", maxWidth: 1520, margin: "0 auto", boxSizing: "border-box", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           {(() => {
             const dk = C.bg === "#080812";
-            const gold = "#c9a227";
-            const accentC = dk ? gold : "#2563eb";
-            return (
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img src={dk ? "/logo.svg" : "/logo-light.svg"} alt="markeTrade" style={{ height: 42, objectFit: "contain" }} />
-              <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>
-            </div>
-            );
+            return <img src={dk ? "/logo.svg" : "/logo-light.svg"} alt="markeTrade" style={{ height: isMobile ? 32 : 42, objectFit: "contain" }} />;
           })()}
-          {shockLabels.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 5 }}>
-              {shockLabels.map(({ label, color }) => (
-                <span key={label} style={{
-                  fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
-                  color: color, border: `1px solid ${color}`, borderRadius: 3,
-                  padding: "2px 6px", background: `${color}18`
-                }}>{label}</span>
-              ))}
-            </div>
-          )}
-          {isAdmin && (
-            <div style={{ fontSize: 9, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, marginTop: 4 }}>
-              {t("backend")} <b>{backendStatus}</b>
-            </div>
-          )}
+          {!isMobile && <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>}
         </div>
-        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: isMobile ? 6 : 14, alignItems: "center", flexWrap: "wrap" }}>
           {isAdmin && (
             <>
               <div style={{ textAlign: "right" }}>
@@ -684,6 +662,22 @@ export default function Dashboard() {
             cursor: "pointer", borderRadius: 4, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif",
           }}>⏻</button>
         </div>
+        {shockLabels.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, width: "100%" }}>
+            {shockLabels.map(({ label, color }) => (
+              <span key={label} style={{
+                fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                color: color, border: `1px solid ${color}`, borderRadius: 3,
+                padding: "2px 6px", background: `${color}18`
+              }}>{label}</span>
+            ))}
+          </div>
+        )}
+        {isAdmin && (
+          <div style={{ fontSize: 9, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, width: "100%" }}>
+            {t("backend")} <b>{backendStatus}</b>
+          </div>
+        )}
       </div>
       </div>
 
