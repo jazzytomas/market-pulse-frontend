@@ -47,6 +47,7 @@ const T = {
   tabCurrencies:   { cz: "MĚNY", en: "CURRENCIES", es: "DIVISAS" },
   tabCbRates:      { cz: "CB SAZBY", en: "CB RATES", es: "TASAS BC" },
   tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST", es: "WATCHLIST" },
+  tabTelegram:    { cz: "📲 TELEGRAM", en: "📲 TELEGRAM", es: "📲 TELEGRAM" },
   // Section labels
   riskSentiment:   { cz: "RISK SENTIMENT", en: "RISK SENTIMENT", es: "SENTIMIENTO DE RIESGO" },
   menovy:          { cz: "MĚNOVÝ PŘEHLED", en: "CURRENCY OVERVIEW", es: "RESUMEN DE DIVISAS" },
@@ -298,6 +299,9 @@ export default function Dashboard() {
   const [fearGreedData, setFearGreedData] = useState(null);
   const [fgHistory, setFgHistory] = useState([]);
   const [dxy, setDxy] = useState(null);
+  const [tgStatus, setTgStatus] = useState(null);
+  const [tgCode, setTgCode] = useState(null);
+  const [tgTimezone, setTgTimezone] = useState("Europe/Prague");
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
   const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
   const [winW, setWinW] = useState(window.innerWidth);
@@ -353,6 +357,18 @@ export default function Dashboard() {
         .then(data => { if (data.admin) setIsAdmin(true); })
         .catch(() => {});
     }
+  }, []);
+
+  // Telegram status
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.id) {
+        fetch(`${API}/api/telegram/status?user_id=${session.user.id}`)
+          .then(r => r.json())
+          .then(data => { setTgStatus(data); if (data.timezone) setTgTimezone(data.timezone); })
+          .catch(() => {});
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -1790,6 +1806,7 @@ export default function Dashboard() {
               <TabBtn label={t("tabCurrencies")} active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
               <TabBtn label={t("tabCbRates")} active={rightTab === "cb"} onClick={() => setRightTab("cb")} />
               <TabBtn label={t("tabWatchlist")} active={rightTab === "watchlist"} onClick={() => setRightTab("watchlist")} />
+              <TabBtn label={t("tabTelegram")} active={rightTab === "telegram"} onClick={() => setRightTab("telegram")} />
             </div>
 
             <div style={{ padding: 14 }}>
@@ -2177,6 +2194,95 @@ export default function Dashboard() {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {rightTab === "telegram" && (
+                <div>
+                  <SectionLabel>📲 TELEGRAM ALERTY</SectionLabel>
+                  <div style={{ fontSize: 10, color: C.textDim, marginBottom: 12, lineHeight: 1.6 }}>
+                    {L(
+                      "Propoj svůj Telegram účet a dostávej ranní briefing a HIGH impact alerty přímo do telefonu.",
+                      "Link your Telegram account to receive morning briefings and HIGH impact alerts on your phone.",
+                      "Vincula tu cuenta de Telegram para recibir briefings matutinos y alertas de alto impacto en tu teléfono."
+                    )}
+                  </div>
+
+                  {tgStatus?.linked ? (
+                    <div>
+                      <div style={{ padding: "10px 12px", background: `${C.green}12`, border: `1px solid ${C.green}33`, borderRadius: 8, marginBottom: 12 }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: C.green, marginBottom: 4 }}>✓ {L("Telegram propojen", "Telegram linked", "Telegram vinculado")}</div>
+                        <div style={{ fontSize: 9, color: C.textDim }}>{L("Propojeno", "Linked", "Vinculado")}: {tgStatus.linked_at?.split("T")[0]}</div>
+                      </div>
+
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: C.text, marginBottom: 6 }}>{L("Časové pásmo", "Timezone", "Zona horaria")}</div>
+                        <select value={tgTimezone} onChange={async (e) => {
+                          const tz = e.target.value;
+                          setTgTimezone(tz);
+                          const sess = await supabase.auth.getSession();
+                          const uid = sess.data?.session?.user?.id;
+                          if (uid) fetch(`${API}/api/telegram/timezone`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: uid, timezone: tz }) });
+                        }} style={{ width: "100%", padding: "6px 8px", fontSize: 10, background: C.bg, color: C.text, border: `1px solid ${C.border}`, borderRadius: 4 }}>
+                          {["Europe/Prague", "Europe/London", "Europe/Berlin", "Europe/Paris", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Asia/Tokyo", "Asia/Shanghai", "Asia/Dubai", "Australia/Sydney", "Pacific/Auckland"].map(tz => (
+                            <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <button onClick={async () => {
+                        const sess = await supabase.auth.getSession();
+                        const uid = sess.data?.session?.user?.id;
+                        if (uid) {
+                          await fetch(`${API}/api/telegram/unlink`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: uid }) });
+                          setTgStatus({ linked: false });
+                          setTgCode(null);
+                        }
+                      }} style={{ fontSize: 9, padding: "6px 14px", background: `${C.red}18`, border: `1px solid ${C.red}55`, color: C.red, borderRadius: 4, cursor: "pointer" }}>
+                        {L("Odpojit Telegram", "Unlink Telegram", "Desvincular Telegram")}
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      {tgCode ? (
+                        <div>
+                          <div style={{ fontSize: 10, color: C.text, marginBottom: 8 }}>
+                            {L("1. Otevři bota v Telegramu:", "1. Open the bot in Telegram:", "1. Abre el bot en Telegram:")}
+                          </div>
+                          <a href={`https://t.me/MarkDash_bot?start=${tgCode}`} target="_blank" rel="noopener noreferrer" style={{
+                            display: "block", textAlign: "center", padding: "10px", background: "#0088cc18", border: "1px solid #0088cc55",
+                            borderRadius: 8, color: "#0088cc", fontSize: 12, fontWeight: 700, textDecoration: "none", marginBottom: 8
+                          }}>
+                            {L("Otevřít @MarkDash_bot", "Open @MarkDash_bot", "Abrir @MarkDash_bot")}
+                          </a>
+                          <div style={{ fontSize: 10, color: C.text, marginBottom: 4 }}>
+                            {L("2. Klikni START (nebo pošli /start)", "2. Click START (or send /start)", "2. Haz clic en START (o envía /start)")}
+                          </div>
+                          <div style={{ fontSize: 9, color: C.textDim, marginBottom: 8 }}>
+                            {L("Kód platí 10 minut.", "Code valid for 10 minutes.", "El código es válido por 10 minutos.")}
+                          </div>
+                          <div style={{ textAlign: "center", padding: "8px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, fontFamily: "monospace", fontSize: 18, letterSpacing: 4, color: C.accent, fontWeight: 700 }}>
+                            {tgCode}
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={async () => {
+                          const sess = await supabase.auth.getSession();
+                          const uid = sess.data?.session?.user?.id;
+                          if (uid) {
+                            const res = await fetch(`${API}/api/telegram/link`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: uid }) });
+                            const data = await res.json();
+                            setTgCode(data.code);
+                          }
+                        }} style={{
+                          width: "100%", padding: "12px", background: "#0088cc18", border: "1px solid #0088cc55",
+                          color: "#0088cc", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer"
+                        }}>
+                          📲 {L("Propojit Telegram", "Link Telegram", "Vincular Telegram")}
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
