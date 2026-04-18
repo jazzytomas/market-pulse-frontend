@@ -14,6 +14,30 @@ const RED = "#ff3d5e";
 const font = "'Space Grotesk', sans-serif";
 const fontTitle = "'Orbitron', sans-serif";
 
+const API_URL = "https://market-pulse-fdgb.onrender.com";
+
+async function startCheckout(plan, user) {
+  try {
+    const res = await fetch(`${API_URL}/api/create_checkout_session`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan,
+        user_id: user.id,
+        user_email: user.email,
+      }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.detail || "Checkout failed");
+    }
+  } catch (e) {
+    alert("Chyba při vytváření platby: " + e.message);
+  }
+}
+
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,13 +55,29 @@ export default function Auth() {
     setLoading(true);
     setError("");
     setMessage("");
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
+      setLoading(false);
       setError(err.message);
-    } else {
+      return;
+    }
+    // Po loginu: zjistit subscription status, pokud není aktivní → checkout
+    try {
+      const token = data.session?.access_token;
+      const meRes = await fetch(`${API_URL}/api/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const me = await meRes.json();
+      const active = ["active", "trialing"].includes(me.subscription_status);
+      if (active) {
+        navigate("/dashboard");
+      } else {
+        await startCheckout(selectedPlan, data.user);
+      }
+    } catch (e) {
       navigate("/dashboard");
     }
+    setLoading(false);
   };
 
   const handleRegister = async (e) => {
@@ -45,17 +85,23 @@ export default function Auth() {
     setLoading(true);
     setError("");
     setMessage("");
-    const { error: err } = await supabase.auth.signUp({
+    const { data, error: err } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { plan: selectedPlan } },
     });
-    setLoading(false);
     if (err) {
+      setLoading(false);
       setError(err.message);
-    } else {
-      setMessage("Check your email for a confirmation link!");
+      return;
     }
+    // Pokud je session rovnou vytvořena (email confirm vypnutý) → checkout
+    if (data.session && data.user) {
+      await startCheckout(selectedPlan, data.user);
+    } else {
+      setMessage("Zkontroluj email pro potvrzení účtu, pak se přihlaš.");
+    }
+    setLoading(false);
   };
 
   const handleForgot = async (e) => {

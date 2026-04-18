@@ -43,6 +43,7 @@ const T = {
   },
   plans: [
     {
+      key: "monthly",
       name: { cz: "MĚSÍČNÍ", en: "MONTHLY", es: "MENSUAL" },
       price: "$14.9",
       period: { cz: "/měs", en: "/mo", es: "/mes" },
@@ -56,6 +57,7 @@ const T = {
       popular: false,
     },
     {
+      key: "yearly",
       name: { cz: "ROČNÍ", en: "YEARLY", es: "ANUAL" },
       price: "$119",
       period: { cz: "/rok", en: "/yr", es: "/año" },
@@ -69,6 +71,7 @@ const T = {
       popular: true,
     },
     {
+      key: "lifetime",
       name: { cz: "DOŽIVOTNÍ", en: "LIFETIME", es: "DE POR VIDA" },
       price: "$350",
       period: { cz: " jednorázově", en: " once", es: " único pago" },
@@ -219,7 +222,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <button onClick={() => goAuth(t(p.name).toLowerCase())} style={{
+              <button onClick={() => goAuth(p.key)} style={{
                 width: "100%",
                 background: p.popular ? GOLD : "transparent",
                 color: p.popular ? "#080812" : GOLD,
