@@ -167,7 +167,8 @@ function computeCurrencyTotals(list) {
       if (ci && ci[c]) {
         const score = ci[c].score || 0;
         if (score !== 0) {
-          const baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
+          let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
+          if (s.demoted_at) baseW *= 0.5; // STARŠÍ = poloviční síla
           if (baseW > 0) {
             const w = baseW * Math.pow(DECAY, idx); // nejnovější = plná váha
             weightedSum += score * w;
@@ -890,7 +891,7 @@ export default function Dashboard() {
                   const sorted = [...scenarios].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                   const allHigh = sorted.filter(s => s.weight === "HIGH");
                   const activeHigh = allHigh.filter(s => !s.demoted_at);
-                  const demotedHigh = allHigh.filter(s => s.demoted_at).map(s => ({ ...s, risk_score: Math.round((s.risk_score || 0) * 0.4) }));
+                  const demotedHigh = allHigh.filter(s => s.demoted_at).map(s => ({ ...s, risk_score: Math.round((s.risk_score || 0) * 0.5) }));
                   const fullList = scenarioFilter === "HIGH"
                     ? activeHigh
                     : scenarioFilter === "OLD"
@@ -1702,7 +1703,7 @@ export default function Dashboard() {
                   <AccSection id="risk" emoji="🌡️" title="RISK SENTIMENT">
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Celkové nálada trhu vůči riziku. Vypočítává se jako vážený průměr AI skóre zpráv + VIX index." : "Overall market risk mood. Calculated as weighted average of AI news scores + VIX index."} />
                     <Row label={lang === "cz" ? "Škála" : "Scale"} desc={lang === "cz" ? "+100 = maximální Risk ON (trhy rostou, investoři kupují riziková aktiva). −100 = maximální Risk OFF (strach, útěk do bezpečí)." : "+100 = max Risk ON (markets rising, investors buying risky assets). −100 = max Risk OFF (fear, flight to safety)."} />
-                    <Row label="VIX" desc={lang === "cz" ? "Index strachu. VIX nad 25 = strach na trhu (Risk OFF). VIX pod 15 = klid (Risk ON). Váha 2× HIGH zpráva." : "Fear index. VIX above 25 = market fear (Risk OFF). VIX below 15 = calm (Risk ON). Weight = 2× HIGH news."} />
+                    <Row label="VIX" desc={lang === "cz" ? "Index strachu. VIX nad 25 = strach na trhu (Risk OFF). VIX pod 15 = klid (Risk ON). Váha = 1× HIGH zpráva." : "Fear index. VIX above 25 = market fear (Risk OFF). VIX below 15 = calm (Risk ON). Weight = 1× HIGH news."} />
                     <Row label={lang === "cz" ? "Jak použít" : "How to use"} desc={lang === "cz" ? "Risk ON → sleduj AUD, NZD, CAD. Risk OFF → sleduj USD, JPY, CHF. Neutral → čekej na potvrzení." : "Risk ON → watch AUD, NZD, CAD. Risk OFF → watch USD, JPY, CHF. Neutral → wait for confirmation."} />
                   </AccSection>
 
