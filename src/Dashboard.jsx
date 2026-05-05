@@ -154,13 +154,24 @@ const volWindows = [
   { session: "Weekend", time: "Pa 17:00-Ne 17:00", vol: 10, pairs: "GAP riziko" },
 ];
 
+function ageWeight(createdAt) {
+  // Time-based decay: D1=100%, D2=90%, D3=75%, D4+=50%
+  if (!createdAt) return 1.0;
+  // SQLite datetime('now') je UTC, ale string nemá Z – připojíme
+  const iso = createdAt.includes("T") ? createdAt : createdAt.replace(" ", "T") + "Z";
+  const ageMs = Date.now() - new Date(iso).getTime();
+  const ageDays = ageMs / 86400000;
+  if (ageDays < 1) return 1.0;
+  if (ageDays < 2) return 0.9;
+  if (ageDays < 3) return 0.75;
+  return 0.5;
+}
+
 function computeCurrencyTotals(list) {
   const result = {};
-  const DECAY = 0.65; // každá starší zpráva má 65% váhu té novější
   CURRENCIES.forEach((c) => {
     let weightedSum = 0;
     let totalW = 0;
-    let idx = 0;
     for (const s of (list || [])) {
       const ciRaw = s.currency_impact || s.currencyImpact;
       const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
@@ -170,10 +181,9 @@ function computeCurrencyTotals(list) {
           let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
           if (s.demoted_at) baseW *= 0.5; // STARŠÍ = poloviční síla
           if (baseW > 0) {
-            const w = baseW * Math.pow(DECAY, idx); // nejnovější = plná váha
+            const w = baseW * ageWeight(s.created_at); // čerstvé = plná váha, starší se postupně tlumí
             weightedSum += score * w;
             totalW += w;
-            idx++;
           }
         }
       }
