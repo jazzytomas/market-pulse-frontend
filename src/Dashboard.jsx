@@ -30,6 +30,10 @@ const T = {
   rescan:          { cz: "⟳ RESCAN", en: "⟳ RESCAN", es: "⟳ REESCANEAR" },
   scanning:        { cz: (s) => `◌ ${s}s...`, en: (s) => `◌ ${s}s...`, es: (s) => `◌ ${s}s...` },
   backend:         { cz: "Backend:", en: "Backend:", es: "Backend:" },
+  modeIntraday:    { cz: "⚡ INTRADAY", en: "⚡ INTRADAY", es: "⚡ INTRADÍA" },
+  modeSwing:       { cz: "📊 SWING", en: "📊 SWING", es: "📊 SWING" },
+  modeTooltipIntra:{ cz: "Intraday: čerstvé zprávy = plná váha, starší <24h rychle slábnou", en: "Intraday: fresh news = full weight, older <24h decay fast", es: "Intradía: noticias frescas = peso completo, antiguas decaen" },
+  modeTooltipSwing:{ cz: "Swing: zprávy drží váhu několik dní, větší kontext", en: "Swing: news hold weight for days, broader context", es: "Swing: noticias mantienen peso varios días" },
   // Tabs (center)
   tabScenarios:    { cz: "⚡ SCÉNÁŘE", en: "⚡ SCENARIOS", es: "⚡ ESCENARIOS" },
   tabEvents:       { cz: "📅 EVENTS", en: "📅 EVENTS", es: "📅 EVENTOS" },
@@ -154,21 +158,32 @@ const volWindows = [
   { session: "Weekend", time: "Pa 17:00-Ne 17:00", vol: 10, pairs: "GAP riziko" },
 ];
 
-function ageWeight(createdAt) {
-  // Time-based decay: D1=100%, D2=90%, D3=75%, D4+=50%
+function ageWeight(createdAt, mode = "swing") {
   if (!createdAt) return 1.0;
   // SQLite datetime('now') je UTC, ale string nemá Z – připojíme
   const iso = createdAt.includes("T") ? createdAt : createdAt.replace(" ", "T") + "Z";
   const ageMs = Date.now() - new Date(iso).getTime();
-  const ageDays = ageMs / 86400000;
+  const ageHours = ageMs / 3600000;
+  const ageDays = ageHours / 24;
+  if (mode === "intraday") {
+    // Reaktivní na čerstvé zprávy, rychlý pokles
+    if (ageHours < 2) return 1.0;
+    if (ageHours < 6) return 0.7;
+    if (ageHours < 12) return 0.35;
+    if (ageHours < 24) return 0.15;
+    return 0.05;
+  }
+  // Swing: pomalejší decay, drží i pár dní starý kontext
   if (ageDays < 1) return 1.0;
-  if (ageDays < 2) return 0.9;
-  if (ageDays < 3) return 0.75;
+  if (ageDays < 2) return 0.95;
+  if (ageDays < 4) return 0.85;
+  if (ageDays < 7) return 0.7;
   return 0.5;
 }
 
-function computeCurrencyTotals(list) {
+function computeCurrencyTotals(list, mode = "swing") {
   const result = {};
+  const demotedFactor = mode === "intraday" ? 0.2 : 0.7;
   CURRENCIES.forEach((c) => {
     let weightedSum = 0;
     let totalW = 0;
@@ -179,9 +194,9 @@ function computeCurrencyTotals(list) {
         const score = ci[c].score || 0;
         if (score !== 0) {
           let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
-          if (s.demoted_at) baseW *= 0.5; // STARŠÍ = poloviční síla
+          if (s.demoted_at) baseW *= demotedFactor;
           if (baseW > 0) {
-            const w = baseW * ageWeight(s.created_at); // čerstvé = plná váha, starší se postupně tlumí
+            const w = baseW * ageWeight(s.created_at, mode);
             weightedSum += score * w;
             totalW += w;
           }
@@ -315,6 +330,7 @@ export default function Dashboard() {
   const [tgTimezone, setTgTimezone] = useState("Europe/Prague");
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("mp_theme") !== "light");
   const [lang, setLang] = useState(() => localStorage.getItem("mp_lang") || "cz");
+  const [tradeMode, setTradeMode] = useState(() => localStorage.getItem("mp_trade_mode") || "swing");
   const [winW, setWinW] = useState(window.innerWidth);
 
   const t = (key, ...args) => {
@@ -498,7 +514,7 @@ export default function Dashboard() {
       });
   }, []);
 
-  const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : []);
+  const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : [], tradeMode);
 
   const runScan = () => {
     setScanning(true);
@@ -670,6 +686,18 @@ export default function Dashboard() {
               }}>{scanning ? t("scanning", scanCountdown) : t("rescan")}</button>
             </>
           )}
+          <button
+            onClick={() => { const next = tradeMode === "swing" ? "intraday" : "swing"; setTradeMode(next); localStorage.setItem("mp_trade_mode", next); }}
+            title={tradeMode === "intraday" ? t("modeTooltipIntra") : t("modeTooltipSwing")}
+            style={{
+              background: tradeMode === "intraday" ? `${C.red}22` : `${C.accent}18`,
+              border: `1px solid ${tradeMode === "intraday" ? C.red : C.accent}`,
+              color: tradeMode === "intraday" ? C.red : C.accent,
+              padding: "6px 10px", fontSize: 10, letterSpacing: 1.5,
+              cursor: "pointer", borderRadius: 4, fontFamily: "Orbitron, monospace",
+            }}>
+            {tradeMode === "intraday" ? t("modeIntraday") : t("modeSwing")}
+          </button>
           <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
             background: "none", border: `1px solid ${C.border}`,
             padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
@@ -2012,7 +2040,7 @@ export default function Dashboard() {
                         const dayKeys = Object.keys(days).sort();
                         if (dayKeys.length < 2) return null;
                         const points = dayKeys.map(d => {
-                          const t = computeCurrencyTotals(days[d]);
+                          const t = computeCurrencyTotals(days[d], tradeMode);
                           return { d, score: Math.round((t[base] || 0) - (t[quote] || 0)) };
                         });
                         const maxAbs = Math.max(1, ...points.map(p => Math.abs(p.score)));
