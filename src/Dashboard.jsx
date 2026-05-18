@@ -166,12 +166,12 @@ function ageWeight(createdAt, mode = "swing") {
   const ageHours = ageMs / 3600000;
   const ageDays = ageHours / 24;
   if (mode === "intraday") {
-    // Reaktivní na čerstvé zprávy, rychlý pokles
+    // Reaktivní na čerstvé zprávy, jen <24h, starší ignoruj
     if (ageHours < 2) return 1.0;
     if (ageHours < 6) return 0.7;
     if (ageHours < 12) return 0.35;
     if (ageHours < 24) return 0.15;
-    return 0.05;
+    return 0;
   }
   // Swing: pomalejší decay, drží i pár dní starý kontext
   if (ageDays < 1) return 1.0;
