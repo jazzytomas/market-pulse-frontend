@@ -17,6 +17,16 @@ code {
   50% { box-shadow: 0 0 0 5px rgba(24, 100, 220, 0); }
 }
 
+@keyframes mp-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes mp-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 @keyframes pulseBlue {
   0%, 100% {
     box-shadow: 0 0 6px rgba(24, 100, 220, 0.55), inset 0 0 4px rgba(24, 100, 220, 0.1);

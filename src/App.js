@@ -27,7 +27,7 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ background: "#080812", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a227", fontFamily: "'Orbitron', sans-serif", fontSize: 14, letterSpacing: 2 }}>
+      <div style={{ background: "#0a0c12", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a227", fontFamily: "'Orbitron', sans-serif", fontSize: 14, letterSpacing: 2 }}>
         LOADING...
       </div>
     );

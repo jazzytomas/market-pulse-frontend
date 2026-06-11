@@ -2,19 +2,21 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 
 const LIGHT = {
-  bg: "#f1f5f9", panel: "#ffffff", border: "#e2e8f0",
-  accent: "#2563eb", green: "#059669", red: "#dc2626",
-  yellow: "#d97706", orange: "#ea580c", muted: "#94a3b8",
-  text: "#0f172a", textDim: "#64748b",
-  shadow: "0 2px 12px rgba(15,23,42,0.08)",
+  dark: false,
+  bg: "#f4f6fa", panel: "#ffffff", border: "#e3e8f0",
+  accent: "#2563eb", green: "#0a9e6e", red: "#d83a52",
+  yellow: "#b97d10", orange: "#e2702c", muted: "#9aa5b5",
+  text: "#101828", textDim: "#5d6b81",
+  shadow: "0 1px 3px rgba(16,24,40,0.05), 0 4px 16px rgba(16,24,40,0.06)",
 };
 
 const DARK = {
-  bg: "#080812", panel: "#0f0f22", border: "#2a1d6e",
-  accent: "#c9a227", green: "#00e5a8", red: "#ff3d5e",
-  yellow: "#c9a227", orange: "#ff8c42", muted: "#5a4f8a",
-  text: "#f0eaff", textDim: "#9080c4",
-  shadow: "0 2px 16px rgba(0,0,0,0.5)",
+  dark: true,
+  bg: "#0a0c12", panel: "#10141d", border: "#232b3d",
+  accent: "#c9a227", green: "#2ebd85", red: "#f6465d",
+  yellow: "#d9a425", orange: "#f0883e", muted: "#566075",
+  text: "#e8ecf4", textDim: "#93a0b8",
+  shadow: "0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.35)",
 };
 
 const ThemeContext = React.createContext(LIGHT);
@@ -285,6 +287,31 @@ function TabBtn({ label, active, onClick }) {
 function SectionLabel({ children, center }) {
   const C = React.useContext(ThemeContext);
   return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "'Space Grotesk', sans-serif" }}>{children}</div>;
+}
+
+function TickerBar({ items }) {
+  const C = React.useContext(ThemeContext);
+  if (!items || items.length < 4) return null;
+  const renderRow = (dup) => items.map((it, i) => {
+    const col = it.change > 0 ? C.green : it.change < 0 ? C.red : C.textDim;
+    return (
+      <span key={`${dup}-${i}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0 16px", borderRight: `1px solid ${C.border}` }}>
+        <span style={{ fontSize: 10, fontWeight: 600, color: C.textDim, letterSpacing: 0.5 }}>{it.name}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: C.text, fontFamily: "monospace" }}>{it.price}</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: col }}>
+          {it.change > 0 ? "▲" : it.change < 0 ? "▼" : "—"}{Math.abs(it.change || 0).toFixed(2)}%
+        </span>
+      </span>
+    );
+  });
+  return (
+    <div style={{ borderBottom: `1px solid ${C.border}`, background: C.panel, overflow: "hidden", whiteSpace: "nowrap" }}>
+      <div style={{ display: "inline-block", whiteSpace: "nowrap", padding: "7px 0", animation: `mp-ticker ${Math.max(30, items.length * 4)}s linear infinite` }}>
+        {renderRow("a")}
+        {renderRow("b")}
+      </div>
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -667,7 +694,7 @@ export default function Dashboard() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", maxWidth: 1520, margin: "0 auto", boxSizing: "border-box", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           {(() => {
-            const dk = C.bg === "#080812";
+            const dk = C.dark;
             return <img src={dk ? "/logo.svg" : "/logo-light.svg"} alt="markeTrade" style={{ height: isMobile ? 32 : 42, objectFit: "contain" }} />;
           })()}
           {!isMobile && <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>}
@@ -734,6 +761,13 @@ export default function Dashboard() {
         )}
       </div>
       </div>
+
+      {/* Ticker – live ceny přes celou šířku */}
+      <TickerBar items={[
+        ...(dxy && dxy.price ? [{ name: "DXY", price: dxy.price, change: dxy.change || 0 }] : []),
+        ...watchlistData.map(p => ({ name: p.name, price: p.price, change: p.change || 0 })),
+        ...commodities.map(c => ({ name: cName(c.name), price: c.price, change: c.change || 0 })),
+      ]} />
 
     <div style={{ maxWidth: 1520, margin: "0 auto", padding: 14, boxSizing: "border-box", ...(isMobile ? { overflowX: "hidden", width: "100%" } : {}) }}>
 
@@ -892,6 +926,57 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
+          {/* BREAKING – hlavní katalyzátory z HIGH scénářů */}
+          {(() => {
+            const breaking = [...scenarios]
+              .filter(s => s.weight === "HIGH" && !s.demoted_at)
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .slice(0, 5);
+            if (breaking.length === 0) return null;
+            const tagFor = (s) => {
+              const txt = `${s.title || ""} ${s.summary || ""}`.toLowerCase();
+              const has = (kws) => kws.some(k => txt.includes(k));
+              if (has(["ceasefire", "peace", "truce", "de-escalat", "deescalat", "paused", "pause"])) return { label: L("Deeskalace", "De-escalation", "Desescalada"), color: C.green };
+              if (has(["war", "strike", "attack", "missile", "escalat", "invasion", "hormuz", "nuclear", "sanction", "military"])) return { label: L("Eskalace", "Escalation", "Escalada"), color: C.red };
+              if (has([" cpi", "inflation", " ppi", "payroll", "nfp", "jobs report"])) return { label: "Hot print", color: C.orange };
+              if (has(["fed ", "fomc", "boj", "ecb", "boe", "rate decision", "rate hike", "rate cut", "central bank"])) return { label: L("Klíčový event", "Key risk event", "Evento clave"), color: C.accent };
+              const rs = s.risk_score || 0;
+              if (rs <= -25) return { label: "Risk-off", color: C.red };
+              if (rs >= 25) return { label: "Risk-on", color: C.green };
+              return { label: "Watch", color: C.yellow };
+            };
+            return (
+              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.red, display: "inline-block", animation: "mp-blink 1.6s ease-in-out infinite" }} />
+                  <span style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, fontFamily: "'Space Grotesk', sans-serif" }}>{L("BREAKING — HLAVNÍ KATALYZÁTORY TRHU", "BREAKING — TOP MARKET CATALYSTS", "BREAKING — PRINCIPALES CATALIZADORES")}</span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {breaking.map(s => {
+                    const tag = tagFor(s);
+                    const dotCol = (s.risk_score || 0) >= 0 ? C.green : C.red;
+                    const summaryText = (lang === "cz" && s.summary_cz) ? s.summary_cz : s.summary;
+                    const timeStr = s.created_at ? new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+                    return (
+                      <div key={s.id} onClick={() => { setCenterTab("scenarios"); setScenarioFilter("HIGH"); setScenarioPage(1); setExpandedScenario(s.id); }}
+                        style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 10px", borderRadius: 8, cursor: "pointer", background: `${tag.color}08`, border: `1px solid ${C.border}` }}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: dotCol, marginTop: 5, flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: C.text, lineHeight: 1.45 }}>{s.title}</span>
+                          {summaryText && <span style={{ fontSize: 9, color: C.textDim, lineHeight: 1.45 }}> — {summaryText.length > 170 ? summaryText.slice(0, 170) + "…" : summaryText}</span>}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
+                          <span style={{ fontSize: 8, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>
+                          {timeStr && <span style={{ fontSize: 7, color: C.muted }}>{timeStr}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* CENTER tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
@@ -1821,7 +1906,7 @@ export default function Dashboard() {
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
                 const isPerfect = p.biasCount === 5;
                 const PERFECT_BLUE = "#1864dc";
-                const isDark = C.bg === "#080812";
+                const isDark = C.dark;
                 return (
                   <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
                     style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
@@ -2149,7 +2234,7 @@ export default function Dashboard() {
                 }
 
                 const PERFECT_BLUE = "#1864dc";
-                const isDark = C.bg === "#080812";
+                const isDark = C.dark;
                 return (
                   <div>
                     <SectionLabel>{t("pairsTitle")}</SectionLabel>
@@ -2218,19 +2303,36 @@ export default function Dashboard() {
                   {watchlistData.length === 0 ? (
                     <div style={{ fontSize: 9, color: C.muted }}>{t("watchNoData")}</div>
                   ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {watchlistData.map((pair) => {
-                        const col = pair.change > 0 ? C.green : pair.change < 0 ? C.red : C.yellow;
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 24px" }}>
+                      {[0, 1].map(half => {
+                        const slice = isMobile
+                          ? (half === 0 ? watchlistData : [])
+                          : watchlistData.slice(half * Math.ceil(watchlistData.length / 2), (half + 1) * Math.ceil(watchlistData.length / 2));
+                        if (slice.length === 0) return null;
                         return (
-                          <div key={pair.name} style={{ padding: "8px 10px", background: `${col}08`, border: `1px solid ${C.border}`, borderLeft: `3px solid ${col}`, borderRadius: 6 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{pair.name}</span>
-                              <span style={{ fontSize: 10, color: col, fontWeight: 700 }}>
-                                {pair.change > 0 ? "▲" : pair.change < 0 ? "▼" : "—"} {Math.abs(pair.change).toFixed(3)}%
-                              </span>
-                            </div>
-                            <div style={{ fontSize: 10, color: C.textDim, fontFamily: "monospace" }}>{pair.price}</div>
-                          </div>
+                          <table key={half} style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                              <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                                <th style={{ textAlign: "left", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("PÁR", "PAIR", "PAR")}</th>
+                                <th style={{ textAlign: "right", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("CENA", "PRICE", "PRECIO")}</th>
+                                <th style={{ textAlign: "right", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("ZMĚNA", "CHG", "CAMBIO")}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {slice.map(pair => {
+                                const col = pair.change > 0 ? C.green : pair.change < 0 ? C.red : C.textDim;
+                                return (
+                                  <tr key={pair.name} style={{ borderBottom: `1px solid ${C.border}` }}>
+                                    <td style={{ fontSize: 10, fontWeight: 700, color: C.text, padding: "7px 0" }}>{pair.name}</td>
+                                    <td style={{ fontSize: 10, color: C.textDim, fontFamily: "monospace", textAlign: "right", padding: "7px 0" }}>{pair.price}</td>
+                                    <td style={{ fontSize: 9, color: col, fontWeight: 700, textAlign: "right", padding: "7px 0", whiteSpace: "nowrap" }}>
+                                      {pair.change > 0 ? "▲" : pair.change < 0 ? "▼" : "—"} {Math.abs(pair.change).toFixed(3)}%
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
                         );
                       })}
                     </div>
