@@ -10,7 +10,7 @@ const DIM = "#93a0b8";
 const GREEN = "#2ebd85";
 
 const font = "'Space Grotesk', sans-serif";
-const fontTitle = "'Orbitron', sans-serif";
+const fontTitle = "'Space Grotesk', sans-serif";
 
 const LANGS = ["cz", "en", "es"];
 const LANG_FLAGS = { cz: "cz", en: "us", es: "es" };
@@ -86,6 +86,17 @@ const T = {
     },
   ],
   popular: { cz: "NEJOBLÍBENĚJŠÍ", en: "MOST POPULAR", es: "MÁS POPULAR" },
+  heroStats: [
+    { cz: "8 měn sledováno 24/5", en: "8 currencies tracked 24/5", es: "8 divisas monitoreadas 24/5" },
+    { cz: "AI skóre zpráv v reálném čase", en: "Real-time AI news scoring", es: "Scoring IA de noticias en tiempo real" },
+    { cz: "COT · korelace · sezónnost", en: "COT · correlations · seasonality", es: "COT · correlaciones · estacionalidad" },
+    { cz: "Telegram alerty", en: "Telegram alerts", es: "Alertas por Telegram" },
+  ],
+  liveLabel: { cz: "ŽIVÝ DASHBOARD", en: "LIVE DASHBOARD", es: "DASHBOARD EN VIVO" },
+  ctaEnd: {
+    title: { cz: "Připraven vidět trh jasněji?", en: "Ready to see the market clearly?", es: "¿Listo para ver el mercado con claridad?" },
+    desc: { cz: "Vyzkoušej MarkeTrade na 3 dny zdarma. Zrušit můžeš kdykoliv.", en: "Try MarkeTrade free for 3 days. Cancel anytime.", es: "Prueba MarkeTrade gratis por 3 días. Cancela cuando quieras." },
+  },
   features: [
     { icon: "🤖", title: { cz: "AI Sentiment Scoring", en: "AI Sentiment Scoring", es: "Scoring de sentimiento IA" }, desc: { cz: "Claude AI analyzuje každý titulek a v reálném čase hodnotí jeho dopad na 8 hlavních měn.", en: "Claude AI analyzes every headline and scores its impact on 8 major currencies in real-time.", es: "Claude AI analiza cada titular y evalúa su impacto en 8 divisas principales en tiempo real." } },
     { icon: "📅", title: { cz: "Ekonomický kalendář", en: "Economic Calendar", es: "Calendario económico" }, desc: { cz: "Události z ForexFactory s daty actual vs forecast, hodnocením volatility a okny dopadu.", en: "ForexFactory events with actual vs forecast data, volatility ratings, and impact windows.", es: "Eventos de ForexFactory con datos real vs pronóstico, ratings de volatilidad y ventanas de impacto." } },
@@ -138,42 +149,67 @@ export default function LandingPage() {
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: font, overflowX: "hidden", maxWidth: "100vw" }}>
       {/* NAV */}
-      <nav style={{ padding: "18px 16px", borderBottom: `1px solid ${BORDER}`, maxWidth: 1200, margin: "0 auto", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <img src="/logo.svg" alt="MarkeTrade" style={{ height: 36, objectFit: "contain" }} />
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <nav style={{ borderBottom: `1px solid ${BORDER}`, position: "sticky", top: 0, background: `${BG}ee`, backdropFilter: "blur(8px)", zIndex: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "14px 24px", maxWidth: 1200, margin: "0 auto", boxSizing: "border-box", flexWrap: "wrap" }}>
+          <img src="/logo.svg" alt="MarkeTrade" style={{ height: 34, objectFit: "contain" }} />
+          <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
+            <a href="#features" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.features)}</a>
+            <a href="#pricing" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.pricing)}</a>
+            <a href="#faq" style={{ color: DIM, textDecoration: "none", fontSize: 14 }}>{t(T.nav.faq)}</a>
             <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
               background: "none", border: `1px solid ${BORDER}`,
-              padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
+              padding: "4px 8px", cursor: "pointer", borderRadius: 7, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
             }}>
-              <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="24" height="18" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
-              <span style={{ color: DIM, fontSize: 11, fontFamily: font }}>{LANG_LABELS[lang]}</span>
+              <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="22" height="16" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
+              <span style={{ color: DIM, fontSize: 12, fontFamily: font }}>{LANG_LABELS[lang]}</span>
             </button>
-            <button onClick={() => navigate("/auth")} style={{ background: "transparent", border: `1px solid ${GOLD}`, color: GOLD, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontFamily: fontTitle, fontSize: 12, letterSpacing: 1 }}>{t(T.nav.login)}</button>
+            <button onClick={() => navigate("/auth")} style={{ background: "transparent", border: `1px solid ${GOLD}`, color: GOLD, padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontFamily: font, fontWeight: 700, fontSize: 13, letterSpacing: 0.5 }}>{t(T.nav.login)}</button>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
-          <a href="#features" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.features)}</a>
-          <a href="#pricing" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.pricing)}</a>
-          <a href="#faq" style={{ color: DIM, textDecoration: "none", fontSize: 13 }}>{t(T.nav.faq)}</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{ textAlign: "center", padding: "80px 24px 60px", maxWidth: 800, margin: "0 auto" }}>
-        <div style={{ fontFamily: fontTitle, fontSize: 11, letterSpacing: 4, color: GOLD, marginBottom: 16 }}>{t(T.hero.badge)}</div>
-        <h1 style={{ fontFamily: fontTitle, fontSize: "clamp(28px, 5vw, 48px)", color: TEXT, margin: "0 0 20px", lineHeight: 1.2 }}>
+      <div style={{ background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${GOLD}14, transparent)` }}>
+      <section style={{ textAlign: "center", padding: "76px 24px 0", maxWidth: 820, margin: "0 auto" }}>
+        <div style={{ display: "inline-block", fontFamily: font, fontWeight: 600, fontSize: 12, letterSpacing: 2.5, color: GOLD, marginBottom: 18, border: `1px solid ${GOLD}44`, background: `${GOLD}12`, padding: "5px 14px", borderRadius: 20 }}>{t(T.hero.badge)}</div>
+        <h1 style={{ fontFamily: font, fontSize: "clamp(32px, 5.5vw, 56px)", fontWeight: 700, color: TEXT, margin: "0 0 20px", lineHeight: 1.15, letterSpacing: -1 }}>
           {t(T.hero.title1)}<br />
           <span style={{ color: GOLD }}>{t(T.hero.title2)}</span>
         </h1>
-        <p style={{ color: DIM, fontSize: 17, lineHeight: 1.7, maxWidth: 600, margin: "0 auto 32px" }}>
+        <p style={{ color: DIM, fontSize: 17, lineHeight: 1.7, maxWidth: 620, margin: "0 auto 32px" }}>
           {t(T.hero.desc)}
         </p>
-        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#0a0c12", border: "none", padding: "14px 36px", borderRadius: 10, fontFamily: font, fontSize: 15, letterSpacing: 0.5, cursor: "pointer", fontWeight: 700 }}>
+        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#0a0c12", border: "none", padding: "15px 40px", borderRadius: 10, fontFamily: font, fontSize: 15, letterSpacing: 0.5, cursor: "pointer", fontWeight: 700, boxShadow: `0 8px 30px ${GOLD}33` }}>
           {t(T.hero.cta)}
         </button>
-        <div style={{ color: DIM, fontSize: 12, marginTop: 10 }}>{t(T.hero.sub)}</div>
+        <div style={{ color: DIM, fontSize: 13, marginTop: 12 }}>{t(T.hero.sub)}</div>
       </section>
+
+      {/* SCREENSHOT – ukázka produktu */}
+      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "52px 24px 8px" }}>
+        <div style={{ borderRadius: 14, border: `1px solid ${BORDER}`, background: PANEL, boxShadow: `0 40px 100px rgba(0,0,0,0.6), 0 0 80px ${GOLD}10`, overflow: "hidden" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "11px 16px", borderBottom: `1px solid ${BORDER}` }}>
+            <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#f6465d" }} />
+            <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#d9a425" }} />
+            <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#2ebd85" }} />
+            <span style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 12 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#2ebd85", display: "inline-block" }} />
+              <span style={{ fontSize: 11, color: DIM, letterSpacing: 2, fontWeight: 600 }}>{t(T.liveLabel)}</span>
+            </span>
+          </div>
+          <img src="/screenshot-dashboard.png" alt="MarkeTrade dashboard" style={{ display: "block", width: "100%" }} />
+        </div>
+        {/* Stats band */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "14px 36px", flexWrap: "wrap", padding: "26px 0 6px" }}>
+          {T.heroStats.map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ color: GREEN, fontSize: 14, fontWeight: 700 }}>✓</span>
+              <span style={{ color: DIM, fontSize: 14 }}>{t(s)}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+      </div>
 
       {/* FEATURES */}
       <section id="features" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
@@ -200,11 +236,12 @@ export default function LandingPage() {
             <div key={i} style={{
               background: PANEL,
               border: `${p.popular ? 2 : 1}px solid ${p.popular ? GOLD : BORDER}`,
-              borderRadius: 12,
+              borderRadius: 14,
               padding: 28,
               position: "relative",
               display: "flex",
               flexDirection: "column",
+              boxShadow: p.popular ? `0 12px 50px ${GOLD}1f` : "none",
             }}>
               {p.popular && (
                 <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#0a0c12", fontFamily: font, fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: "4px 16px", borderRadius: 20 }}>{t(T.popular)}</div>
@@ -256,6 +293,17 @@ export default function LandingPage() {
             )}
           </div>
         ))}
+      </section>
+
+      {/* ZÁVĚREČNÉ CTA */}
+      <section style={{ textAlign: "center", padding: "30px 24px 80px", maxWidth: 680, margin: "0 auto" }}>
+        <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "44px 32px", boxShadow: `0 20px 60px rgba(0,0,0,0.4), 0 0 60px ${GOLD}0d` }}>
+          <h2 style={{ fontFamily: font, fontSize: "clamp(22px, 3.5vw, 32px)", fontWeight: 700, color: TEXT, margin: "0 0 12px", letterSpacing: -0.5 }}>{t(T.ctaEnd.title)}</h2>
+          <p style={{ color: DIM, fontSize: 15, margin: "0 0 26px" }}>{t(T.ctaEnd.desc)}</p>
+          <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#0a0c12", border: "none", padding: "14px 38px", borderRadius: 10, fontFamily: font, fontSize: 15, cursor: "pointer", fontWeight: 700, boxShadow: `0 8px 30px ${GOLD}33` }}>
+            {t(T.hero.cta)}
+          </button>
+        </div>
       </section>
 
       {/* FOOTER */}
