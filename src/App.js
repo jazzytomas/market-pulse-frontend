@@ -6,7 +6,9 @@ import LandingPage from "./LandingPage";
 import Auth from "./Auth";
 
 function ProtectedRoute({ session, children }) {
-  if (!session) return <Navigate to="/auth" replace />;
+  // Lokální vývoj: na localhostu pustíme dashboard bez přihlášení (produkce nezměněna)
+  const isLocalDev = window.location.hostname === "localhost";
+  if (!session && !isLocalDev) return <Navigate to="/auth" replace />;
   return children;
 }
 

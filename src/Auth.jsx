@@ -3,12 +3,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
 const GOLD = "#c9a227";
-const BG = "#080812";
-const PANEL = "#0f0f22";
-const BORDER = "#2a1d6e";
-const TEXT = "#f0eaff";
-const DIM = "#9080c4";
-const GREEN = "#00e5a8";
+const BG = "#0a0c12";
+const PANEL = "#10141d";
+const BORDER = "#232b3d";
+const TEXT = "#e8ecf4";
+const DIM = "#93a0b8";
+const GREEN = "#2ebd85";
 const RED = "#ff3d5e";
 
 const font = "'Space Grotesk', sans-serif";
@@ -165,7 +165,7 @@ export default function Auth() {
           <button
             type="submit"
             disabled={loading}
-            style={{ width: "100%", background: GOLD, color: "#080812", border: "none", padding: "12px 0", borderRadius: 8, fontFamily: fontTitle, fontSize: 13, letterSpacing: 1, cursor: loading ? "wait" : "pointer", fontWeight: 700, opacity: loading ? 0.6 : 1 }}
+            style={{ width: "100%", background: GOLD, color: "#0a0c12", border: "none", padding: "12px 0", borderRadius: 8, fontFamily: fontTitle, fontSize: 13, letterSpacing: 1, cursor: loading ? "wait" : "pointer", fontWeight: 700, opacity: loading ? 0.6 : 1 }}
           >
             {loading ? "..." : mode === "login" ? "LOG IN" : mode === "register" ? "SIGN UP" : "SEND RESET LINK"}
           </button>

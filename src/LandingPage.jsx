@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const GOLD = "#c9a227";
-const BG = "#080812";
-const PANEL = "#0f0f22";
-const BORDER = "#2a1d6e";
-const TEXT = "#f0eaff";
-const DIM = "#9080c4";
-const GREEN = "#00e5a8";
+const BG = "#0a0c12";
+const PANEL = "#10141d";
+const BORDER = "#232b3d";
+const TEXT = "#e8ecf4";
+const DIM = "#93a0b8";
+const GREEN = "#2ebd85";
 
 const font = "'Space Grotesk', sans-serif";
 const fontTitle = "'Orbitron', sans-serif";
@@ -169,7 +169,7 @@ export default function LandingPage() {
         <p style={{ color: DIM, fontSize: 17, lineHeight: 1.7, maxWidth: 600, margin: "0 auto 32px" }}>
           {t(T.hero.desc)}
         </p>
-        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#080812", border: "none", padding: "14px 36px", borderRadius: 10, fontFamily: font, fontSize: 15, letterSpacing: 0.5, cursor: "pointer", fontWeight: 700 }}>
+        <button onClick={() => goAuth("monthly")} style={{ background: GOLD, color: "#0a0c12", border: "none", padding: "14px 36px", borderRadius: 10, fontFamily: font, fontSize: 15, letterSpacing: 0.5, cursor: "pointer", fontWeight: 700 }}>
           {t(T.hero.cta)}
         </button>
         <div style={{ color: DIM, fontSize: 12, marginTop: 10 }}>{t(T.hero.sub)}</div>
@@ -207,7 +207,7 @@ export default function LandingPage() {
               flexDirection: "column",
             }}>
               {p.popular && (
-                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#080812", fontFamily: font, fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: "4px 16px", borderRadius: 20 }}>{t(T.popular)}</div>
+                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#0a0c12", fontFamily: font, fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: "4px 16px", borderRadius: 20 }}>{t(T.popular)}</div>
               )}
               <div style={{ fontFamily: font, fontSize: 13, fontWeight: 700, letterSpacing: 1, color: DIM, marginBottom: 12, textTransform: "uppercase" }}>{t(p.name)}</div>
               <div style={{ marginBottom: 8 }}>
@@ -225,7 +225,7 @@ export default function LandingPage() {
               <button onClick={() => goAuth(p.key)} style={{
                 width: "100%",
                 background: p.popular ? GOLD : "transparent",
-                color: p.popular ? "#080812" : GOLD,
+                color: p.popular ? "#0a0c12" : GOLD,
                 border: p.popular ? "none" : `1px solid ${GOLD}`,
                 padding: "12px 0",
                 borderRadius: 8,

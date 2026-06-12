@@ -32,28 +32,28 @@ const T = {
   rescan:          { cz: "⟳ RESCAN", en: "⟳ RESCAN", es: "⟳ REESCANEAR" },
   scanning:        { cz: (s) => `◌ ${s}s...`, en: (s) => `◌ ${s}s...`, es: (s) => `◌ ${s}s...` },
   backend:         { cz: "Backend:", en: "Backend:", es: "Backend:" },
-  modeIntraday:    { cz: "⚡ INTRADAY", en: "⚡ INTRADAY", es: "⚡ INTRADÍA" },
-  modeSwing:       { cz: "📊 SWING", en: "📊 SWING", es: "📊 SWING" },
+  modeIntraday:    { cz: "INTRADAY", en: "INTRADAY", es: "INTRADÍA" },
+  modeSwing:       { cz: "SWING", en: "SWING", es: "SWING" },
   modeTooltipIntra:{ cz: "Intraday: čerstvé zprávy = plná váha, starší <24h rychle slábnou", en: "Intraday: fresh news = full weight, older <24h decay fast", es: "Intradía: noticias frescas = peso completo, antiguas decaen" },
   modeTooltipSwing:{ cz: "Swing: zprávy drží váhu několik dní, větší kontext", en: "Swing: news hold weight for days, broader context", es: "Swing: noticias mantienen peso varios días" },
   // Tabs (center)
-  tabScenarios:    { cz: "⚡ SCÉNÁŘE", en: "⚡ SCENARIOS", es: "⚡ ESCENARIOS" },
-  tabEvents:       { cz: "📅 EVENTS", en: "📅 EVENTS", es: "📅 EVENTOS" },
-  tabCot:          { cz: "📊 COT", en: "📊 COT", es: "📊 COT" },
-  tabCorrelation:  { cz: "🔗 KORELACE", en: "🔗 CORRELATION", es: "🔗 CORRELACIÓN" },
-  tabSeasonal:     { cz: "📈 SEZÓNA", en: "📈 SEASONAL", es: "📈 ESTACIONAL" },
-  tabHistory:      { cz: "🕐 HISTORIE", en: "🕐 HISTORY", es: "🕐 HISTORIAL" },
-  tabFearGreed:    { cz: "😱 FEAR&GREED", en: "😱 FEAR&GREED", es: "😱 MIEDO&CODICIA" },
-  tabBacktest:     { cz: "🎯 BACKTEST", en: "🎯 BACKTEST", es: "🎯 BACKTEST" },
-  tabEducation:    { cz: "🎓 VÝUKA", en: "🎓 EDUCATION", es: "🎓 EDUCACIÓN" },
-  tabGuide:        { cz: "📖 PRŮVODCE", en: "📖 GUIDE", es: "📖 GUÍA" },
+  tabScenarios:    { cz: "SCÉNÁŘE", en: "SCENARIOS", es: "ESCENARIOS" },
+  tabEvents:       { cz: "EVENTS", en: "EVENTS", es: "EVENTOS" },
+  tabCot:          { cz: "COT", en: "COT", es: "COT" },
+  tabCorrelation:  { cz: "KORELACE", en: "CORRELATION", es: "CORRELACIÓN" },
+  tabSeasonal:     { cz: "SEZÓNA", en: "SEASONAL", es: "ESTACIONAL" },
+  tabHistory:      { cz: "HISTORIE", en: "HISTORY", es: "HISTORIAL" },
+  tabFearGreed:    { cz: "FEAR & GREED", en: "FEAR & GREED", es: "MIEDO & CODICIA" },
+  tabBacktest:     { cz: "BACKTEST", en: "BACKTEST", es: "BACKTEST" },
+  tabEducation:    { cz: "VÝUKA", en: "EDUCATION", es: "EDUCACIÓN" },
+  tabGuide:        { cz: "PRŮVODCE", en: "GUIDE", es: "GUÍA" },
   // Tabs (right panel)
   tabPairs:        { cz: "PÁRY", en: "PAIRS", es: "PARES" },
   tabStatus:       { cz: "STATUS", en: "STATUS", es: "ESTADO" },
   tabCurrencies:   { cz: "MĚNY", en: "CURRENCIES", es: "DIVISAS" },
   tabCbRates:      { cz: "CB SAZBY", en: "CB RATES", es: "TASAS BC" },
   tabWatchlist:    { cz: "WATCHLIST", en: "WATCHLIST", es: "WATCHLIST" },
-  tabTelegram:    { cz: "📲 TELEGRAM", en: "📲 TELEGRAM", es: "📲 TELEGRAM" },
+  tabTelegram:    { cz: "TELEGRAM", en: "TELEGRAM", es: "TELEGRAM" },
   // Section labels
   riskSentiment:   { cz: "RISK SENTIMENT", en: "RISK SENTIMENT", es: "SENTIMIENTO DE RIESGO" },
   menovy:          { cz: "MĚNOVÝ PŘEHLED", en: "CURRENCY OVERVIEW", es: "RESUMEN DE DIVISAS" },
@@ -222,7 +222,7 @@ function ScoreBar({ score, height = 6 }) {
         position: "absolute",
         left: score >= 0 ? "50%" : `${pct}%`,
         width: score >= 0 ? `${pct - 50}%` : `${50 - pct}%`,
-        height: "100%", background: color, boxShadow: `0 0 5px ${color}`, borderRadius: 3,
+        height: "100%", background: color, borderRadius: 3,
       }} />
     </div>
   );
@@ -246,23 +246,20 @@ function RiskMeter({ score }) {
             <stop offset="100%" stopColor={GD} stopOpacity="0.7" />
           </linearGradient>
         </defs>
-        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke={C.border} strokeWidth="9" strokeLinecap="round" />
-        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke="url(#arcGrad)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke={C.border} strokeWidth="8" strokeLinecap="round" />
+        <path d="M 12 100 A 82 82 0 0 1 178 100" fill="none" stroke="url(#arcGrad)" strokeWidth="8" strokeLinecap="round" />
         <g transform={`rotate(${angle}, 95, 100)`}>
-          <line x1="95" y1="100" x2="95" y2="24" stroke={GB} strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="95" y1="100" x2="95" y2="26" stroke={GB} strokeWidth="2.5" strokeLinecap="round" />
           <circle cx="95" cy="100" r="5" fill={GB} />
         </g>
-        <text x="38" y="98" fill={GD} fontSize="8" fontFamily="monospace" textAnchor="middle">-100</text>
-        <text x="38" y="108" fill={GD} fontSize="7" fontFamily="monospace" textAnchor="middle">risk off</text>
-        <text x="95" y="12" fill={G} fontSize="8" fontFamily="monospace" textAnchor="middle">0</text>
-        <text x="152" y="98" fill={GD} fontSize="8" fontFamily="monospace" textAnchor="middle">+100</text>
-        <text x="152" y="108" fill={GD} fontSize="7" fontFamily="monospace" textAnchor="middle">risk on</text>
+        <text x="14" y="115" fill={C.textDim} fontSize="9" fontFamily="'Space Grotesk', sans-serif" textAnchor="start">RISK OFF</text>
+        <text x="176" y="115" fill={C.textDim} fontSize="9" fontFamily="'Space Grotesk', sans-serif" textAnchor="end">RISK ON</text>
       </svg>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 26, fontWeight: 900, color: G, fontFamily: "Orbitron, monospace", filter: `drop-shadow(0 0 8px ${G})` }}>
+        <div style={{ fontSize: 30, fontWeight: 700, color: G, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: -0.5 }}>
           {clamp > 0 ? "+" : ""}{clamp}
         </div>
-        <div style={{ fontSize: 10, letterSpacing: 4, color: G, fontFamily: "Orbitron, monospace" }}>{label}</div>
+        <div style={{ fontSize: 11, letterSpacing: 3, color: C.textDim, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>{label}</div>
       </div>
     </div>
   );
@@ -272,21 +269,20 @@ function TabBtn({ label, active, onClick }) {
   const C = React.useContext(ThemeContext);
   return (
     <button onClick={onClick} style={{
-      background: active ? `${C.accent}18` : "none",
-      border: "none",
-      borderBottom: active ? `2px solid ${C.accent}` : "2px solid transparent",
+      background: active ? `${C.accent}1c` : "transparent",
+      border: `1px solid ${active ? `${C.accent}55` : "transparent"}`,
       color: active ? C.accent : C.textDim,
-      padding: "6px 12px 9px", fontSize: 13, letterSpacing: 1,
-      cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif", fontWeight: active ? 700 : 600,
+      padding: "7px 14px", fontSize: 12, letterSpacing: 0.8,
+      cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif", fontWeight: active ? 700 : 500,
       textTransform: "uppercase", whiteSpace: "nowrap",
-      borderRadius: "4px 4px 0 0", transition: "color 0.15s, background 0.15s",
+      borderRadius: 8, transition: "color 0.15s, background 0.15s",
     }}>{label}</button>
   );
 }
 
 function SectionLabel({ children, center }) {
   const C = React.useContext(ThemeContext);
-  return <div style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "'Space Grotesk', sans-serif" }}>{children}</div>;
+  return <div style={{ fontSize: 11, letterSpacing: 2.5, fontWeight: 600, color: C.textDim, marginBottom: 10, textAlign: center ? "center" : "left", fontFamily: "'Space Grotesk', sans-serif" }}>{children}</div>;
 }
 
 function TickerBar({ items }) {
@@ -296,9 +292,9 @@ function TickerBar({ items }) {
     const col = it.change > 0 ? C.green : it.change < 0 ? C.red : C.textDim;
     return (
       <span key={`${dup}-${i}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0 16px", borderRight: `1px solid ${C.border}` }}>
-        <span style={{ fontSize: 10, fontWeight: 600, color: C.textDim, letterSpacing: 0.5 }}>{it.name}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: C.text, fontFamily: "monospace" }}>{it.price}</span>
-        <span style={{ fontSize: 9, fontWeight: 700, color: col }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: C.textDim, letterSpacing: 0.5 }}>{it.name}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: C.text, fontFamily: "monospace" }}>{it.price}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: col }}>
           {it.change > 0 ? "▲" : it.change < 0 ? "▼" : "—"}{Math.abs(it.change || 0).toFixed(2)}%
         </span>
       </span>
@@ -571,20 +567,20 @@ export default function Dashboard() {
     const highScenarios = scenarios.filter(s => s.weight === "HIGH");
     const allText = highScenarios.map(s => (s.title + " " + (s.summary || "")).toLowerCase()).join(" ");
     if (["iran","war","conflict","missile","attack","military","sanction","nato","nuclear","troops","strike","invasion","blockade","hormuz","weapon"].some(kw => allText.includes(kw)))
-      labels.push({ label: L("GEOPOLITICKÝ ŠOK", "GEOPOLITICAL SHOCK", "SHOCK GEOPOLÍTICO"), color: "#e74c3c" });
+      labels.push({ label: L("GEOPOLITICKÝ ŠOK", "GEOPOLITICAL SHOCK", "SHOCK GEOPOLÍTICO"), color: C.red });
     if (["inflation"," cpi"," ppi","stagflat","price surge","price shock","overheating"].some(kw => allText.includes(kw)))
-      labels.push({ label: L("INFLAČNÍ ŠOK", "INFLATION SHOCK", "SHOCK INFLACIONARIO"), color: "#1abc9c" });
+      labels.push({ label: L("INFLAČNÍ ŠOK", "INFLATION SHOCK", "SHOCK INFLACIONARIO"), color: C.yellow });
     if (["supply chain","shortage","embargo","export ban","port clos","supply shock","mines in strait"].some(kw => allText.includes(kw)))
-      labels.push({ label: L("NABÍDKOVÝ ŠOK", "SUPPLY SHOCK", "SHOCK DE OFERTA"), color: "#9b59b6" });
+      labels.push({ label: L("NABÍDKOVÝ ŠOK", "SUPPLY SHOCK", "SHOCK DE OFERTA"), color: C.orange });
     if (["tariff","trade war","section 301","trade barrier","import duty","trade probe"].some(kw => allText.includes(kw)))
-      labels.push({ label: L("OBCHODNÍ VÁLKA", "TRADE WAR", "GUERRA COMERCIAL"), color: "#e67e22" });
+      labels.push({ label: L("OBCHODNÍ VÁLKA", "TRADE WAR", "GUERRA COMERCIAL"), color: C.orange });
     const wti = commodities.find(c => c.name && cName(c.name).toLowerCase().includes("wti"));
     if (wti && wti.change && wti.price) {
       const priceNum = parseFloat(String(wti.price).replace(/[^0-9.-]/g, ""));
       const prev = priceNum - wti.change;
       const pct = prev !== 0 ? (wti.change / prev) * 100 : 0;
-      if (pct > 3) labels.push({ label: L("ROPNÝ SKOK", "OIL SPIKE", "SUBIDA DEL PETRÓLEO"), color: "#f1c40f" });
-      else if (pct < -3) labels.push({ label: L("PÁD ROPY", "OIL DROP", "CAÍDA DEL PETRÓLEO"), color: "#2ecc71" });
+      if (pct > 3) labels.push({ label: L("ROPNÝ SKOK", "OIL SPIKE", "SUBIDA DEL PETRÓLEO"), color: C.yellow });
+      else if (pct < -3) labels.push({ label: L("PÁD ROPY", "OIL DROP", "CAÍDA DEL PETRÓLEO"), color: C.green });
     }
     return labels;
   }, [scenarios, commodities, lang]);
@@ -697,19 +693,19 @@ export default function Dashboard() {
             const dk = C.dark;
             return <img src={dk ? "/logo.svg" : "/logo-light.svg"} alt="markeTrade" style={{ height: isMobile ? 32 : 42, objectFit: "contain" }} />;
           })()}
-          {!isMobile && <div style={{ fontSize: 7, color: C.textDim, letterSpacing: 3, fontFamily: "Orbitron, monospace" }}>{t("aiEngine")}</div>}
+          {!isMobile && <div style={{ fontSize: 9, color: C.textDim, letterSpacing: 3, fontFamily: "'Space Grotesk', sans-serif" }}>{t("aiEngine")}</div>}
         </div>
         <div style={{ display: "flex", gap: isMobile ? 6 : 14, alignItems: "center", flexWrap: "wrap" }}>
           {isAdmin && (
             <>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 9, color: C.textDim }}>{t("lastScan")}</div>
-                <div style={{ fontSize: 12, color: C.accent }}>{lastUpdate}</div>
+                <div style={{ fontSize: 11, color: C.textDim }}>{t("lastScan")}</div>
+                <div style={{ fontSize: 14, color: C.accent }}>{lastUpdate}</div>
               </div>
               <button onClick={runScan} disabled={scanning} style={{
                 background: `${C.accent}18`, border: `1px solid ${scanning ? C.muted : C.accent}`,
-                color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 9,
-                letterSpacing: 2, cursor: "pointer", borderRadius: 4, fontFamily: "Orbitron, monospace",
+                color: scanning ? C.textDim : C.accent, padding: "6px 12px", fontSize: 11,
+                letterSpacing: 2, cursor: "pointer", borderRadius: 7, fontFamily: "'Space Grotesk', sans-serif",
               }}>{scanning ? t("scanning", scanCountdown) : t("rescan")}</button>
             </>
           )}
@@ -720,34 +716,34 @@ export default function Dashboard() {
               background: tradeMode === "intraday" ? `${C.red}22` : `${C.accent}18`,
               border: `1px solid ${tradeMode === "intraday" ? C.red : C.accent}`,
               color: tradeMode === "intraday" ? C.red : C.accent,
-              padding: "6px 10px", fontSize: 10, letterSpacing: 1.5,
-              cursor: "pointer", borderRadius: 4, fontFamily: "Orbitron, monospace",
+              padding: "6px 10px", fontSize: 12, letterSpacing: 1.5,
+              cursor: "pointer", borderRadius: 7, fontFamily: "'Space Grotesk', sans-serif",
             }}>
             {tradeMode === "intraday" ? t("modeIntraday") : t("modeSwing")}
           </button>
           <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
             background: "none", border: `1px solid ${C.border}`,
-            padding: "3px 8px", cursor: "pointer", borderRadius: 4, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
+            padding: "3px 8px", cursor: "pointer", borderRadius: 7, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
           }}>
             <img src={`https://flagcdn.com/24x18/${LANG_FLAGS[lang]}.png`} width="24" height="18" alt={LANG_LABELS[lang]} style={{ display: "block", borderRadius: 2 }} />
-            <span style={{ color: C.textDim, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif" }}>{LANG_LABELS[lang]}</span>
+            <span style={{ color: C.textDim, fontSize: 13, fontFamily: "'Space Grotesk', sans-serif" }}>{LANG_LABELS[lang]}</span>
           </button>
           <button onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem("mp_theme", next ? "dark" : "light"); }} title={darkMode ? "Light mode" : "Dark mode"} style={{
             background: darkMode ? "#c9a22718" : `${C.border}`, border: `1px solid ${darkMode ? "#c9a22755" : C.border}`,
             color: C.textDim, padding: "6px 9px", fontSize: 14,
-            cursor: "pointer", borderRadius: 4, lineHeight: 1,
+            cursor: "pointer", borderRadius: 7, lineHeight: 1,
           }}>{darkMode ? "☀️" : "🌙"}</button>
           <button onClick={() => supabase.auth.signOut()} title="Log out" style={{
             background: "none", border: `1px solid ${C.border}`,
-            color: C.textDim, padding: "6px 9px", fontSize: 11,
-            cursor: "pointer", borderRadius: 4, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif",
+            color: C.textDim, padding: "6px 9px", fontSize: 13,
+            cursor: "pointer", borderRadius: 7, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif",
           }}>⏻</button>
         </div>
         {shockLabels.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, width: "100%" }}>
             {shockLabels.map(({ label, color }) => (
               <span key={label} style={{
-                fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                fontSize: 10, fontWeight: 700, letterSpacing: 1.5,
                 color: color, border: `1px solid ${color}`, borderRadius: 3,
                 padding: "2px 6px", background: `${color}18`
               }}>{label}</span>
@@ -755,7 +751,7 @@ export default function Dashboard() {
           </div>
         )}
         {isAdmin && (
-          <div style={{ fontSize: 9, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, width: "100%" }}>
+          <div style={{ fontSize: 11, color: backendStatus === "ok" ? C.green : backendStatus === "checking..." ? C.yellow : C.red, width: "100%" }}>
             {t("backend")} <b>{backendStatus}</b>
           </div>
         )}
@@ -771,7 +767,7 @@ export default function Dashboard() {
 
     <div style={{ maxWidth: 1520, margin: "0 auto", padding: 14, boxSizing: "border-box", ...(isMobile ? { overflowX: "hidden", width: "100%" } : {}) }}>
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "210px 1fr", gap: 12, ...(isMobile ? { width: "100%", minWidth: 0 } : {}) }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "250px 1fr", gap: 14, ...(isMobile ? { width: "100%", minWidth: 0 } : {}) }}>
 
         {/* LEFT – desktop sidebar */}
         {!isMobile && (
@@ -781,18 +777,18 @@ export default function Dashboard() {
               <RiskMeter score={sentiment.total_score} />
               {sentiment.vix != null && (
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 4, marginBottom: 2 }}>
-                  <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>VIX</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
-                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
+                  <span style={{ fontSize: 11, color: C.textDim, letterSpacing: 1 }}>VIX</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
+                  <span style={{ fontSize: 10, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
                 </div>
               )}
               {dxy && dxy.price && (
                 <div style={{ marginTop: 10, padding: "8px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: C.text, letterSpacing: 1.5, fontFamily: "Orbitron, monospace" }}>DXY</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: C.text, letterSpacing: 1.5, fontFamily: "'Space Grotesk', sans-serif" }}>DXY</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{dxy.price}</span>
-                      <span style={{ fontSize: 9, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"} {Math.abs(dxy.change)}%</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{dxy.price}</span>
+                      <span style={{ fontSize: 11, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"} {Math.abs(dxy.change)}%</span>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
@@ -805,8 +801,8 @@ export default function Dashboard() {
                       const arrow = tf.trend === "bullish" ? "▲" : tf.trend === "bearish" ? "▼" : "—";
                       return (
                         <div key={tf.label} style={{ flex: 1, textAlign: "center", padding: "4px 0", background: `${col}12`, border: `1px solid ${col}33`, borderRadius: 4 }}>
-                          <div style={{ fontSize: 8, color: C.textDim, marginBottom: 2 }}>{tf.label}</div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: col }}>{arrow} {tf.trend === "bullish" ? "BULL" : tf.trend === "bearish" ? "BEAR" : "FLAT"}</div>
+                          <div style={{ fontSize: 10, color: C.textDim, marginBottom: 2 }}>{tf.label}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: col }}>{arrow} {tf.trend === "bullish" ? "BULL" : tf.trend === "bearish" ? "BEAR" : "FLAT"}</div>
                         </div>
                       );
                     })}
@@ -821,10 +817,10 @@ export default function Dashboard() {
                   { label: t("riskOff"), currencies: ["USD", "JPY", "CHF"] },
                 ].map(group => (
                   <div key={group.label} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
-                    <span style={{ fontSize: 9, color: C.textDim, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
+                    <span style={{ fontSize: 11, color: C.textDim, width: 54, paddingTop: 2, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                       {group.currencies.map(c => (
-                        <span key={c} style={{ fontSize: 9, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
+                        <span key={c} style={{ fontSize: 11, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
                       ))}
                     </div>
                   </div>
@@ -840,7 +836,7 @@ export default function Dashboard() {
                   { key: "crypto", label: L("Krypto", "Crypto", "Cripto") },
                 ].map(tab => (
                   <div key={tab.key} onClick={() => setMarketTab(tab.key)}
-                    style={{ padding: "4px 10px", fontSize: 9, fontWeight: marketTab === tab.key ? 700 : 400,
+                    style={{ padding: "4px 10px", fontSize: 11, fontWeight: marketTab === tab.key ? 700 : 400,
                       color: marketTab === tab.key ? C.accent : C.muted, cursor: "pointer",
                       borderBottom: marketTab === tab.key ? `2px solid ${C.accent}` : "2px solid transparent",
                       letterSpacing: 1 }}>
@@ -850,19 +846,19 @@ export default function Dashboard() {
               </div>
               {(() => {
                 const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
-                if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
+                if (items.length === 0) return <div style={{ fontSize: 11, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
                 return items.map(c => {
                   const chCol = c.change > 0 ? C.green : c.change < 0 ? C.red : C.yellow;
                   return (
                     <div key={cName(c.name)} style={{ marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
                         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                          <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"} {Math.abs(c.change)}%</span>
-                          <span style={{ fontSize: 9, color: C.textDim }}>{c.price}</span>
+                          <span style={{ fontSize: 11, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"} {Math.abs(c.change)}%</span>
+                          <span style={{ fontSize: 11, color: C.textDim }}>{c.price}</span>
                         </div>
                       </div>
-                      {c.currencies && <div><span style={{ fontSize: 8, color: C.muted }}>{c.currencies}</span></div>}
+                      {c.currencies && <div><span style={{ fontSize: 10, color: C.muted }}>{c.currencies}</span></div>}
                     </div>
                   );
                 });
@@ -876,48 +872,48 @@ export default function Dashboard() {
 
         {/* Mobile: Risk Sentiment strip – gauge vlevo, VIX nahoře + měny dole vpravo */}
         {isMobile && (
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 14px", display: "flex", alignItems: "stretch", gap: 12 }}>
-            {/* Levý sloupec: gauge */}
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Gauge nahoře, pod ním VIX/DXY/měny (na mobilu vertikálně) */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 2 }}>{t("riskSentiment")}</div>
+              <div style={{ fontSize: 10, letterSpacing: 2, color: C.textDim, marginBottom: 2 }}>{t("riskSentiment")}</div>
               <RiskMeter score={sentiment.total_score} />
             </div>
             {/* Pravý sloupec: VIX nahoře, měny dole */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
               {sentiment.vix != null && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
-                  <span style={{ fontSize: 8, color: C.textDim, letterSpacing: 1 }}>VIX</span>
+                  <span style={{ fontSize: 10, color: C.textDim, letterSpacing: 1 }}>VIX</span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: sentiment.vix > 25 ? C.red : sentiment.vix < 15 ? C.green : C.yellow }}>{sentiment.vix.toFixed(1)}</span>
-                  <span style={{ fontSize: 8, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
+                  <span style={{ fontSize: 10, color: C.textDim }}>{sentiment.vix > 25 ? L("▲ strach", "▲ fear", "▲ miedo") : sentiment.vix < 15 ? L("▼ klid", "▼ calm", "▼ calma") : "— neutral"}</span>
                 </div>
               )}
               {dxy && dxy.price && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
-                  <span style={{ fontSize: 8, fontWeight: 700, color: C.text, letterSpacing: 1, fontFamily: "Orbitron, monospace" }}>DXY</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{dxy.price}</span>
-                  <span style={{ fontSize: 8, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"}{Math.abs(dxy.change)}%</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: C.text, letterSpacing: 1, fontFamily: "'Space Grotesk', sans-serif" }}>DXY</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{dxy.price}</span>
+                  <span style={{ fontSize: 10, color: dxy.change > 0 ? C.green : dxy.change < 0 ? C.red : C.textDim }}>{dxy.change > 0 ? "▲" : dxy.change < 0 ? "▼" : "—"}{Math.abs(dxy.change)}%</span>
                   {[
                     { label: "D1", trend: dxy.daily },
                     { label: "4H", trend: dxy.h4 },
                     { label: "1H", trend: dxy.h1 },
                   ].map(tf => {
                     const col = tf.trend === "bullish" ? C.green : tf.trend === "bearish" ? C.red : C.yellow;
-                    return <span key={tf.label} style={{ fontSize: 7, color: col, fontWeight: 700 }}>{tf.label}{tf.trend === "bullish" ? "▲" : tf.trend === "bearish" ? "▼" : "—"}</span>;
+                    return <span key={tf.label} style={{ fontSize: 9, color: col, fontWeight: 700 }}>{tf.label}{tf.trend === "bullish" ? "▲" : tf.trend === "bearish" ? "▼" : "—"}</span>;
                   })}
                 </div>
               )}
               <div style={{ flex: 1, padding: "6px 10px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12 }}>
-                <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 5, fontFamily: "'Space Grotesk', sans-serif" }}>{t("menovy")}</div>
+                <div style={{ fontSize: 10, letterSpacing: 2, color: C.textDim, marginBottom: 5, fontFamily: "'Space Grotesk', sans-serif" }}>{t("menovy")}</div>
                 {[
                   { label: t("riskOn"),  currencies: ["AUD", "NZD", "CAD"] },
                   { label: t("neutral"),  currencies: ["GBP", "EUR"] },
                   { label: t("riskOff"), currencies: ["USD", "JPY", "CHF"] },
                 ].map(group => (
                   <div key={group.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{ fontSize: 9, color: C.textDim, width: 50, flexShrink: 0 }}>{group.label}</span>
+                    <span style={{ fontSize: 11, color: C.textDim, width: 50, flexShrink: 0 }}>{group.label}</span>
                     <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                       {group.currencies.map(c => (
-                        <span key={c} style={{ fontSize: 9, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
+                        <span key={c} style={{ fontSize: 11, color: C.textDim, border: `1px solid ${C.textDim}55`, background: `${C.textDim}12`, padding: "1px 5px", borderRadius: 3 }}>{c}</span>
                       ))}
                     </div>
                   </div>
@@ -950,7 +946,7 @@ export default function Dashboard() {
               <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.red, display: "inline-block", animation: "mp-blink 1.6s ease-in-out infinite" }} />
-                  <span style={{ fontSize: 9, letterSpacing: 3, color: C.textDim, fontFamily: "'Space Grotesk', sans-serif" }}>{L("BREAKING — HLAVNÍ KATALYZÁTORY TRHU", "BREAKING — TOP MARKET CATALYSTS", "BREAKING — PRINCIPALES CATALIZADORES")}</span>
+                  <span style={{ fontSize: 11, letterSpacing: 3, color: C.textDim, fontFamily: "'Space Grotesk', sans-serif" }}>{L("BREAKING — HLAVNÍ KATALYZÁTORY TRHU", "BREAKING — TOP MARKET CATALYSTS", "BREAKING — PRINCIPALES CATALIZADORES")}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {breaking.map(s => {
@@ -962,13 +958,13 @@ export default function Dashboard() {
                       <div key={s.id} onClick={() => { setCenterTab("scenarios"); setScenarioFilter("HIGH"); setScenarioPage(1); setExpandedScenario(s.id); }}
                         style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 10px", borderRadius: 8, cursor: "pointer", background: `${tag.color}08`, border: `1px solid ${C.border}` }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: dotCol, marginTop: 5, flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: C.text, lineHeight: 1.45 }}>{s.title}</span>
-                          {summaryText && <span style={{ fontSize: 9, color: C.textDim, lineHeight: 1.45 }}> — {summaryText.length > 170 ? summaryText.slice(0, 170) + "…" : summaryText}</span>}
+                        <div style={{ flex: 1, minWidth: 0, ...(isMobile ? { display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" } : {}) }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.text, lineHeight: 1.45 }}>{s.title}</span>
+                          {summaryText && <span style={{ fontSize: 11, color: C.textDim, lineHeight: 1.45 }}> — {summaryText.length > 170 ? summaryText.slice(0, 170) + "…" : summaryText}</span>}
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
-                          <span style={{ fontSize: 8, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>
-                          {timeStr && <span style={{ fontSize: 7, color: C.muted }}>{timeStr}</span>}
+                          <span style={{ fontSize: 10, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>
+                          {timeStr && <span style={{ fontSize: 9, color: C.muted }}>{timeStr}</span>}
                         </div>
                       </div>
                     );
@@ -980,7 +976,7 @@ export default function Dashboard() {
 
           {/* CENTER tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
-            <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 4, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabScenarios")} active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label={t("tabEvents")} active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
               <TabBtn label={t("tabCot")} active={centerTab === "cot"} onClick={() => setCenterTab("cot")} />
@@ -1000,13 +996,13 @@ export default function Dashboard() {
                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}>
                   {[{ key: "HIGH", label: t("filterHigh") }, { key: "MED", label: t("filterMed") }, { key: "OLD", label: t("filterOld") }].map(f => (
                     <button key={f.key} onClick={() => { setScenarioFilter(f.key); setScenarioPage(1); }} style={{
-                      fontSize: 9, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontWeight: scenarioFilter === f.key ? 700 : 400,
+                      fontSize: 11, padding: "3px 10px", borderRadius: 7, cursor: "pointer", fontWeight: scenarioFilter === f.key ? 700 : 400,
                       background: scenarioFilter === f.key ? C.accent : C.border,
                       color: scenarioFilter === f.key ? "#000" : C.textDim,
                       border: `1px solid ${scenarioFilter === f.key ? C.accent : C.border}`
                     }}>{f.label}</button>
                   ))}
-                  <span style={{ fontSize: 9, color: C.textDim, alignSelf: "center", marginLeft: 4 }}>{t("clickDetail")}</span>
+                  <span style={{ fontSize: 11, color: C.textDim, alignSelf: "center", marginLeft: 4 }}>{t("clickDetail")}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {(() => {
@@ -1034,19 +1030,19 @@ export default function Dashboard() {
                       <div key={s.id} style={{ border: `1px solid ${isMed ? C.border : sc + "55"}`, borderLeft: `3px solid ${isMed ? "#555" : sc}`, borderRadius: 6, background: isMed ? `${C.panel}88` : `${sc}06`, overflow: "hidden" }}>
                         <div onClick={() => setExpandedScenario(isExp ? null : s.id)} style={{ padding: isMed ? "5px 10px" : "7px 12px", cursor: "pointer" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                            <div style={{ fontSize: isMed ? 10 : 11, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
+                            <div style={{ fontSize: isMed ? 12 : 13, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 8, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
-                              <span style={{ fontSize: isMed ? 11 : 13, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
-                              <span style={{ fontSize: 9, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
+                              <span style={{ fontSize: 10, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              <span style={{ fontSize: isMed ? 13 : 15, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
+                              <span style={{ fontSize: 11, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
                           </div>
-                          {!isExp && <div style={{ fontSize: 8, color: C.muted, marginBottom: isMed ? 1 : 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{summaryText}</div>}
-                          {isExp && <div style={{ fontSize: 9, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{summaryText}</div>}
+                          {!isExp && <div style={{ fontSize: 10, color: C.muted, marginBottom: isMed ? 1 : 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{summaryText}</div>}
+                          {isExp && <div style={{ fontSize: 11, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{summaryText}</div>}
                           {!isMed && <ScoreBar score={rScore} />}
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                            <span style={{ fontSize: 8, color: C.muted }}>{s.source}</span>
-                            {s.created_at && <span style={{ fontSize: 8, color: C.muted }}>{new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
+                            <span style={{ fontSize: 10, color: C.muted }}>{s.source}</span>
+                            {s.created_at && <span style={{ fontSize: 10, color: C.muted }}>{new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
                           </div>
                         </div>
                         {isExp && (
@@ -1061,11 +1057,11 @@ export default function Dashboard() {
                                 return (
                                   <div key={curr}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 2 }}>
-                                      <span style={{ width: 26, fontSize: 9, color: C.textDim }}>{curr}</span>
+                                      <span style={{ width: 26, fontSize: 11, color: C.textDim }}>{curr}</span>
                                       <div style={{ flex: 1 }}><ScoreBar score={imp.score} height={4} /></div>
-                                      <span style={{ width: 32, textAlign: "right", fontSize: 9, color: col }}>{imp.score > 0 ? "+" : ""}{imp.score}</span>
+                                      <span style={{ width: 32, textAlign: "right", fontSize: 11, color: col }}>{imp.score > 0 ? "+" : ""}{imp.score}</span>
                                     </div>
-                                    <div style={{ fontSize: 8, color: C.muted, paddingLeft: 31, lineHeight: 1.4, marginBottom: 3 }}>{lang === "cz" && imp.reason_cz ? imp.reason_cz : imp.reason}</div>
+                                    <div style={{ fontSize: 10, color: C.muted, paddingLeft: 31, lineHeight: 1.4, marginBottom: 3 }}>{lang === "cz" && imp.reason_cz ? imp.reason_cz : imp.reason}</div>
                                   </div>
                                 );
                               })}
@@ -1079,7 +1075,7 @@ export default function Dashboard() {
                     <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 4 }}>
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                         <button key={p} onClick={() => setScenarioPage(p)} style={{
-                          fontSize: 9, width: 26, height: 26, borderRadius: 4, cursor: "pointer", fontWeight: p === safePage ? 700 : 400,
+                          fontSize: 11, width: 26, height: 26, borderRadius: 7, cursor: "pointer", fontWeight: p === safePage ? 700 : 400,
                           background: p === safePage ? C.accent : C.border,
                           color: p === safePage ? "#000" : C.textDim,
                           border: `1px solid ${p === safePage ? C.accent : C.border}`
@@ -1126,7 +1122,7 @@ export default function Dashboard() {
                         const highCount = (dayMap[day] || []).filter(e => e.impact === "HIGH").length;
                         return (
                           <button key={day} onClick={() => setEventDay(day)} style={{
-                            fontSize: 9, padding: "4px 10px", borderRadius: 4, cursor: "pointer",
+                            fontSize: 11, padding: "4px 10px", borderRadius: 7, cursor: "pointer",
                             fontWeight: isActive ? 700 : 400,
                             background: isActive ? C.accent : C.border,
                             color: isActive ? "#000" : C.textDim,
@@ -1134,7 +1130,7 @@ export default function Dashboard() {
                             position: "relative"
                           }}>
                             {dn} {dd}
-                            {highCount > 0 && <span style={{ fontSize: 7, color: isActive ? "#600" : C.red, marginLeft: 3 }}>{highCount}H</span>}
+                            {highCount > 0 && <span style={{ fontSize: 9, color: isActive ? "#600" : C.red, marginLeft: 3 }}>{highCount}H</span>}
                           </button>
                         );
                       })}
@@ -1158,44 +1154,44 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                               <span style={{ width: 7, height: 7, borderRadius: "50%", background: isPast ? C.muted : col, display: "inline-block" }} />
-                              <span style={{ fontSize: 11, fontWeight: 700 }}>{ev.name}</span>
-                              <span style={{ fontSize: 8, color: isPast ? C.muted : col, border: `1px solid ${isPast ? C.muted : col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700 }}>{ev.name}</span>
+                              <span style={{ fontSize: 10, color: isPast ? C.muted : col, border: `1px solid ${isPast ? C.muted : col}44`, padding: "1px 5px", borderRadius: 3 }}>{ev.impact}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                               {score != null && (
-                                <span style={{ fontSize: 8, fontWeight: 700, color: scoreColor, border: `1px solid ${scoreColor}55`, padding: "1px 6px", borderRadius: 3 }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: scoreColor, border: `1px solid ${scoreColor}55`, padding: "1px 6px", borderRadius: 3 }}>
                                   {score > 0 ? "+" : ""}{score}
                                 </span>
                               )}
-                              <span style={{ fontSize: 10, color: isPast ? C.textDim : C.accent }}>{time}</span>
+                              <span style={{ fontSize: 12, color: isPast ? C.textDim : C.accent }}>{time}</span>
                             </div>
                           </div>
                           <div style={{ display: "flex", gap: 14 }}>
                             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
-                              <span style={{ fontSize: 10, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
+                              <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>FORECAST</span>
+                              <span style={{ fontSize: 12, color: C.text }}>{ev.forecast && ev.forecast.trim() ? ev.forecast : "—"}</span>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                              <span style={{ fontSize: 7, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
-                              <span style={{ fontSize: 10, color: C.muted }}>{ev.previous && ev.previous.trim() ? ev.previous : "—"}</span>
+                              <span style={{ fontSize: 9, color: C.textDim, letterSpacing: 1 }}>PREVIOUS</span>
+                              <span style={{ fontSize: 12, color: C.muted }}>{ev.previous && ev.previous.trim() ? ev.previous : "—"}</span>
                             </div>
                           </div>
                         </div>
                       );
                     })}
-                    {dayEvents.length === 0 && <div style={{ fontSize: 9, color: C.muted }}>{t("noEvents")}</div>}
+                    {dayEvents.length === 0 && <div style={{ fontSize: 11, color: C.muted }}>{t("noEvents")}</div>}
                   </>);
                 })()}
                 <div style={{ marginTop: 8, borderTop: `1px solid ${C.border}`, paddingTop: 12 }}>
                   <SectionLabel>{t("volWindows")}</SectionLabel>
                   {volWindows.map((w, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-                      <div style={{ width: 60, fontSize: 9, color: C.textDim }}>{w.session}</div>
+                      <div style={{ width: 60, fontSize: 11, color: C.textDim }}>{w.session}</div>
                       <div style={{ flex: 1, height: 5, background: C.border, borderRadius: 3, overflow: "hidden" }}>
                         <div style={{ width: `${w.vol}%`, height: "100%", background: w.vol > 80 ? C.red : w.vol > 50 ? C.orange : C.muted, borderRadius: 3 }} />
                       </div>
-                      <div style={{ width: 28, fontSize: 9, color: C.textDim, textAlign: "right" }}>{w.vol}%</div>
-                      <div style={{ fontSize: 8, color: C.muted, width: 110 }}>{translatePairs(w.pairs)}</div>
+                      <div style={{ width: 28, fontSize: 11, color: C.textDim, textAlign: "right" }}>{w.vol}%</div>
+                      <div style={{ fontSize: 10, color: C.muted, width: 110 }}>{translatePairs(w.pairs)}</div>
                     </div>
                   ))}
                 </div>
@@ -1204,7 +1200,7 @@ export default function Dashboard() {
 
             {centerTab === "cot" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 4 }}>
+                <div style={{ fontSize: 11, color: C.textDim, marginBottom: 4 }}>
                   {L(
                     "CFTC Commitments of Traders — Leveraged Money pozice · stahuje se každý pátek · datum = reportovací týden (úterý)",
                     "CFTC Commitments of Traders — Leveraged Money positions · fetched every Friday · date = reporting week (Tuesday)",
@@ -1214,7 +1210,7 @@ export default function Dashboard() {
                   const dates = cotData.filter(c => c.date && !c.date.endsWith("*")).map(c => c.date);
                   const latestDate = dates.length > 0 ? dates.sort().reverse()[0] : null;
                   return latestDate ? (
-                    <div style={{ fontSize: 9, color: C.accent, fontFamily: "'Orbitron',sans-serif", marginBottom: 12 }}>
+                    <div style={{ fontSize: 11, color: C.accent, fontFamily: "'Space Grotesk', sans-serif", marginBottom: 12 }}>
                       {`📅 Report: ${latestDate}`}
                     </div>
                   ) : null;
@@ -1230,13 +1226,13 @@ export default function Dashboard() {
                         return (
                           <div key={c.currency} style={{ padding: "6px 8px", background: `${col}08`, border: `1px solid ${col}33`, borderRadius: 5 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                              <span style={{ fontSize: 10, fontWeight: 900, color: col }}>{c.currency}</span>
-                              <span style={{ fontSize: 7, color: col }}>{c.sentiment}</span>
+                              <span style={{ fontSize: 12, fontWeight: 900, color: col }}>{c.currency}</span>
+                              <span style={{ fontSize: 9, color: col }}>{c.sentiment}</span>
                             </div>
                             <div style={{ marginBottom: 3 }}>
                               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <span style={{ fontSize: 7, color: C.green }}>L</span>
-                                <span style={{ fontSize: 7, color: C.green }}>{((c.long || 0) / 1000).toFixed(0)}K</span>
+                                <span style={{ fontSize: 9, color: C.green }}>L</span>
+                                <span style={{ fontSize: 9, color: C.green }}>{((c.long || 0) / 1000).toFixed(0)}K</span>
                               </div>
                               <div style={{ width: "100%", height: 4, background: C.border, borderRadius: 3 }}>
                                 <div style={{ width: `${longPct}%`, height: "100%", background: C.green, borderRadius: 3 }} />
@@ -1244,14 +1240,14 @@ export default function Dashboard() {
                             </div>
                             <div style={{ marginBottom: 4 }}>
                               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <span style={{ fontSize: 7, color: C.red }}>S</span>
-                                <span style={{ fontSize: 7, color: C.red }}>{((c.short || 0) / 1000).toFixed(0)}K</span>
+                                <span style={{ fontSize: 9, color: C.red }}>S</span>
+                                <span style={{ fontSize: 9, color: C.red }}>{((c.short || 0) / 1000).toFixed(0)}K</span>
                               </div>
                               <div style={{ width: "100%", height: 4, background: C.border, borderRadius: 3 }}>
                                 <div style={{ width: `${shortPct}%`, height: "100%", background: C.red, borderRadius: 3 }} />
                               </div>
                             </div>
-                            <div style={{ fontSize: 8, fontWeight: 700, color: col, textAlign: "center", borderTop: `1px solid ${C.border}`, paddingTop: 3 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: col, textAlign: "center", borderTop: `1px solid ${C.border}`, paddingTop: 3 }}>
                               {c.net > 0 ? "+" : ""}{(c.net || 0).toLocaleString()}
                             </div>
                           </div>
@@ -1265,38 +1261,38 @@ export default function Dashboard() {
 
             {centerTab === "corr" && (
               <div>
-                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 12 }}>
+                <div style={{ fontSize: 11, color: C.textDim, marginBottom: 12 }}>
                   {t("corrDesc")}
                 </div>
 
 
                 {/* MĚNY */}
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: C.accent, letterSpacing: 2, marginBottom: 8 }}>
                     {L("KORELACE MĚN", "CURRENCY CORRELATION", "CORRELACIÓN DE DIVISAS")}
                     {currencyCorr && currencyCorr.date && (
-                      <span style={{ fontSize: 8, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 400, color: C.muted, marginLeft: 8 }}>
                         {currencyCorr.days}D · {L("k", "as of", "al")} {currencyCorr.date}
                       </span>
                     )}
                   </div>
                   {!currencyCorr || !currencyCorr.currencies?.length ? (
-                    <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
+                    <div style={{ fontSize: 11, color: C.muted, padding: "20px 0", textAlign: "center" }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
                   ) : (
                     <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
                         <thead>
                           <tr>
                             <td style={{ padding: "4px 6px", color: C.muted }}></td>
                             {currencyCorr.currencies.map(c => (
-                              <td key={c} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 9, fontWeight: 700 }}>{c}</td>
+                              <td key={c} style={{ padding: "4px 6px", color: C.textDim, textAlign: "center", fontSize: 11, fontWeight: 700 }}>{c}</td>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
                           {currencyCorr.currencies.map((cur, i) => (
                             <tr key={cur}>
-                              <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 9, fontWeight: 700 }}>{cur}</td>
+                              <td style={{ padding: "4px 6px", color: C.textDim, fontSize: 11, fontWeight: 700 }}>{cur}</td>
                               {currencyCorr.matrix[i].map((val, j) => (
                                 <td key={j} style={{
                                   padding: "4px 6px", textAlign: "center",
@@ -1317,20 +1313,20 @@ export default function Dashboard() {
             {centerTab === "seasonal" && (
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                  <span style={{ fontSize: 9, color: C.textDim }}>{L("Průměrný měsíční výnos za posledních", "Average monthly return last", "Rendimiento mensual promedio últimos")}</span>
+                  <span style={{ fontSize: 11, color: C.textDim }}>{L("Průměrný měsíční výnos za posledních", "Average monthly return last", "Rendimiento mensual promedio últimos")}</span>
                   {[1, 3, 5, 10].map(y => (
                     <button key={y} onClick={() => setSeasonalYears(y)} style={{
-                      fontSize: 9, padding: "2px 8px", borderRadius: 4, cursor: "pointer",
+                      fontSize: 11, padding: "2px 8px", borderRadius: 7, cursor: "pointer",
                       fontWeight: seasonalYears === y ? 700 : 400,
                       background: seasonalYears === y ? C.accent : C.border,
                       color: seasonalYears === y ? "#000" : C.textDim,
                       border: `1px solid ${seasonalYears === y ? C.accent : C.border}`
                     }}>{y}R</button>
                   ))}
-                  <span style={{ fontSize: 9, color: C.textDim }}>(%, live z yfinance)</span>
+                  <span style={{ fontSize: 11, color: C.textDim }}>(%, live z yfinance)</span>
                 </div>
                 {seasonalLive.length === 0 ? (
-                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t("seasNoData")}</div>
+                  <div style={{ fontSize: 11, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t("seasNoData")}</div>
                 ) : (() => {
                   const currencies = ["USD", "EUR", "GBP", "AUD", "NZD", "JPY", "CHF", "CAD"];
                   const curColors = { USD: "#0077cc", EUR: "#4a9eff", GBP: "#9b59b6", AUD: "#e67e22", NZD: "#1abc9c", JPY: "#e74c3c", CHF: "#95a5a6", CAD: "#f39c12" };
@@ -1341,13 +1337,13 @@ export default function Dashboard() {
                         {currencies.map(cur => (
                           <div key={cur} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                             <div style={{ width: 8, height: 8, borderRadius: 2, background: curColors[cur] }} />
-                            <span style={{ fontSize: 8, color: C.textDim }}>{cur}</span>
+                            <span style={{ fontSize: 10, color: C.textDim }}>{cur}</span>
                           </div>
                         ))}
-                        <span style={{ fontSize: 8, color: C.muted, marginLeft: 6 }}>🟢 bullish · 🔴 bearish</span>
+                        <span style={{ fontSize: 10, color: C.muted, marginLeft: 6 }}>🟢 bullish · 🔴 bearish</span>
                       </div>
                       {/* Heatmap grid */}
-                      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 2, fontSize: 8 }}>
+                      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 2, fontSize: 10 }}>
                         <thead>
                           <tr>
                             <td style={{ width: 28, color: C.muted, paddingBottom: 4 }}></td>
@@ -1359,7 +1355,7 @@ export default function Dashboard() {
                         <tbody>
                           {currencies.map(cur => (
                             <tr key={cur}>
-                              <td style={{ color: curColors[cur], fontWeight: 700, paddingRight: 6, fontSize: 9 }}>{cur}</td>
+                              <td style={{ color: curColors[cur], fontWeight: 700, paddingRight: 6, fontSize: 11 }}>{cur}</td>
                               {seasonalLive.map(m => {
                                 const val = m[cur];
                                 if (val === undefined) return <td key={m.month} style={{ textAlign: "center", color: C.muted }}>—</td>;
@@ -1381,7 +1377,7 @@ export default function Dashboard() {
                           ))}
                         </tbody>
                       </table>
-                      <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>
+                      <div style={{ fontSize: 10, color: C.muted, marginTop: 8 }}>
                         {L(
                           `* hodnoty v %, průměr ${seasonalYears} ${seasonalYears === 1 ? "rok" : seasonalYears < 5 ? "roky" : "let"} · zdroj: yfinance`,
                           `* values in %, average ${seasonalYears} ${seasonalYears === 1 ? "year" : "years"} · source: yfinance`,
@@ -1397,17 +1393,17 @@ export default function Dashboard() {
               <div>
                 <SectionLabel>{t("histTitle")}</SectionLabel>
                 {historyData.length === 0 ? (
-                  <div style={{ fontSize: 9, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t("histNoData")}</div>
+                  <div style={{ fontSize: 11, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t("histNoData")}</div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {historyData.map((h, i) => {
                       const col = h.score > 15 ? C.green : h.score < -15 ? C.red : C.yellow;
                       return (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: `${col}08`, border: `1px solid ${C.border}`, borderRadius: 6 }}>
-                          <span style={{ fontSize: 10, color: C.textDim, width: 36 }}>{h.date}</span>
-                          <span style={{ fontSize: 11, fontWeight: 900, color: col, width: 36 }}>{h.score > 0 ? "+" : ""}{h.score}</span>
-                          <span style={{ fontSize: 8, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3, width: 58, textAlign: "center" }}>{h.label}</span>
-                          <span style={{ fontSize: 9, color: C.muted, flex: 1 }}>{h.count} {L("scénářů", "scenarios", "escenarios")}</span>
+                          <span style={{ fontSize: 12, color: C.textDim, width: 36 }}>{h.date}</span>
+                          <span style={{ fontSize: 13, fontWeight: 900, color: col, width: 36 }}>{h.score > 0 ? "+" : ""}{h.score}</span>
+                          <span style={{ fontSize: 10, color: col, border: `1px solid ${col}44`, padding: "1px 5px", borderRadius: 3, width: 58, textAlign: "center" }}>{h.label}</span>
+                          <span style={{ fontSize: 11, color: C.muted, flex: 1 }}>{h.count} {L("scénářů", "scenarios", "escenarios")}</span>
                         </div>
                       );
                     })}
@@ -1422,8 +1418,8 @@ export default function Dashboard() {
                 if (!data) return (
                   <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
-                    <div style={{ fontSize: 10, color: C.textDim, marginBottom: 12 }}>{label}</div>
-                    <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
+                    <div style={{ fontSize: 12, color: C.textDim, marginBottom: 12 }}>{label}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>
                   </div>
                 );
                 const col = fgColor(data.value);
@@ -1437,17 +1433,17 @@ export default function Dashboard() {
                 return (
                   <div style={{ background: C.bg, border: `1px solid ${col}44`, borderRadius: 10, padding: "14px 10px", textAlign: "center", height: 170, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
-                    <div style={{ fontSize: 9, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
+                    <div style={{ fontSize: 11, letterSpacing: 2, color: C.textDim, marginBottom: 8 }}>{label}</div>
                     <svg width="120" height="72" viewBox="0 0 140 82" style={{ overflow: "visible" }}>
                       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
                         fill="none" stroke={C.border} strokeWidth={sw} strokeLinecap="round" />
                       {pct > 0 && <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${ex.toFixed(2)} ${ey.toFixed(2)}`}
                         fill="none" stroke={col} strokeWidth={sw} strokeLinecap="round" />}
                       <text x={cx} y={cy - 6} textAnchor="middle" fill={col} fontSize="22" fontWeight="900" fontFamily="monospace">{pct}</text>
-                      <text x={cx - r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">0</text>
-                      <text x={cx + r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="7">100</text>
+                      <text x={cx - r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="9">0</text>
+                      <text x={cx + r} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize="9">100</text>
                     </svg>
-                    <div style={{ fontSize: 12, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: col, marginTop: -4 }}>{data.label}</div>
                   </div>
                 );
               };
@@ -1463,7 +1459,7 @@ export default function Dashboard() {
                         <FGGauge label={fg.label} icon={fg.icon} data={fg.data} />
                         {fgHistory.length > 1 && (
                           <div style={{ marginTop: 6, padding: "6px 8px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6 }}>
-                            <div style={{ fontSize: 7, color: C.muted, marginBottom: 4, textAlign: "center" }}>{L("HISTORIE", "HISTORY", "HISTORIAL")}</div>
+                            <div style={{ fontSize: 9, color: C.muted, marginBottom: 4, textAlign: "center" }}>{L("HISTORIE", "HISTORY", "HISTORIAL")}</div>
                             <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 28 }}>
                               {[...fgHistory].reverse().map((h, i) => {
                                 const val = h[fg.histKey];
@@ -1478,8 +1474,8 @@ export default function Dashboard() {
                               })}
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                              <span style={{ fontSize: 6, color: C.muted }}>{fgHistory[fgHistory.length - 1]?.date?.slice(5)}</span>
-                              <span style={{ fontSize: 6, color: C.muted }}>{fgHistory[0]?.date?.slice(5)}</span>
+                              <span style={{ fontSize: 8, color: C.muted }}>{fgHistory[fgHistory.length - 1]?.date?.slice(5)}</span>
+                              <span style={{ fontSize: 8, color: C.muted }}>{fgHistory[0]?.date?.slice(5)}</span>
                             </div>
                           </div>
                         )}
@@ -1491,11 +1487,11 @@ export default function Dashboard() {
                       {[["0–20","Extreme Fear",C.red],["21–40","Fear",C.orange],["41–60","Neutral",C.yellow],["61–80","Greed","#7ec850"],["81–100","Extreme Greed",C.green]].map(([range, lbl, col]) => (
                         <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 5 }}>
                           <div style={{ width: 8, height: 8, borderRadius: 2, background: col }} />
-                          <span style={{ fontSize: 8, color: C.textDim }}>{range} {lbl}</span>
+                          <span style={{ fontSize: 10, color: C.textDim }}>{range} {lbl}</span>
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontSize: 8, color: C.muted, marginTop: 8 }}>
+                    <div style={{ fontSize: 10, color: C.muted, marginTop: 8 }}>
                       {L("Forex = náš AI sentiment + VIX · Akcie = VIX + S&P momentum · Krypto = alternative.me · cache 15 min", "Forex = our AI sentiment + VIX · Stocks = VIX + S&P momentum · Crypto = alternative.me · cache 15 min", "Forex = nuestro AI sentiment + VIX · Acciones = VIX + S&P momentum · Cripto = alternative.me · cache 15 min")}
                     </div>
                   </div>
@@ -1506,10 +1502,10 @@ export default function Dashboard() {
             {centerTab === "backtest" && (
               <div>
                 {!backtestData || backtestData.total === 0 ? (
-                  <div style={{ fontSize: 9, color: C.muted, padding: "30px 0", textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: C.muted, padding: "30px 0", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 8 }}>⏳</div>
                     {L("Data se hromadí – backtest potřebuje min. 24h na první výsledky.", "Data is accumulating – backtest needs min. 24h for first results.", "Los datos se acumulan – el backtest necesita mín. 24h para los primeros resultados.")}<br/>
-                    <span style={{ fontSize: 8 }}>{L("Každou hodinu se ukládají vstupní ceny, po 24h se vyhodnocuje přesnost.", "Entry prices are saved every hour, accuracy is evaluated after 24h.", "Los precios de entrada se guardan cada hora, la precisión se evalúa después de 24h.")}</span>
+                    <span style={{ fontSize: 10 }}>{L("Každou hodinu se ukládají vstupní ceny, po 24h se vyhodnocuje přesnost.", "Entry prices are saved every hour, accuracy is evaluated after 24h.", "Los precios de entrada se guardan cada hora, la precisión se evalúa después de 24h.")}</span>
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1521,7 +1517,7 @@ export default function Dashboard() {
                         { label: L("VYHODNOCENO", "EVALUATED", "EVALUADO"), value: `${backtestData.total} ${L("predikcí", "predictions", "predicciones")}`, color: C.textDim },
                       ].map(s => (
                         <div key={s.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 12px", textAlign: "center" }}>
-                          <div style={{ fontSize: 8, color: C.textDim, letterSpacing: 2, marginBottom: 4 }}>{s.label}</div>
+                          <div style={{ fontSize: 10, color: C.textDim, letterSpacing: 2, marginBottom: 4 }}>{s.label}</div>
                           <div style={{ fontSize: 16, fontWeight: 900, color: s.color }}>{s.value}</div>
                         </div>
                       ))}
@@ -1536,9 +1532,9 @@ export default function Dashboard() {
                             const col = acc >= 55 ? C.green : acc >= 45 ? C.yellow : C.red;
                             return (
                               <div key={c.currency} style={{ background: `${col}0a`, border: `1px solid ${col}33`, borderRadius: 6, padding: "8px", textAlign: "center" }}>
-                                <div style={{ fontSize: 11, fontWeight: 900, color: col }}>{c.currency}</div>
+                                <div style={{ fontSize: 13, fontWeight: 900, color: col }}>{c.currency}</div>
                                 <div style={{ fontSize: 14, fontWeight: 900, color: col }}>{acc}%</div>
-                                <div style={{ fontSize: 8, color: C.muted }}>{c.correct}/{c.total} · ø{c.avg_move}%</div>
+                                <div style={{ fontSize: 10, color: C.muted }}>{c.correct}/{c.total} · ø{c.avg_move}%</div>
                               </div>
                             );
                           })}
@@ -1562,14 +1558,14 @@ export default function Dashboard() {
                             const resEmoji = r.correct === 1 ? "✅" : "❌";
                             return (
                               <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", background: `${resCol}06`, border: `1px solid ${C.border}`, borderRadius: 5 }}>
-                                <span style={{ fontSize: 11 }}>{resEmoji}</span>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: C.text, width: 28 }}>{r.currency}</span>
-                                <span style={{ fontSize: 9, color: aiCol, width: 32 }}>AI {r.ai_score > 0 ? "+" : ""}{r.ai_score}</span>
-                                <span style={{ fontSize: 9, color: r.actual_pct > 0 ? C.green : C.red, width: 44 }}>
+                                <span style={{ fontSize: 13 }}>{resEmoji}</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: C.text, width: 28 }}>{r.currency}</span>
+                                <span style={{ fontSize: 11, color: aiCol, width: 32 }}>AI {r.ai_score > 0 ? "+" : ""}{r.ai_score}</span>
+                                <span style={{ fontSize: 11, color: r.actual_pct > 0 ? C.green : C.red, width: 44 }}>
                                   trh {r.actual_pct > 0 ? "+" : ""}{r.actual_pct?.toFixed(2)}%
                                 </span>
-                                <span style={{ fontSize: 8, color: C.muted, flex: 1 }} title={r.title}>{r.title?.slice(0, 45)}{r.title?.length > 45 ? "…" : ""}</span>
-                                <span style={{ fontSize: 8, color: C.textDim, flexShrink: 0 }}>{r.weight}</span>
+                                <span style={{ fontSize: 10, color: C.muted, flex: 1 }} title={r.title}>{r.title?.slice(0, 45)}{r.title?.length > 45 ? "…" : ""}</span>
+                                <span style={{ fontSize: 10, color: C.textDim, flexShrink: 0 }}>{r.weight}</span>
                               </div>
                             );
                           })}
@@ -1578,7 +1574,7 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
                             {Array.from({ length: totalBtPages }, (_, i) => i + 1).map(p => (
                               <button key={p} onClick={() => setBtPage(p)} style={{
-                                fontSize: 9, width: 26, height: 26, borderRadius: 4, cursor: "pointer", fontWeight: p === safeBtPage ? 700 : 400,
+                                fontSize: 11, width: 26, height: 26, borderRadius: 7, cursor: "pointer", fontWeight: p === safeBtPage ? 700 : 400,
                                 background: p === safeBtPage ? C.accent : C.border,
                                 color: p === safeBtPage ? "#000" : C.textDim,
                                 border: `1px solid ${p === safeBtPage ? C.accent : C.border}`
@@ -1597,24 +1593,24 @@ export default function Dashboard() {
             {centerTab === "education" && (() => {
               const Section = ({ emoji, title, children, highlight }) => (
                 <div style={{ marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid ${C.border}`, ...(highlight ? { background: `${C.accent}08`, borderRadius: 10, padding: 14, border: `1px solid ${C.accent}33` } : {}) }}>
-                  <div style={{ fontSize: 11, fontWeight: 900, color: highlight ? C.accent : C.text, letterSpacing: 2, marginBottom: 10, fontFamily: "'Space Grotesk', sans-serif" }}>{emoji} {title}</div>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: highlight ? C.accent : C.text, letterSpacing: 2, marginBottom: 10, fontFamily: "'Space Grotesk', sans-serif" }}>{emoji} {title}</div>
                   {children}
                 </div>
               );
-              const P = ({ children }) => <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.7, marginBottom: 8 }}>{children}</div>;
+              const P = ({ children }) => <div style={{ fontSize: 11, color: C.textDim, lineHeight: 1.7, marginBottom: 8 }}>{children}</div>;
               const Sub = ({ title, children }) => (
                 <div style={{ marginBottom: 10 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: C.text, marginBottom: 4 }}>{title}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.text, marginBottom: 4 }}>{title}</div>
                   {children}
                 </div>
               );
               return (
-                <div style={{ fontSize: 9, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 11, lineHeight: 1.6 }}>
 
                   <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
                     {[{ key: "tech", cz: "📐 TECHNICKÁ ANALÝZA", en: "📐 TECHNICAL ANALYSIS" }, { key: "fund", cz: "🏦 FUNDAMENTÁLNÍ ANALÝZA", en: "🏦 FUNDAMENTAL ANALYSIS" }].map(t2 => (
                       <button key={t2.key} onClick={() => setEduTab(t2.key)} style={{
-                        flex: 1, padding: "8px 12px", fontSize: 10, fontWeight: eduTab === t2.key ? 700 : 500,
+                        flex: 1, padding: "8px 12px", fontSize: 12, fontWeight: eduTab === t2.key ? 700 : 500,
                         fontFamily: "'Space Grotesk', sans-serif", letterSpacing: 0.5,
                         background: eduTab === t2.key ? `${C.accent}18` : C.bg,
                         border: `1px solid ${eduTab === t2.key ? C.accent : C.border}`,
@@ -1792,7 +1788,7 @@ export default function Dashboard() {
 
                   </>}
 
-                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 4 }}>
+                  <div style={{ fontSize: 10, color: C.muted, textAlign: "center", paddingTop: 4 }}>
                     {lang === "cz" ? "Toto je vzdělávací obsah · není to investiční doporučení · vždy obchoduj na demo účtu než přejdeš na real" : "This is educational content · not investment advice · always trade on demo account before going live"}
                   </div>
 
@@ -1807,8 +1803,8 @@ export default function Dashboard() {
                   <div style={{ marginBottom: 6, border: `1px solid ${isOpen ? C.accent + "44" : C.border}`, borderRadius: 8, overflow: "hidden" }}>
                     <div onClick={() => setOpenGuide(isOpen ? null : id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isOpen ? `${C.accent}0a` : "transparent" }}>
                       <span style={{ fontSize: 18 }}>{emoji}</span>
-                      <span style={{ fontSize: 11, fontWeight: 900, color: isOpen ? C.accent : C.text, letterSpacing: 2, flex: 1 }}>{title}</span>
-                      <span style={{ fontSize: 12, color: C.muted, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
+                      <span style={{ fontSize: 13, fontWeight: 900, color: isOpen ? C.accent : C.text, letterSpacing: 2, flex: 1 }}>{title}</span>
+                      <span style={{ fontSize: 14, color: C.muted, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
                     </div>
                     {isOpen && <div style={{ padding: "0 14px 14px" }}>{children}</div>}
                   </div>
@@ -1816,12 +1812,12 @@ export default function Dashboard() {
               };
               const Row = ({ label, desc }) => (
                 <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: C.text, minWidth: 110, flexShrink: 0 }}>{label}</span>
-                  <span style={{ fontSize: 9, color: C.textDim, lineHeight: 1.5 }}>{desc}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: C.text, minWidth: 110, flexShrink: 0 }}>{label}</span>
+                  <span style={{ fontSize: 11, color: C.textDim, lineHeight: 1.5 }}>{desc}</span>
                 </div>
               );
               return (
-                <div style={{ fontSize: 9, lineHeight: 1.6, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 6 }}>
+                <div style={{ fontSize: 11, lineHeight: 1.6, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 6 }}>
 
                   <AccSection id="risk" emoji="🌡️" title="RISK SENTIMENT">
                     <Row label={lang === "cz" ? "Co to je" : "What it is"} desc={lang === "cz" ? "Celkové nálada trhu vůči riziku. Vypočítává se jako vážený průměr AI skóre zpráv + VIX index." : "Overall market risk mood. Calculated as weighted average of AI news scores + VIX index."} />
@@ -1886,7 +1882,7 @@ export default function Dashboard() {
                     <Row label={lang === "cz" ? "Risk ON/OFF" : "Risk ON/OFF"} desc={lang === "cz" ? "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP." : "Risk ON: AUD, NZD, CAD. Risk OFF: USD, JPY, CHF. Neutral: EUR, GBP."} />
                   </AccSection>
 
-                  <div style={{ fontSize: 8, color: C.muted, textAlign: "center", paddingTop: 8, gridColumn: isMobile ? "1" : "1 / -1" }}>
+                  <div style={{ fontSize: 10, color: C.muted, textAlign: "center", paddingTop: 8, gridColumn: isMobile ? "1" : "1 / -1" }}>
                     {lang === "cz" ? "Data se aktualizují automaticky · COT každý pátek · Sezónnost každých 24h" : "Data updates automatically · COT every Friday · Seasonality every 24h"}
                   </div>
 
@@ -1900,7 +1896,7 @@ export default function Dashboard() {
           {/* TOP SETUPS strip */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "8px 12px", flexShrink: 0, ...(isMobile ? { order: 1 } : {}) }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, flexShrink: 0 }}>{t("topSetups")}</span>
+              <span style={{ fontSize: 10, letterSpacing: 2, color: C.textDim, flexShrink: 0 }}>{t("topSetups")}</span>
               {topSetups.map(p => {
                 const col = p.biasDir === "long" ? C.green : p.biasDir === "short" ? C.red : C.yellow;
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
@@ -1909,14 +1905,14 @@ export default function Dashboard() {
                 const isDark = C.dark;
                 return (
                   <div key={p.pair} onClick={() => { setRightTab("pairs"); setSelectedPair({ pair: p.pair, base: p.base, quote: p.quote }); }}
-                    style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 4, cursor: "pointer",
+                    style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 7, cursor: "pointer",
                       background: isPerfect ? "rgba(24, 100, 220, 0.2)" : `${col}0f`,
                       border: isPerfect ? `1.5px solid ${PERFECT_BLUE}` : `1px solid ${col}44`,
                       animation: isPerfect ? "pulse 2s infinite" : "none" }}>
-                    {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
-                    <span style={{ fontSize: 10, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text }}>{p.pair}</span>
-                    <span style={{ fontSize: 9, color: col }}>{arrow}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col }}>{p.biasCount}/5</span>
+                    {isPerfect && <span style={{ fontSize: 11 }}>⚡</span>}
+                    <span style={{ fontSize: 12, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text }}>{p.pair}</span>
+                    <span style={{ fontSize: 11, color: col }}>{arrow}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col }}>{p.biasCount}/5</span>
                   </div>
                 );
               })}
@@ -1925,7 +1921,7 @@ export default function Dashboard() {
 
           {/* BOTTOM tabs */}
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, overflow: "hidden" }}>
-            <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 4, padding: "8px 10px", borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabPairs")} active={rightTab === "pairs"} onClick={() => setRightTab("pairs")} />
               <TabBtn label={t("tabCurrencies")} active={rightTab === "currencies"} onClick={() => setRightTab("currencies")} />
               <TabBtn label={t("tabCbRates")} active={rightTab === "cb"} onClick={() => setRightTab("cb")} />
@@ -1942,9 +1938,9 @@ export default function Dashboard() {
                     <SectionLabel>{t("currBias")}</SectionLabel>
                     {[...CURRENCIES].sort((a, b) => currencyTotals[b] - currencyTotals[a]).map(curr => (
                       <div key={curr} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                        <span style={{ width: 28, fontSize: 10, color: C.textDim }}>{curr}</span>
+                        <span style={{ width: 28, fontSize: 12, color: C.textDim }}>{curr}</span>
                         <div style={{ flex: 1 }}><ScoreBar score={currencyTotals[curr]} height={5} /></div>
-                        <span style={{ width: 36, textAlign: "right", fontSize: 10, color: currencyTotals[curr] > NEUTRAL_THRESHOLD ? C.green : currencyTotals[curr] < -NEUTRAL_THRESHOLD ? C.red : C.yellow }}>
+                        <span style={{ width: 36, textAlign: "right", fontSize: 12, color: currencyTotals[curr] > NEUTRAL_THRESHOLD ? C.green : currencyTotals[curr] < -NEUTRAL_THRESHOLD ? C.red : C.yellow }}>
                           {currencyTotals[curr] > 0 ? "+" : ""}{currencyTotals[curr]}
                         </span>
                       </div>
@@ -1958,10 +1954,10 @@ export default function Dashboard() {
                       { label: "🔴 Bearish", currencies: CURRENCIES.filter(c => currencyTotals[c] < -NEUTRAL_THRESHOLD), color: C.red },
                     ].map(group => (
                       <div key={group.label} style={{ marginBottom: 10 }}>
-                        <div style={{ fontSize: 9, color: group.color, marginBottom: 5 }}>{group.label}</div>
+                        <div style={{ fontSize: 11, color: group.color, marginBottom: 5 }}>{group.label}</div>
                         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                           {group.currencies.map(c => (
-                            <span key={c} style={{ fontSize: 9, color: group.color, border: `1px solid ${group.color}55`, background: `${group.color}12`, padding: "2px 6px", borderRadius: 3 }}>{c}</span>
+                            <span key={c} style={{ fontSize: 11, color: group.color, border: `1px solid ${group.color}55`, background: `${group.color}12`, padding: "2px 6px", borderRadius: 3 }}>{c}</span>
                           ))}
                         </div>
                       </div>
@@ -2065,25 +2061,25 @@ export default function Dashboard() {
 
                   return (
                     <div>
-                      <button onClick={() => setSelectedPair(null)} style={{ background: "none", border: `1px solid ${C.border}`, color: C.textDim, padding: "3px 10px", borderRadius: 4, cursor: "pointer", fontSize: 9, marginBottom: 10 }}>← {lang === "cz" ? "Zpět" : "Back"}</button>
+                      <button onClick={() => setSelectedPair(null)} style={{ background: "none", border: `1px solid ${C.border}`, color: C.textDim, padding: "3px 10px", borderRadius: 7, cursor: "pointer", fontSize: 11, marginBottom: 10 }}>← {lang === "cz" ? "Zpět" : "Back"}</button>
 
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
                         <div>
                           <div style={{ fontSize: 16, fontWeight: 900, color: C.text, letterSpacing: 1 }}>{pair}</div>
-                          <div style={{ fontSize: 8, color: C.muted }}>{base} {lang === "cz" ? "základní" : "base"} · {quote} {lang === "cz" ? "kótovací" : "quote"}</div>
+                          <div style={{ fontSize: 10, color: C.muted }}>{base} {lang === "cz" ? "základní" : "base"} · {quote} {lang === "cz" ? "kótovací" : "quote"}</div>
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 26, fontWeight: 900, color: pairCol, lineHeight: 1 }}>{pairScore > 0 ? "+" : ""}{pairScore}</div>
-                          <div style={{ fontSize: 9, color: pairCol, fontWeight: 700 }}>{pairBias}</div>
+                          <div style={{ fontSize: 11, color: pairCol, fontWeight: 700 }}>{pairBias}</div>
                         </div>
                       </div>
 
                       <div style={{ background: `${confluenceCol}12`, border: `1px solid ${confluenceCol}40`, borderRadius: 6, padding: "7px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div>
-                          <div style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{lang === "cz" ? "SHODA FAKTORŮ (Confluence)" : "FACTOR CONFLUENCE"}</div>
-                          <div style={{ fontSize: 8, color: C.muted }}>{lang === "cz" ? "Kolik faktorů podporuje aktuální bias" : "How many factors support current bias"}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{lang === "cz" ? "SHODA FAKTORŮ (Confluence)" : "FACTOR CONFLUENCE"}</div>
+                          <div style={{ fontSize: 10, color: C.muted }}>{lang === "cz" ? "Kolik faktorů podporuje aktuální bias" : "How many factors support current bias"}</div>
                         </div>
-                        <div style={{ fontSize: 24, fontWeight: 900, color: confluenceCol }}>{biasCount}<span style={{ fontSize: 12, color: C.muted }}>/{factors.length}</span></div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: confluenceCol }}>{biasCount}<span style={{ fontSize: 14, color: C.muted }}>/{factors.length}</span></div>
                       </div>
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -2093,24 +2089,24 @@ export default function Dashboard() {
                           return (
                             <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 52px 1fr", gap: 4, alignItems: "center", padding: "6px 8px", background: `${alCol}08`, border: `1px solid ${alCol}22`, borderRadius: 5 }}>
                               <div>
-                                <div style={{ fontSize: 7, color: C.muted, marginBottom: 2 }}>{f.label}</div>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{f.baseVal}</div>
-                                <div style={{ fontSize: 7, color: C.textDim }}>{base}</div>
+                                <div style={{ fontSize: 9, color: C.muted, marginBottom: 2 }}>{f.label}</div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{f.baseVal}</div>
+                                <div style={{ fontSize: 9, color: C.textDim }}>{base}</div>
                               </div>
                               <div style={{ textAlign: "center" }}>
-                                <div style={{ fontSize: 13, color: alCol, fontWeight: 900 }}>{icon}</div>
-                                <div style={{ fontSize: 6, color: alCol, lineHeight: 1.2 }}>{f.favors ? `→ ${f.favors}` : (lang === "cz" ? "neutr." : "neutr.")}</div>
+                                <div style={{ fontSize: 15, color: alCol, fontWeight: 900 }}>{icon}</div>
+                                <div style={{ fontSize: 8, color: alCol, lineHeight: 1.2 }}>{f.favors ? `→ ${f.favors}` : (lang === "cz" ? "neutr." : "neutr.")}</div>
                               </div>
                               <div style={{ textAlign: "right" }}>
-                                <div style={{ fontSize: 7, color: C.muted, marginBottom: 2 }}>&nbsp;</div>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: C.text }}>{f.quoteVal}</div>
-                                <div style={{ fontSize: 7, color: C.textDim }}>{quote}</div>
+                                <div style={{ fontSize: 9, color: C.muted, marginBottom: 2 }}>&nbsp;</div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{f.quoteVal}</div>
+                                <div style={{ fontSize: 9, color: C.textDim }}>{quote}</div>
                               </div>
                             </div>
                           );
                         })}
                       </div>
-                      <div style={{ fontSize: 7, color: C.muted, marginTop: 7 }}>{lang === "cz" ? "✓ podporuje nákup · ✗ podporuje prodej · — neutrální" : "✓ supports buy · ✗ supports sell · — neutral"}</div>
+                      <div style={{ fontSize: 9, color: C.muted, marginTop: 7 }}>{lang === "cz" ? "✓ podporuje nákup · ✗ podporuje prodej · — neutrální" : "✓ supports buy · ✗ supports sell · — neutral"}</div>
 
                       {/* HISTORICKÝ SCORE (mini chart) */}
                       {(() => {
@@ -2131,7 +2127,7 @@ export default function Dashboard() {
                         const maxAbs = Math.max(1, ...points.map(p => Math.abs(p.score)));
                         return (
                           <div style={{ marginTop: 10, padding: "8px 10px", background: C.bg, borderRadius: 6, border: `1px solid ${C.border}` }}>
-                            <div style={{ fontSize: 8, color: C.textDim, marginBottom: 6 }}>{lang === "cz" ? `HISTORICKÉ SKÓRE — posledních ${points.length} dní` : `HISTORICAL SCORE — last ${points.length} days`}</div>
+                            <div style={{ fontSize: 10, color: C.textDim, marginBottom: 6 }}>{lang === "cz" ? `HISTORICKÉ SKÓRE — posledních ${points.length} dní` : `HISTORICAL SCORE — last ${points.length} days`}</div>
                             <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 36 }}>
                               {points.map((p, i) => {
                                 const h = Math.max(3, (Math.abs(p.score) / maxAbs) * 34);
@@ -2144,8 +2140,8 @@ export default function Dashboard() {
                               })}
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
-                              <span style={{ fontSize: 6, color: C.muted }}>{points[0]?.d?.slice(5)}</span>
-                              <span style={{ fontSize: 6, color: C.muted }}>{points[points.length - 1]?.d?.slice(5)}</span>
+                              <span style={{ fontSize: 8, color: C.muted }}>{points[0]?.d?.slice(5)}</span>
+                              <span style={{ fontSize: 8, color: C.muted }}>{points[points.length - 1]?.d?.slice(5)}</span>
                             </div>
                           </div>
                         );
@@ -2161,10 +2157,10 @@ export default function Dashboard() {
                         return (
                           <div style={{ marginTop: 10 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                              <span style={{ fontSize: 8, letterSpacing: 2, color: C.textDim }}>{lang === "cz" ? "ZPRÁVY" : "NEWS"}</span>
+                              <span style={{ fontSize: 10, letterSpacing: 2, color: C.textDim }}>{lang === "cz" ? "ZPRÁVY" : "NEWS"}</span>
                               {["HIGH", "MED"].map(f => (
                                 <button key={f} onClick={() => setPairNewsFilter(f)} style={{
-                                  fontSize: 8, padding: "2px 8px", borderRadius: 4, cursor: "pointer", fontWeight: pairNewsFilter === f ? 700 : 400,
+                                  fontSize: 10, padding: "2px 8px", borderRadius: 7, cursor: "pointer", fontWeight: pairNewsFilter === f ? 700 : 400,
                                   background: pairNewsFilter === f ? C.accent : C.border,
                                   color: pairNewsFilter === f ? "#000" : C.textDim,
                                   border: `1px solid ${pairNewsFilter === f ? C.accent : C.border}`
@@ -2172,7 +2168,7 @@ export default function Dashboard() {
                               ))}
                             </div>
                             {relevant.length === 0 ? (
-                              <div style={{ fontSize: 8, color: C.muted, padding: "8px 0" }}>{lang === "cz" ? `Žádné ${pairNewsFilter} zprávy pro tento pár.` : `No ${pairNewsFilter} news for this pair.`}</div>
+                              <div style={{ fontSize: 10, color: C.muted, padding: "8px 0" }}>{lang === "cz" ? `Žádné ${pairNewsFilter} zprávy pro tento pár.` : `No ${pairNewsFilter} news for this pair.`}</div>
                             ) : (
                             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                               {relevant.map(s => {
@@ -2183,15 +2179,15 @@ export default function Dashboard() {
                                 const col = net > 5 ? C.green : net < -5 ? C.red : C.yellow;
                                 const dateStr = s.created_at ? new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : null;
                                 return (
-                                  <div key={s.id} onClick={() => { setCenterTab("scenarios"); setExpandedScenario(s.id); setScenarioFilter(s.weight === "HIGH" ? "HIGH" : "MED"); }} style={{ padding: "5px 8px", background: `${col}08`, border: `1px solid ${col}22`, borderLeft: `2px solid ${col}`, borderRadius: 4, cursor: "pointer" }}>
-                                    <div style={{ fontSize: 8, color: C.text, lineHeight: 1.3 }}>{s.title || s.headline}</div>
+                                  <div key={s.id} onClick={() => { setCenterTab("scenarios"); setExpandedScenario(s.id); setScenarioFilter(s.weight === "HIGH" ? "HIGH" : "MED"); }} style={{ padding: "5px 8px", background: `${col}08`, border: `1px solid ${col}22`, borderLeft: `2px solid ${col}`, borderRadius: 7, cursor: "pointer" }}>
+                                    <div style={{ fontSize: 10, color: C.text, lineHeight: 1.3 }}>{s.title || s.headline}</div>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 3 }}>
                                       <div style={{ display: "flex", gap: 8 }}>
-                                        <span style={{ fontSize: 7, color: C.textDim }}>{base}: {bScore > 0 ? "+" : ""}{bScore}</span>
-                                        <span style={{ fontSize: 7, color: C.textDim }}>{quote}: {qScore > 0 ? "+" : ""}{qScore}</span>
-                                        <span style={{ fontSize: 7, color: col, fontWeight: 700 }}>net: {net > 0 ? "+" : ""}{net}</span>
+                                        <span style={{ fontSize: 9, color: C.textDim }}>{base}: {bScore > 0 ? "+" : ""}{bScore}</span>
+                                        <span style={{ fontSize: 9, color: C.textDim }}>{quote}: {qScore > 0 ? "+" : ""}{qScore}</span>
+                                        <span style={{ fontSize: 9, color: col, fontWeight: 700 }}>net: {net > 0 ? "+" : ""}{net}</span>
                                       </div>
-                                      {dateStr && <span style={{ fontSize: 7, color: C.muted }}>{dateStr}</span>}
+                                      {dateStr && <span style={{ fontSize: 9, color: C.muted }}>{dateStr}</span>}
                                     </div>
                                   </div>
                                 );
@@ -2208,19 +2204,19 @@ export default function Dashboard() {
                         if (relEvents.length === 0) return null;
                         return (
                           <div style={{ marginTop: 10 }}>
-                            <div style={{ fontSize: 8, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>{lang === "cz" ? "NADCHÁZEJÍCÍ UDÁLOSTI" : "UPCOMING EVENTS"}</div>
+                            <div style={{ fontSize: 10, letterSpacing: 2, color: C.textDim, marginBottom: 6 }}>{lang === "cz" ? "NADCHÁZEJÍCÍ UDÁLOSTI" : "UPCOMING EVENTS"}</div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                               {relEvents.map((e, i) => {
                                 const impCol = e.impact === "HIGH" ? C.red : e.impact === "MED" ? C.yellow : C.muted;
                                 return (
                                   <div key={i} style={{ padding: "5px 8px", background: `${impCol}08`, border: `1px solid ${impCol}22`, borderRadius: 4 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                      <span style={{ fontSize: 8, color: C.text }}>{e.title}</span>
-                                      <span style={{ fontSize: 7, color: impCol, border: `1px solid ${impCol}44`, padding: "1px 4px", borderRadius: 3 }}>{e.impact}</span>
+                                      <span style={{ fontSize: 10, color: C.text }}>{e.title}</span>
+                                      <span style={{ fontSize: 9, color: impCol, border: `1px solid ${impCol}44`, padding: "1px 4px", borderRadius: 3 }}>{e.impact}</span>
                                     </div>
                                     <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                                      <span style={{ fontSize: 7, color: C.textDim }}>{e.currency} · {e.time || e.date}</span>
-                                      {e.forecast && <span style={{ fontSize: 7, color: C.muted }}>{lang === "cz" ? "Oček.:" : "Exp.:"} {e.forecast}</span>}
+                                      <span style={{ fontSize: 9, color: C.textDim }}>{e.currency} · {e.time || e.date}</span>
+                                      {e.forecast && <span style={{ fontSize: 9, color: C.muted }}>{lang === "cz" ? "Oček.:" : "Exp.:"} {e.forecast}</span>}
                                     </div>
                                   </div>
                                 );
@@ -2254,15 +2250,15 @@ export default function Dashboard() {
                               animation: isPerfect ? "pulse 2s infinite" : "none" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                                {isPerfect && <span style={{ fontSize: 9 }}>⚡</span>}
-                                <span style={{ fontSize: 10, fontWeight: 700, color: perfectText }}>{pair}</span>
+                                {isPerfect && <span style={{ fontSize: 11 }}>⚡</span>}
+                                <span style={{ fontSize: 12, fontWeight: 700, color: perfectText }}>{pair}</span>
                               </div>
-                              <span style={{ fontSize: 11, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
+                              <span style={{ fontSize: 13, fontWeight: 900, color: col }}>{score > 0 ? "+" : ""}{score}</span>
                             </div>
                             <div style={{ marginBottom: 3 }}><ScoreBar score={score} height={3} /></div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 7, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
-                              <span style={{ fontSize: 7, color: C.muted }}>
+                              <span style={{ fontSize: 9, color: perfectScore, fontWeight: 700 }}>{biasCount}/5</span>
+                              <span style={{ fontSize: 9, color: C.muted }}>
                                 {base} {currencyTotals[base] > 0 ? "+" : ""}{currencyTotals[base]} / {quote} {currencyTotals[quote] > 0 ? "+" : ""}{currencyTotals[quote]}
                               </span>
                             </div>
@@ -2283,12 +2279,12 @@ export default function Dashboard() {
                       return (
                         <div key={cb.bank} style={{ padding: "5px 7px", background: `${biasCol}08`, border: `1px solid ${biasCol}22`, borderRadius: 5 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                            <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cb.currency}</span>
-                            <span style={{ fontSize: 10, fontWeight: 900, color: biasCol }}>{cb.rate}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{cb.currency}</span>
+                            <span style={{ fontSize: 12, fontWeight: 900, color: biasCol }}>{cb.rate}</span>
                           </div>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 7, color: C.muted }}>{cb.bank}</span>
-                            <span style={{ fontSize: 7, color: biasCol, border: `1px solid ${biasCol}44`, padding: "0px 4px", borderRadius: 2 }}>{cb.bias}</span>
+                            <span style={{ fontSize: 9, color: C.muted }}>{cb.bank}</span>
+                            <span style={{ fontSize: 9, color: biasCol, border: `1px solid ${biasCol}44`, padding: "0px 4px", borderRadius: 2 }}>{cb.bias}</span>
                           </div>
                         </div>
                       );
@@ -2301,7 +2297,7 @@ export default function Dashboard() {
                 <div>
                   <SectionLabel>WATCHLIST — LIVE PRICES</SectionLabel>
                   {watchlistData.length === 0 ? (
-                    <div style={{ fontSize: 9, color: C.muted }}>{t("watchNoData")}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>{t("watchNoData")}</div>
                   ) : (
                     <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 24px" }}>
                       {[0, 1].map(half => {
@@ -2313,9 +2309,9 @@ export default function Dashboard() {
                           <table key={half} style={{ width: "100%", borderCollapse: "collapse" }}>
                             <thead>
                               <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                                <th style={{ textAlign: "left", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("PÁR", "PAIR", "PAR")}</th>
-                                <th style={{ textAlign: "right", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("CENA", "PRICE", "PRECIO")}</th>
-                                <th style={{ textAlign: "right", fontSize: 8, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("ZMĚNA", "CHG", "CAMBIO")}</th>
+                                <th style={{ textAlign: "left", fontSize: 10, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("PÁR", "PAIR", "PAR")}</th>
+                                <th style={{ textAlign: "right", fontSize: 10, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("CENA", "PRICE", "PRECIO")}</th>
+                                <th style={{ textAlign: "right", fontSize: 10, letterSpacing: 1.5, color: C.muted, fontWeight: 600, padding: "4px 0" }}>{L("ZMĚNA", "CHG", "CAMBIO")}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -2323,9 +2319,9 @@ export default function Dashboard() {
                                 const col = pair.change > 0 ? C.green : pair.change < 0 ? C.red : C.textDim;
                                 return (
                                   <tr key={pair.name} style={{ borderBottom: `1px solid ${C.border}` }}>
-                                    <td style={{ fontSize: 10, fontWeight: 700, color: C.text, padding: "7px 0" }}>{pair.name}</td>
-                                    <td style={{ fontSize: 10, color: C.textDim, fontFamily: "monospace", textAlign: "right", padding: "7px 0" }}>{pair.price}</td>
-                                    <td style={{ fontSize: 9, color: col, fontWeight: 700, textAlign: "right", padding: "7px 0", whiteSpace: "nowrap" }}>
+                                    <td style={{ fontSize: 12, fontWeight: 700, color: C.text, padding: "7px 0" }}>{pair.name}</td>
+                                    <td style={{ fontSize: 12, color: C.textDim, fontFamily: "monospace", textAlign: "right", padding: "7px 0" }}>{pair.price}</td>
+                                    <td style={{ fontSize: 11, color: col, fontWeight: 700, textAlign: "right", padding: "7px 0", whiteSpace: "nowrap" }}>
                                       {pair.change > 0 ? "▲" : pair.change < 0 ? "▼" : "—"} {Math.abs(pair.change).toFixed(3)}%
                                     </td>
                                   </tr>
@@ -2343,7 +2339,7 @@ export default function Dashboard() {
               {rightTab === "telegram" && (
                 <div>
                   <SectionLabel>📲 TELEGRAM ALERTY</SectionLabel>
-                  <div style={{ fontSize: 10, color: C.textDim, marginBottom: 12, lineHeight: 1.6 }}>
+                  <div style={{ fontSize: 12, color: C.textDim, marginBottom: 12, lineHeight: 1.6 }}>
                     {L(
                       "Propoj svůj Telegram účet a dostávej ranní briefing a HIGH impact alerty přímo do telefonu.",
                       "Link your Telegram account to receive morning briefings and HIGH impact alerts on your phone.",
@@ -2354,19 +2350,19 @@ export default function Dashboard() {
                   {tgStatus?.linked ? (
                     <div>
                       <div style={{ padding: "10px 12px", background: `${C.green}12`, border: `1px solid ${C.green}33`, borderRadius: 8, marginBottom: 12 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: C.green, marginBottom: 4 }}>✓ {L("Telegram propojen", "Telegram linked", "Telegram vinculado")}</div>
-                        <div style={{ fontSize: 9, color: C.textDim }}>{L("Propojeno", "Linked", "Vinculado")}: {tgStatus.linked_at?.split("T")[0]}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: C.green, marginBottom: 4 }}>✓ {L("Telegram propojen", "Telegram linked", "Telegram vinculado")}</div>
+                        <div style={{ fontSize: 11, color: C.textDim }}>{L("Propojeno", "Linked", "Vinculado")}: {tgStatus.linked_at?.split("T")[0]}</div>
                       </div>
 
                       <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: C.text, marginBottom: 6 }}>{L("Časové pásmo", "Timezone", "Zona horaria")}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: C.text, marginBottom: 6 }}>{L("Časové pásmo", "Timezone", "Zona horaria")}</div>
                         <select value={tgTimezone} onChange={async (e) => {
                           const tz = e.target.value;
                           setTgTimezone(tz);
                           const sess = await supabase.auth.getSession();
                           const uid = sess.data?.session?.user?.id;
                           if (uid) fetch(`${API}/api/telegram/timezone`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: uid, timezone: tz }) });
-                        }} style={{ width: "100%", padding: "6px 8px", fontSize: 10, background: C.bg, color: C.text, border: `1px solid ${C.border}`, borderRadius: 4 }}>
+                        }} style={{ width: "100%", padding: "6px 8px", fontSize: 12, background: C.bg, color: C.text, border: `1px solid ${C.border}`, borderRadius: 4 }}>
                           {["Europe/Prague", "Europe/London", "Europe/Berlin", "Europe/Paris", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Asia/Tokyo", "Asia/Shanghai", "Asia/Dubai", "Australia/Sydney", "Pacific/Auckland"].map(tz => (
                             <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
                           ))}
@@ -2381,7 +2377,7 @@ export default function Dashboard() {
                           setTgStatus({ linked: false });
                           setTgCode(null);
                         }
-                      }} style={{ fontSize: 9, padding: "6px 14px", background: `${C.red}18`, border: `1px solid ${C.red}55`, color: C.red, borderRadius: 4, cursor: "pointer" }}>
+                      }} style={{ fontSize: 11, padding: "6px 14px", background: `${C.red}18`, border: `1px solid ${C.red}55`, color: C.red, borderRadius: 7, cursor: "pointer" }}>
                         {L("Odpojit Telegram", "Unlink Telegram", "Desvincular Telegram")}
                       </button>
                     </div>
@@ -2389,19 +2385,19 @@ export default function Dashboard() {
                     <div>
                       {tgCode ? (
                         <div>
-                          <div style={{ fontSize: 10, color: C.text, marginBottom: 8 }}>
+                          <div style={{ fontSize: 12, color: C.text, marginBottom: 8 }}>
                             {L("1. Otevři bota v Telegramu:", "1. Open the bot in Telegram:", "1. Abre el bot en Telegram:")}
                           </div>
                           <a href={`https://t.me/MarkDash_bot?start=${tgCode}`} target="_blank" rel="noopener noreferrer" style={{
                             display: "block", textAlign: "center", padding: "10px", background: "#0088cc18", border: "1px solid #0088cc55",
-                            borderRadius: 8, color: "#0088cc", fontSize: 12, fontWeight: 700, textDecoration: "none", marginBottom: 8
+                            borderRadius: 8, color: "#0088cc", fontSize: 14, fontWeight: 700, textDecoration: "none", marginBottom: 8
                           }}>
                             {L("Otevřít @MarkDash_bot", "Open @MarkDash_bot", "Abrir @MarkDash_bot")}
                           </a>
-                          <div style={{ fontSize: 10, color: C.text, marginBottom: 4 }}>
+                          <div style={{ fontSize: 12, color: C.text, marginBottom: 4 }}>
                             {L("2. Klikni START (nebo pošli /start)", "2. Click START (or send /start)", "2. Haz clic en START (o envía /start)")}
                           </div>
-                          <div style={{ fontSize: 9, color: C.textDim, marginBottom: 8 }}>
+                          <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8 }}>
                             {L("Kód platí 10 minut.", "Code valid for 10 minutes.", "El código es válido por 10 minutos.")}
                           </div>
                           <div style={{ textAlign: "center", padding: "8px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, fontFamily: "monospace", fontSize: 18, letterSpacing: 4, color: C.accent, fontWeight: 700 }}>
@@ -2419,7 +2415,7 @@ export default function Dashboard() {
                           }
                         }} style={{
                           width: "100%", padding: "12px", background: "#0088cc18", border: "1px solid #0088cc55",
-                          color: "#0088cc", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer"
+                          color: "#0088cc", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer"
                         }}>
                           📲 {L("Propojit Telegram", "Link Telegram", "Vincular Telegram")}
                         </button>
@@ -2444,7 +2440,7 @@ export default function Dashboard() {
             { key: "crypto", label: "Krypto" },
           ].map(tab => (
             <div key={tab.key} onClick={() => setMarketTab(tab.key)}
-              style={{ padding: "3px 8px", fontSize: 9, fontWeight: marketTab === tab.key ? 700 : 400,
+              style={{ padding: "3px 8px", fontSize: 11, fontWeight: marketTab === tab.key ? 700 : 400,
                 color: marketTab === tab.key ? C.accent : C.muted, cursor: "pointer",
                 borderBottom: marketTab === tab.key ? `2px solid ${C.accent}` : "2px solid transparent",
                 letterSpacing: 1 }}>
@@ -2454,7 +2450,7 @@ export default function Dashboard() {
         </div>
         {(() => {
           const items = marketTab === "commodities" ? commodities : marketTab === "stocks" ? stocksData : cryptoData;
-          if (items.length === 0) return <div style={{ fontSize: 9, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
+          if (items.length === 0) return <div style={{ fontSize: 11, color: C.muted }}>{L("Načítám...", "Loading...", "Cargando...")}</div>;
           return (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 6 }}>
               {items.map(c => {
@@ -2462,10 +2458,10 @@ export default function Dashboard() {
                 return (
                   <div key={cName(c.name)} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
-                      <span style={{ fontSize: 9, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"}{Math.abs(c.change)}%</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{cName(c.name)}</span>
+                      <span style={{ fontSize: 11, color: chCol }}>{c.change > 0 ? "▲" : c.change < 0 ? "▼" : "—"}{Math.abs(c.change)}%</span>
                     </div>
-                    {c.currencies && <div><span style={{ fontSize: 7, color: C.muted }}>{c.currencies}</span></div>}
+                    {c.currencies && <div><span style={{ fontSize: 9, color: C.muted }}>{c.currencies}</span></div>}
                   </div>
                 );
               })}
@@ -2474,7 +2470,7 @@ export default function Dashboard() {
         })()}
       </div>}
 
-      <div style={{ fontSize: 8, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
+      <div style={{ fontSize: 10, color: C.muted, borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 12, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
         <span>⚡ {t("footerSources")}</span>
         <span>{t("footerDisclaimer")}</span>
       </div>
