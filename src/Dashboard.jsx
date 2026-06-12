@@ -585,6 +585,22 @@ export default function Dashboard() {
     return labels;
   }, [scenarios, commodities, lang]);
 
+  const centerPanelRef = React.useRef(null);
+
+  // Klasifikační tag scénáře (keyword heuristika) – breaking lišta + karty scénářů
+  const tagFor = (s) => {
+    const txt = `${s.title || ""} ${s.summary || ""}`.toLowerCase();
+    const has = (kws) => kws.some(k => txt.includes(k));
+    if (has(["ceasefire", "peace", "truce", "de-escalat", "deescalat", "paused", "pause"])) return { label: L("Deeskalace", "De-escalation", "Desescalada"), color: C.green };
+    if (has(["war", "strike", "attack", "missile", "escalat", "invasion", "hormuz", "nuclear", "sanction", "military"])) return { label: L("Eskalace", "Escalation", "Escalada"), color: C.red };
+    if (has([" cpi", "inflation", " ppi", "payroll", "nfp", "jobs report"])) return { label: "Hot print", color: C.orange };
+    if (has(["fed ", "fomc", "boj", "ecb", "boe", "rate decision", "rate hike", "rate cut", "central bank"])) return { label: L("Klíčový event", "Key risk event", "Evento clave"), color: C.accent };
+    const rs = s.risk_score || 0;
+    if (rs <= -25) return { label: "Risk-off", color: C.red };
+    if (rs >= 25) return { label: "Risk-on", color: C.green };
+    return { label: "Watch", color: C.yellow };
+  };
+
   const RISK_CHAR_GLOBAL = {
     AUD: "risk_on", NZD: "risk_on", CAD: "risk_on",
     EUR: "neutral", GBP: "neutral",
@@ -923,49 +939,35 @@ export default function Dashboard() {
           </div>
         )}
 
-          {/* BREAKING – hlavní katalyzátory z HIGH scénářů */}
+          {/* BREAKING – kompaktní lišta top 3 katalyzátorů (detail je ve Scénářích) */}
           {(() => {
             const breaking = [...scenarios]
               .filter(s => s.weight === "HIGH" && !s.demoted_at)
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-              .slice(0, 5);
+              .slice(0, 3);
             if (breaking.length === 0) return null;
-            const tagFor = (s) => {
-              const txt = `${s.title || ""} ${s.summary || ""}`.toLowerCase();
-              const has = (kws) => kws.some(k => txt.includes(k));
-              if (has(["ceasefire", "peace", "truce", "de-escalat", "deescalat", "paused", "pause"])) return { label: L("Deeskalace", "De-escalation", "Desescalada"), color: C.green };
-              if (has(["war", "strike", "attack", "missile", "escalat", "invasion", "hormuz", "nuclear", "sanction", "military"])) return { label: L("Eskalace", "Escalation", "Escalada"), color: C.red };
-              if (has([" cpi", "inflation", " ppi", "payroll", "nfp", "jobs report"])) return { label: "Hot print", color: C.orange };
-              if (has(["fed ", "fomc", "boj", "ecb", "boe", "rate decision", "rate hike", "rate cut", "central bank"])) return { label: L("Klíčový event", "Key risk event", "Evento clave"), color: C.accent };
-              const rs = s.risk_score || 0;
-              if (rs <= -25) return { label: "Risk-off", color: C.red };
-              if (rs >= 25) return { label: "Risk-on", color: C.green };
-              return { label: "Watch", color: C.yellow };
-            };
             return (
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "10px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: "8px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.red, display: "inline-block", animation: "mp-blink 1.6s ease-in-out infinite" }} />
-                  <span style={{ fontSize: 11, letterSpacing: 3, color: C.textDim, fontFamily: "'Space Grotesk', sans-serif" }}>{L("BREAKING — HLAVNÍ KATALYZÁTORY TRHU", "BREAKING — TOP MARKET CATALYSTS", "BREAKING — PRINCIPALES CATALIZADORES")}</span>
+                  <span style={{ fontSize: 10, letterSpacing: 2.5, fontWeight: 600, color: C.textDim, fontFamily: "'Space Grotesk', sans-serif" }}>BREAKING</span>
+                  <span style={{ fontSize: 9, color: C.muted }}>{L("klikni pro detail", "click for detail", "clic para detalle")}</span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {breaking.map(s => {
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {breaking.map((s, i) => {
                     const tag = tagFor(s);
-                    const dotCol = (s.risk_score || 0) >= 0 ? C.green : C.red;
-                    const summaryText = (lang === "cz" && s.summary_cz) ? s.summary_cz : s.summary;
-                    const timeStr = s.created_at ? new Date(s.created_at + "Z").toLocaleString("cs-CZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+                    const cleanTitle = (s.title || "").replace(/^breaking:\s*/i, "");
+                    const timeStr = s.created_at ? new Date(s.created_at + "Z").toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }) : "";
                     return (
-                      <div key={s.id} onClick={() => { setCenterTab("scenarios"); setScenarioFilter("HIGH"); setScenarioPage(1); setExpandedScenario(s.id); }}
-                        style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 10px", borderRadius: 8, cursor: "pointer", background: `${tag.color}08`, border: `1px solid ${C.border}` }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: dotCol, marginTop: 5, flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0, ...(isMobile ? { display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" } : {}) }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: C.text, lineHeight: 1.45 }}>{s.title}</span>
-                          {summaryText && <span style={{ fontSize: 11, color: C.textDim, lineHeight: 1.45 }}> — {summaryText.length > 170 ? summaryText.slice(0, 170) + "…" : summaryText}</span>}
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>
-                          {timeStr && <span style={{ fontSize: 9, color: C.muted }}>{timeStr}</span>}
-                        </div>
+                      <div key={s.id}
+                        onClick={() => {
+                          setCenterTab("scenarios"); setScenarioFilter("HIGH"); setScenarioPage(1); setExpandedScenario(s.id);
+                          setTimeout(() => centerPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+                        }}
+                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", cursor: "pointer", borderTop: i > 0 ? `1px solid ${C.border}` : "none" }}>
+                        <span style={{ fontSize: 10, color: C.muted, flexShrink: 0, width: 36, fontFamily: "monospace" }}>{timeStr}</span>
+                        <span style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 600, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{cleanTitle}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap", flexShrink: 0 }}>{tag.label}</span>
                       </div>
                     );
                   })}
@@ -975,7 +977,7 @@ export default function Dashboard() {
           })()}
 
           {/* CENTER tabs */}
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
+          <div ref={centerPanelRef} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: C.shadow, padding: 14, ...(isMobile ? { minHeight: 400, order: 2 } : {}) }}>
             <div style={{ display: "flex", gap: 4, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}`, overflowX: "auto", flexShrink: 0 }}>
               <TabBtn label={t("tabScenarios")} active={centerTab === "scenarios"} onClick={() => setCenterTab("scenarios")} />
               <TabBtn label={t("tabEvents")} active={centerTab === "calendar"} onClick={() => setCenterTab("calendar")} />
@@ -1032,7 +1034,9 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
                             <div style={{ fontSize: isMed ? 12 : 13, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                              <span style={{ fontSize: 10, color: s.weight === "HIGH" ? "#000" : C.muted, background: s.weight === "HIGH" ? "#c9a227" : C.border, fontWeight: s.weight === "HIGH" ? 700 : 400, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
+                              {isMed
+                                ? <span style={{ fontSize: 10, color: C.muted, background: C.border, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
+                                : (() => { const tag = tagFor(s); return <span style={{ fontSize: 10, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>; })()}
                               <span style={{ fontSize: isMed ? 13 : 15, fontWeight: 700, color: isMed ? C.muted : sc }}>{rScore > 0 ? "+" : ""}{rScore}</span>
                               <span style={{ fontSize: 11, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
