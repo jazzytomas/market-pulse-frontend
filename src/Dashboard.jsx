@@ -1034,6 +1034,7 @@ export default function Dashboard() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
                             <div style={{ fontSize: isMed ? 12 : 13, fontWeight: isMed ? 500 : 700, color: isMed ? C.textDim : C.text, flex: 1, paddingRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
                             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+                              {s.is_followup && <span title={L("Dopad už byl zacenen dřívější zprávou", "Impact already priced in by an earlier report", "Impacto ya descontado por una noticia previa")} style={{ fontSize: 9, fontWeight: 700, color: C.muted, border: `1px solid ${C.border}`, background: C.border, padding: "1px 5px", borderRadius: 3, whiteSpace: "nowrap" }}>{L("navazující", "follow-up", "seguimiento")}</span>}
                               {isMed
                                 ? <span style={{ fontSize: 10, color: C.muted, background: C.border, padding: "1px 5px", borderRadius: 3 }}>{s.weight}</span>
                                 : (() => { const tag = tagFor(s); return <span style={{ fontSize: 10, fontWeight: 700, color: tag.color, border: `1px solid ${tag.color}55`, background: `${tag.color}14`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>{tag.label}</span>; })()}
