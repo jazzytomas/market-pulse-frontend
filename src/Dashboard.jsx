@@ -663,20 +663,31 @@ export default function Dashboard() {
     { pair: "USD/JPY", base: "USD", quote: "JPY" },
     // EUR crosses
     { pair: "EUR/AUD", base: "EUR", quote: "AUD" },
+    { pair: "EUR/CAD", base: "EUR", quote: "CAD" },
     { pair: "EUR/CHF", base: "EUR", quote: "CHF" },
     { pair: "EUR/GBP", base: "EUR", quote: "GBP" },
     { pair: "EUR/JPY", base: "EUR", quote: "JPY" },
+    { pair: "EUR/NZD", base: "EUR", quote: "NZD" },
     // GBP crosses
     { pair: "GBP/AUD", base: "GBP", quote: "AUD" },
     { pair: "GBP/CAD", base: "GBP", quote: "CAD" },
+    { pair: "GBP/CHF", base: "GBP", quote: "CHF" },
     { pair: "GBP/JPY", base: "GBP", quote: "JPY" },
     { pair: "GBP/NZD", base: "GBP", quote: "NZD" },
-    // Other crosses
+    // AUD crosses
     { pair: "AUD/CAD", base: "AUD", quote: "CAD" },
+    { pair: "AUD/CHF", base: "AUD", quote: "CHF" },
     { pair: "AUD/JPY", base: "AUD", quote: "JPY" },
-    { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
-    { pair: "CHF/JPY", base: "CHF", quote: "JPY" },
+    { pair: "AUD/NZD", base: "AUD", quote: "NZD" },
+    // NZD crosses
+    { pair: "NZD/CAD", base: "NZD", quote: "CAD" },
+    { pair: "NZD/CHF", base: "NZD", quote: "CHF" },
     { pair: "NZD/JPY", base: "NZD", quote: "JPY" },
+    // CAD crosses
+    { pair: "CAD/CHF", base: "CAD", quote: "CHF" },
+    { pair: "CAD/JPY", base: "CAD", quote: "JPY" },
+    // CHF crosses
+    { pair: "CHF/JPY", base: "CHF", quote: "JPY" },
   ];
 
   const pairsWithConfluence = ALL_PAIRS.map(p => ({ ...p, ...computeConfluenceForPair(p.base, p.quote) }))
@@ -2236,11 +2247,15 @@ export default function Dashboard() {
 
                 const PERFECT_BLUE = "#1864dc";
                 const isDark = C.dark;
+                // Spodní sekce párů: řadit podle ABSOLUTNÍ hodnoty skóre páru sestupně
+                // (největší |skóre| nahoře, bez ohledu na znaménko). Top setupy zůstávají beze změny.
+                const pairScoreAbs = (p) => Math.abs(Math.round(currencyTotals[p.base] - currencyTotals[p.quote]));
+                const restPairsByScore = [...pairsWithConfluence].sort((a, b) => pairScoreAbs(b) - pairScoreAbs(a));
                 return (
                   <div>
                     <SectionLabel>{t("pairsTitle")}</SectionLabel>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                      {pairsWithConfluence.map(({ pair, base, quote, biasCount, biasDir }) => {
+                      {restPairsByScore.map(({ pair, base, quote, biasCount, biasDir }) => {
                         const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
                         const col = score > 0 ? C.green : score < 0 ? C.red : C.yellow;
                         const isPerfect = biasCount === 5;
