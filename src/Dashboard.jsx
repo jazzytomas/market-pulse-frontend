@@ -137,6 +137,9 @@ const LangContext = React.createContext("cz");
 
 const NEUTRAL_THRESHOLD = 5;
 const CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD", "NZD"];
+// Point 3: měřítko tanh saturace pro skóre měny (Σ skóre·váha → ±100).
+// Vyšší = pomalejší saturace. 250 ≈ jedna čerstvá HIGH (+60) → ~62, stará/slabá → výrazně méně.
+const CURRENCY_SUM_SCALE = 250;
 const API = "https://market-pulse-fdgb.onrender.com";
 
 
@@ -165,22 +168,16 @@ function ageWeight(createdAt, mode = "swing") {
   // SQLite datetime('now') je UTC, ale string nemá Z – připojíme
   const iso = createdAt.includes("T") ? createdAt : createdAt.replace(" ", "T") + "Z";
   const ageMs = Date.now() - new Date(iso).getTime();
-  const ageHours = ageMs / 3600000;
+  const ageHours = Math.max(0, ageMs / 3600000);
   const ageDays = ageHours / 24;
+  // Point 2: plynulý exponenciální decay místo schodů – staré eventy reálně vyhasnou.
   if (mode === "intraday") {
-    // Reaktivní na čerstvé zprávy, jen <24h, starší ignoruj
-    if (ageHours < 2) return 1.0;
-    if (ageHours < 6) return 0.7;
-    if (ageHours < 12) return 0.35;
-    if (ageHours < 24) return 0.15;
-    return 0;
+    // Reaktivní: nad 24h se event prakticky vynuluje
+    if (ageHours >= 24) return 0;
+    return Math.exp(-ageHours / 8);   // 0h=1.0 · 8h≈0.37 · 16h≈0.14 · ~24h→0
   }
-  // Swing: pomalejší decay, drží i pár dní starý kontext
-  if (ageDays < 1) return 1.0;
-  if (ageDays < 2) return 0.95;
-  if (ageDays < 4) return 0.85;
-  if (ageDays < 7) return 0.7;
-  return 0.5;
+  // Swing: pomalejší decay BEZ trvalé podlahy 0.5 – po týdnu reálně vyprší
+  return Math.exp(-ageDays / 4);      // 0d=1.0 · 1d≈0.78 · 2d≈0.61 · 4d≈0.37 · 7d≈0.17
 }
 
 function computeCurrencyTotals(list, mode = "swing") {
@@ -188,7 +185,6 @@ function computeCurrencyTotals(list, mode = "swing") {
   const demotedFactor = mode === "intraday" ? 0.2 : 0.7;
   CURRENCIES.forEach((c) => {
     let weightedSum = 0;
-    let totalW = 0;
     for (const s of (list || [])) {
       const ciRaw = s.currency_impact || s.currencyImpact;
       const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
@@ -198,14 +194,14 @@ function computeCurrencyTotals(list, mode = "swing") {
           let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
           if (s.demoted_at) baseW *= demotedFactor;
           if (baseW > 0) {
-            const w = baseW * ageWeight(s.created_at, mode);
-            weightedSum += score * w;
-            totalW += w;
+            weightedSum += score * baseW * ageWeight(s.created_at, mode);
           }
         }
       }
     }
-    result[c] = totalW > 0 ? Math.round(weightedSum / totalW) : 0;
+    // Point 3: saturující SOUČET (tanh) místo váženého průměru. Víc čerstvých
+    // souhlasných zpráv bias zesílí; jedna stará/slabá ho nesatuje na plnou hodnotu.
+    result[c] = Math.round(Math.tanh(weightedSum / CURRENCY_SUM_SCALE) * 100);
   });
   return result;
 }
@@ -539,6 +535,62 @@ export default function Dashboard() {
 
   const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : [], tradeMode);
 
+  // --- Point 1: cenové momentum per měna ---
+  // Odvozeno z denní % změny USD párů (watchlist) + DXY. Kladné = měna dnes posiluje.
+  // CHF nemá ve watchlistu pár → zůstává null (faktor pak neutrální, netrestá).
+  const currencyMomentum = (() => {
+    const wl = {};
+    (watchlistData || []).forEach(p => { if (p && p.name) wl[p.name] = (typeof p.change === "number" ? p.change : null); });
+    const m = {
+      EUR: wl["EUR/USD"] ?? null,
+      GBP: wl["GBP/USD"] ?? null,
+      AUD: wl["AUD/USD"] ?? null,
+      NZD: wl["NZD/USD"] ?? null,
+      JPY: wl["USD/JPY"] != null ? -wl["USD/JPY"] : null,
+      CAD: wl["USD/CAD"] != null ? -wl["USD/CAD"] : null,
+      USD: (dxy && typeof dxy.change === "number") ? dxy.change : null,
+      CHF: null,
+    };
+    // USD fallback ze syntetiky, pokud DXY chybí
+    if (m.USD == null) {
+      const inv = [];
+      if (m.EUR != null) inv.push(-m.EUR);
+      if (m.GBP != null) inv.push(-m.GBP);
+      if (m.AUD != null) inv.push(-m.AUD);
+      if (m.NZD != null) inv.push(-m.NZD);
+      if (wl["USD/JPY"] != null) inv.push(wl["USD/JPY"]);
+      if (wl["USD/CAD"] != null) inv.push(wl["USD/CAD"]);
+      if (inv.length) m.USD = inv.reduce((a, b) => a + b, 0) / inv.length;
+    }
+    return m;
+  })();
+
+  const MOMENTUM_EPS = 0.05; // % deadband – menší rozdíl bereme jako šum (neutrál)
+  const momentumAlign = (base, quote) => {
+    const mb = currencyMomentum[base], mq = currencyMomentum[quote];
+    if (mb == null || mq == null) return "neutral";
+    const d = mb - mq;
+    if (d > MOMENTUM_EPS) return "long";
+    if (d < -MOMENTUM_EPS) return "short";
+    return "neutral";
+  };
+
+  // Skóre páru z news sentimentu + tlumení při konfliktu s cenovým momentem (point 1).
+  // Když cena jde proti news-biasu, magnitudu srazíme – řeší "GBP bullish, ale padá".
+  const PRICE_CONFLICT_DAMPEN = 0.5;
+  const newsPairScore = (base, quote) => Math.round(currencyTotals[base] - currencyTotals[quote]);
+  const priceConflicts = (base, quote) => {
+    const ns = newsPairScore(base, quote);
+    if (ns === 0) return false;
+    const ma = momentumAlign(base, quote);
+    if (ma === "neutral") return false;
+    return ma !== (ns > 0 ? "long" : "short");
+  };
+  const adjustedPairScore = (base, quote) => {
+    const ns = newsPairScore(base, quote);
+    return priceConflicts(base, quote) ? Math.round(ns * PRICE_CONFLICT_DAMPEN) : ns;
+  };
+
   const runScan = () => {
     setScanning(true);
     fetch(`${API}/api/rescan?token=${encodeURIComponent(adminTokenRef.current)}`).catch(() => {});
@@ -643,13 +695,14 @@ export default function Dashboard() {
       { aligns: (baseSeas !== null && quoteSeas !== null) ? (baseSeas > quoteSeas ? "long" : baseSeas < quoteSeas ? "short" : "neutral") : "neutral" },
       { aligns: riskAlign },
       { aligns: (baseRate !== null && quoteRate !== null) ? (baseRate > quoteRate ? "long" : baseRate < quoteRate ? "short" : "neutral") : "neutral" },
+      { aligns: momentumAlign(base, quote) },   // point 1: cenové momentum jako 6. faktor
     ];
-    const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
+    const pairScore = adjustedPairScore(base, quote);
     const longCount = factors.filter(f => f.aligns === "long").length;
     const shortCount = factors.filter(f => f.aligns === "short").length;
     const biasDir = pairScore > 0 ? "long" : pairScore < 0 ? "short" : "neutral";
     const biasCount = biasDir === "long" ? longCount : biasDir === "short" ? shortCount : Math.max(longCount, shortCount);
-    return { pairScore, biasDir, biasCount, longCount, shortCount, total: 5 };
+    return { pairScore, biasDir, biasCount, longCount, shortCount, total: factors.length };
   };
 
   const ALL_PAIRS = [
@@ -694,9 +747,7 @@ export default function Dashboard() {
     .sort((a, b) => {
       // Sort by confluence first, then by absolute score
       if (b.biasCount !== a.biasCount) return b.biasCount - a.biasCount;
-      const scoreA = Math.abs(Math.round(currencyTotals[a.base] - currencyTotals[a.quote]));
-      const scoreB = Math.abs(Math.round(currencyTotals[b.base] - currencyTotals[b.quote]));
-      return scoreB - scoreA;
+      return Math.abs(b.pairScore) - Math.abs(a.pairScore);
     });
   const topSetups = pairsWithConfluence.slice(0, 4);
 
@@ -1916,7 +1967,7 @@ export default function Dashboard() {
               {topSetups.map(p => {
                 const col = p.biasDir === "long" ? C.green : p.biasDir === "short" ? C.red : C.yellow;
                 const arrow = p.biasDir === "long" ? "▲" : p.biasDir === "short" ? "▼" : "→";
-                const isPerfect = p.biasCount === 5;
+                const isPerfect = p.biasCount === p.total;
                 const PERFECT_BLUE = "#1864dc";
                 const isDark = C.dark;
                 return (
@@ -1928,7 +1979,7 @@ export default function Dashboard() {
                     {isPerfect && <span style={{ fontSize: 11 }}>⚡</span>}
                     <span style={{ fontSize: 12, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text }}>{p.pair}</span>
                     <span style={{ fontSize: 11, color: col }}>{arrow}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col }}>{p.biasCount}/5</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col }}>{p.biasCount}/{p.total}</span>
                   </div>
                 );
               })}
@@ -1993,7 +2044,8 @@ export default function Dashboard() {
 
                 if (selectedPair) {
                   const { pair, base, quote } = selectedPair;
-                  const pairScore = Math.round(currencyTotals[base] - currencyTotals[quote]);
+                  const pairScore = adjustedPairScore(base, quote);
+                  const pairPriceConflict = priceConflicts(base, quote);
                   const pairCol = pairScore > 0 ? C.green : pairScore < 0 ? C.red : C.yellow;
                   const pairBias = pairScore > 0 ? (lang === "cz" ? "▲ NÁKUP (Long)" : "▲ BUY (Long)") : pairScore < 0 ? (lang === "cz" ? "▼ PRODEJ (Short)" : "▼ SELL (Short)") : (lang === "cz" ? "→ NEUTRÁLNÍ (Neutral)" : "→ NEUTRAL");
 
@@ -2068,6 +2120,13 @@ export default function Dashboard() {
                       aligns: (baseRate !== null && quoteRate !== null) ? (baseRate > quoteRate ? "long" : baseRate < quoteRate ? "short" : "neutral") : "neutral",
                       favors: (baseRate !== null && quoteRate !== null && baseRate !== quoteRate) ? (baseRate > quoteRate ? base : quote) : null,
                     },
+                    {
+                      label: lang === "cz" ? "Cenové momentum (Price Momentum, denní %)" : "Price Momentum (daily %)",
+                      baseVal: currencyMomentum[base] != null ? `${currencyMomentum[base] > 0 ? "+" : ""}${currencyMomentum[base].toFixed(2)}%` : "—",
+                      quoteVal: currencyMomentum[quote] != null ? `${currencyMomentum[quote] > 0 ? "+" : ""}${currencyMomentum[quote].toFixed(2)}%` : "—",
+                      aligns: momentumAlign(base, quote),
+                      favors: momentumAlign(base, quote) === "long" ? base : momentumAlign(base, quote) === "short" ? quote : null,
+                    },
                   ];
 
                   const longCount = factors.filter(f => f.aligns === "long").length;
@@ -2087,6 +2146,7 @@ export default function Dashboard() {
                         <div style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 26, fontWeight: 900, color: pairCol, lineHeight: 1 }}>{pairScore > 0 ? "+" : ""}{pairScore}</div>
                           <div style={{ fontSize: 11, color: pairCol, fontWeight: 700 }}>{pairBias}</div>
+                          {pairPriceConflict && <div style={{ fontSize: 10, color: C.red, fontWeight: 700, marginTop: 2 }}>{lang === "cz" ? "⚠ cena jde proti zprávám (skóre tlumeno)" : "⚠ price against news (score dampened)"}</div>}
                         </div>
                       </div>
 
@@ -2126,20 +2186,32 @@ export default function Dashboard() {
 
                       {/* HISTORICKÝ SCORE (mini chart) */}
                       {(() => {
-                        const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                         const days = {};
                         scenarios.forEach(s => {
-                          const d = s.created_at ? s.created_at.split("T")[0] : null;
+                          // created_at je "YYYY-MM-DD HH:MM:SS" (mezera, bez T) → seskup podle data
+                          const d = s.created_at ? s.created_at.slice(0, 10) : null;
                           if (!d) return;
                           if (!days[d]) days[d] = [];
                           days[d].push(s);
                         });
                         const dayKeys = Object.keys(days).sort();
                         if (dayKeys.length < 2) return null;
-                        const points = dayKeys.map(d => {
-                          const t = computeCurrencyTotals(days[d], tradeMode);
-                          return { d, score: Math.round((t[base] || 0) - (t[quote] || 0)) };
-                        });
+                        // Skóre "k danému dni": vážený průměr news bez age-decay a bez tanh
+                        // (jinak by point 3 + decay vůči teď zploštily historii).
+                        const dayPairScore = (arr) => {
+                          let sum = 0, w = 0;
+                          for (const s of arr) {
+                            const ciRaw = s.currency_impact || s.currencyImpact;
+                            const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
+                            const bw = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
+                            if (bw === 0) continue;
+                            const sb = (ci[base] && ci[base].score) || 0;
+                            const sq = (ci[quote] && ci[quote].score) || 0;
+                            sum += (sb - sq) * bw; w += bw;
+                          }
+                          return w > 0 ? Math.round(sum / w) : 0;
+                        };
+                        const points = dayKeys.map(d => ({ d, score: dayPairScore(days[d]) }));
                         const maxAbs = Math.max(1, ...points.map(p => Math.abs(p.score)));
                         return (
                           <div style={{ marginTop: 10, padding: "8px 10px", background: C.bg, borderRadius: 6, border: `1px solid ${C.border}` }}>
@@ -2249,16 +2321,15 @@ export default function Dashboard() {
                 const isDark = C.dark;
                 // Spodní sekce párů: řadit podle ABSOLUTNÍ hodnoty skóre páru sestupně
                 // (největší |skóre| nahoře, bez ohledu na znaménko). Top setupy zůstávají beze změny.
-                const pairScoreAbs = (p) => Math.abs(Math.round(currencyTotals[p.base] - currencyTotals[p.quote]));
-                const restPairsByScore = [...pairsWithConfluence].sort((a, b) => pairScoreAbs(b) - pairScoreAbs(a));
+                const restPairsByScore = [...pairsWithConfluence].sort((a, b) => Math.abs(b.pairScore) - Math.abs(a.pairScore));
                 return (
                   <div>
                     <SectionLabel>{t("pairsTitle")}</SectionLabel>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                      {restPairsByScore.map(({ pair, base, quote, biasCount, biasDir }) => {
-                        const score = Math.round(currencyTotals[base] - currencyTotals[quote]);
+                      {restPairsByScore.map(({ pair, base, quote, biasCount, biasDir, pairScore, total }) => {
+                        const score = pairScore;
                         const col = score > 0 ? C.green : score < 0 ? C.red : C.yellow;
-                        const isPerfect = biasCount === 5;
+                        const isPerfect = biasCount === total;
                         const perfectText = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : C.text;
                         const perfectScore = isPerfect ? (isDark ? "#ffffff" : PERFECT_BLUE) : col;
                         return (
