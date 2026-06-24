@@ -344,6 +344,7 @@ export default function Dashboard() {
   const [fearGreedData, setFearGreedData] = useState(null);
   const [fgHistory, setFgHistory] = useState([]);
   const [dxy, setDxy] = useState(null);
+  const [momentumData, setMomentumData] = useState(null);   // point 5: 3-5denní cenové momentum
   const [tgStatus, setTgStatus] = useState(null);
   const [tgCode, setTgCode] = useState(null);
   const [tgTimezone, setTgTimezone] = useState("Europe/Prague");
@@ -455,6 +456,14 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // Point 5: 3-5denní cenové momentum (8 měn + zlato/US500/WTI)
+    const fetchMomentum = () => fetch(`${API}/api/momentum`).then(r => r.json()).then(data => setMomentumData(data || null)).catch(() => {});
+    fetchMomentum();
+    const id = setInterval(fetchMomentum, 600000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
     setSeasonalLive([]);
     fetch(`${API}/api/seasonal?years=${seasonalYears}`)
       .then(r => r.json())
@@ -538,7 +547,18 @@ export default function Dashboard() {
   // --- Point 1: cenové momentum per měna ---
   // Odvozeno z denní % změny USD párů (watchlist) + DXY. Kladné = měna dnes posiluje.
   // CHF nemá ve watchlistu pár → zůstává null (faktor pak neutrální, netrestá).
+  // PREFERUJ 3-5denní momentum z backendu (/api/momentum); fallback = 1denní změna z watchlistu.
+  const momentumIs5d = !!(momentumData && momentumData.currencies && Object.keys(momentumData.currencies).length);
   const currencyMomentum = (() => {
+    if (momentumIs5d) {
+      const m = {};
+      ["EUR", "GBP", "AUD", "NZD", "JPY", "CAD", "CHF", "USD"].forEach(c => {
+        const v = momentumData.currencies[c];
+        m[c] = (v && typeof v.pct === "number") ? v.pct : null;
+      });
+      return m;
+    }
+    // --- fallback: 1denní % změna z watchlistu + DXY ---
     const wl = {};
     (watchlistData || []).forEach(p => { if (p && p.name) wl[p.name] = (typeof p.change === "number" ? p.change : null); });
     const m = {
@@ -551,7 +571,6 @@ export default function Dashboard() {
       USD: (dxy && typeof dxy.change === "number") ? dxy.change : null,
       CHF: null,
     };
-    // USD fallback ze syntetiky, pokud DXY chybí
     if (m.USD == null) {
       const inv = [];
       if (m.EUR != null) inv.push(-m.EUR);
@@ -565,7 +584,30 @@ export default function Dashboard() {
     return m;
   })();
 
-  const MOMENTUM_EPS = 0.05; // % deadband – menší rozdíl bereme jako šum (neutrál)
+  // Deadband: u 5denního okna je šum větší než u 1denního
+  const MOMENTUM_EPS = momentumIs5d ? 0.3 : 0.05; // % rozdíl pod prahem = neutrál
+
+  // Point 5b: divergence u klíčových instrumentů (zlato/US500/WTI) vs risk sentiment.
+  // Bezpečné přístavy (zlato) by v risk-off měly růst, US500 (risk) v risk-off klesat.
+  const instrumentDivergence = (() => {
+    if (!momentumData || !momentumData.instruments) return [];
+    const rs = sentiment.total_score || 0;
+    if (Math.abs(rs) <= NEUTRAL_THRESHOLD) return []; // bez jasného fundamentu neřešíme
+    const riskOff = rs < 0;
+    const out = [];
+    const check = (name, expectedTrend) => {
+      const inst = momentumData.instruments[name];
+      if (!inst || typeof inst.pct !== "number") return;
+      const t = inst.trend;
+      if (t !== "neutral" && t !== expectedTrend) {
+        out.push({ name, pct: inst.pct, trend: t, expected: expectedTrend });
+      }
+    };
+    // risk-off → zlato nahoru (bullish), US500 dolů (bearish); risk-on opačně
+    check("XAUUSD", riskOff ? "bullish" : "bearish");
+    check("US500", riskOff ? "bearish" : "bullish");
+    return out;
+  })();
   const momentumAlign = (base, quote) => {
     const mb = currencyMomentum[base], mq = currencyMomentum[quote];
     if (mb == null || mq == null) return "neutral";
@@ -1984,6 +2026,18 @@ export default function Dashboard() {
                 );
               })}
             </div>
+            {/* Point 5b: divergence varování u klíčových instrumentů vs risk sentiment */}
+            {instrumentDivergence.length > 0 && (
+              <div style={{ marginTop: 7, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                <span style={{ fontSize: 10, letterSpacing: 1, color: C.red, flexShrink: 0 }}>⚠ {L("DIVERGENCE", "DIVERGENCE", "DIVERGENCIA")}</span>
+                {instrumentDivergence.map(d => (
+                  <span key={d.name} title={L("Cena instrumentu jde proti aktuálnímu risk sentimentu", "Instrument price contradicts current risk sentiment", "El precio contradice el sentimiento de riesgo")}
+                    style={{ fontSize: 10, fontWeight: 700, color: C.red, border: `1px solid ${C.red}55`, background: `${C.red}12`, padding: "1px 6px", borderRadius: 3, whiteSpace: "nowrap" }}>
+                    {d.name} {d.pct > 0 ? "+" : ""}{d.pct}% ({d.trend === "bullish" ? "▲" : "▼"} vs {d.expected === "bullish" ? "▲" : "▼"})
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* BOTTOM tabs */}
@@ -2121,7 +2175,7 @@ export default function Dashboard() {
                       favors: (baseRate !== null && quoteRate !== null && baseRate !== quoteRate) ? (baseRate > quoteRate ? base : quote) : null,
                     },
                     {
-                      label: lang === "cz" ? "Cenové momentum (Price Momentum, denní %)" : "Price Momentum (daily %)",
+                      label: (lang === "cz" ? "Cenové momentum" : "Price Momentum") + (momentumIs5d ? ` (${momentumData.lookback_days}d %)` : " (1d %)"),
                       baseVal: currencyMomentum[base] != null ? `${currencyMomentum[base] > 0 ? "+" : ""}${currencyMomentum[base].toFixed(2)}%` : "—",
                       quoteVal: currencyMomentum[quote] != null ? `${currencyMomentum[quote] > 0 ? "+" : ""}${currencyMomentum[quote].toFixed(2)}%` : "—",
                       aligns: momentumAlign(base, quote),
