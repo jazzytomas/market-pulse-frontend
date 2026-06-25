@@ -140,6 +140,11 @@ const CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD", "NZD"];
 // Point 3: měřítko tanh saturace pro skóre měny (Σ skóre·váha → ±100).
 // Vyšší = pomalejší saturace. 250 ≈ jedna čerstvá HIGH (+60) → ~62, stará/slabá → výrazně méně.
 const CURRENCY_SUM_SCALE = 250;
+// Časový decay váhy scénáře (swing) – SJEDNOCENO s backendem (scenario_decay).
+// Plná váha do DECAY_FULL_DAYS, pak půlení s poločasem DECAY_HALFLIFE_DAYS → ~0 kolem 6-7 dní.
+const DECAY_FULL_DAYS = 1.0;
+const DECAY_HALFLIFE_DAYS = 1.2;
+const DEMOTED_FACTOR = 0.7;   // mírné utlumení demotovaných (mimo aktivní set), zbytek řeší decay
 const API = "https://market-pulse-fdgb.onrender.com";
 
 
@@ -176,13 +181,15 @@ function ageWeight(createdAt, mode = "swing") {
     if (ageHours >= 24) return 0;
     return Math.exp(-ageHours / 8);   // 0h=1.0 · 8h≈0.37 · 16h≈0.14 · ~24h→0
   }
-  // Swing: pomalejší decay BEZ trvalé podlahy 0.5 – po týdnu reálně vyprší
-  return Math.exp(-ageDays / 4);      // 0d=1.0 · 1d≈0.78 · 2d≈0.61 · 4d≈0.37 · 7d≈0.17
+  // Swing: plná váha do DECAY_FULL_DAYS, pak půlení s poločasem DECAY_HALFLIFE_DAYS.
+  // 1d=1.0 · 2d≈0.56 · 3d≈0.32 · 4d≈0.18 · 5d≈0.10 · 6d≈0.06 · 7d≈0.03 (sjednoceno s backendem)
+  if (ageDays <= DECAY_FULL_DAYS) return 1.0;
+  return Math.pow(0.5, (ageDays - DECAY_FULL_DAYS) / DECAY_HALFLIFE_DAYS);
 }
 
 function computeCurrencyTotals(list, mode = "swing") {
   const result = {};
-  const demotedFactor = mode === "intraday" ? 0.2 : 0.7;
+  const demotedFactor = mode === "intraday" ? 0.2 : DEMOTED_FACTOR;
   CURRENCIES.forEach((c) => {
     let weightedSum = 0;
     for (const s of (list || [])) {
