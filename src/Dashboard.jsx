@@ -1153,8 +1153,8 @@ export default function Dashboard() {
                               <span style={{ fontSize: 11, color: C.textDim }}>{isExp ? "▲" : "▼"}</span>
                             </div>
                           </div>
-                          {!isExp && <div style={{ fontSize: 10, color: C.muted, marginBottom: isMed ? 1 : 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{summaryText}</div>}
-                          {isExp && <div style={{ fontSize: 11, color: C.muted, marginBottom: isMed ? 2 : 5 }}>{summaryText}</div>}
+                          {!isExp && <div style={{ fontSize: 10, color: C.muted, marginBottom: isMed ? 1 : 3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{summaryText}</div>}
+                          {isExp && <div style={{ fontSize: 11, color: C.muted, marginBottom: isMed ? 2 : 5, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{summaryText}</div>}
                           {!isMed && <ScoreBar score={rScore} />}
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
                             <span style={{ fontSize: 10, color: C.muted }}>{s.source}</span>
