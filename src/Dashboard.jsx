@@ -549,7 +549,24 @@ export default function Dashboard() {
       });
   }, []);
 
-  const currencyTotals = computeCurrencyTotals(scenarios.length > 0 ? scenarios : [], tradeMode);
+  // CHYBA 2: intraday age-decay nuluje vše >24h. Když nejsou žádné čerstvé (<24h) HIGH/MED
+  // scénáře, intraday by vyšel prázdný. Fallback: spočítej fundament swing křivkou (poslední
+  // dostupný režim) a označ jako "stará data", ať uživatel vždy něco vidí.
+  let intradayStale = false;
+  let currencyTotals;
+  if (tradeMode === "intraday") {
+    const hasFresh = (scenarios || []).some(
+      s => (s.weight === "HIGH" || s.weight === "MED") && ageWeight(s.created_at, "intraday") > 0
+    );
+    if (hasFresh) {
+      currencyTotals = computeCurrencyTotals(scenarios, "intraday");
+    } else {
+      currencyTotals = computeCurrencyTotals(scenarios, "swing");  // fallback na nejnovější dostupné skóre
+      intradayStale = scenarios.length > 0;
+    }
+  } else {
+    currencyTotals = computeCurrencyTotals(scenarios, tradeMode);
+  }
 
   // --- Point 1: cenové momentum per měna ---
   // Odvozeno z denní % změny USD párů (watchlist) + DXY. Kladné = měna dnes posiluje.
@@ -692,11 +709,19 @@ export default function Dashboard() {
   const tagFor = (s) => {
     const txt = `${s.title || ""} ${s.summary || ""}`.toLowerCase();
     const has = (kws) => kws.some(k => txt.includes(k));
-    if (has(["ceasefire", "peace", "truce", "de-escalat", "deescalat", "paused", "pause"])) return { label: L("Deeskalace", "De-escalation", "Desescalada"), color: C.green };
-    if (has(["war", "strike", "attack", "missile", "escalat", "invasion", "hormuz", "nuclear", "sanction", "military"])) return { label: L("Eskalace", "Escalation", "Escalada"), color: C.red };
+    const rs = s.risk_score || 0;
+    // ESKALACE má přednost: konkrétní vojenská/sankční AKCE (vč. porušení příměří) přebije
+    // pouhý výskyt slova "ceasefire". Pozn.: "struck" ≠ "strike", proto obě formy.
+    const escalationKw = ["war", "strike", "struck", "airstrike", "air strike", "attack", "missile",
+      "shelling", "bombard", "bombing", "escalat", "invasion", "invaded", "retaliat", "hormuz",
+      "nuclear", "military", "violat", "breach", "new sanction", "fresh sanction", "sanctions on", "imposes sanction"];
+    const deescalationKw = ["ceasefire", "peace", "truce", "de-escalat", "deescalat", "withdraw",
+      "agreement", "deal reached", "sanctions lifted", "lifted sanction", "paused", "pause"];
+    if (has(escalationKw)) return { label: L("Eskalace", "Escalation", "Escalada"), color: C.red };
+    // Deeskalace jen když to neodporuje risk-off skóre (silně záporné = nikdy deeskalace)
+    if (has(deescalationKw) && rs > -25) return { label: L("Deeskalace", "De-escalation", "Desescalada"), color: C.green };
     if (has([" cpi", "inflation", " ppi", "payroll", "nfp", "jobs report"])) return { label: "Hot print", color: C.orange };
     if (has(["fed ", "fomc", "boj", "ecb", "boe", "rate decision", "rate hike", "rate cut", "central bank"])) return { label: L("Klíčový event", "Key risk event", "Evento clave"), color: C.accent };
-    const rs = s.risk_score || 0;
     if (rs <= -25) return { label: "Risk-off", color: C.red };
     if (rs >= 25) return { label: "Risk-on", color: C.green };
     return { label: "Watch", color: C.yellow };
@@ -848,6 +873,15 @@ export default function Dashboard() {
             }}>
             {tradeMode === "intraday" ? t("modeIntraday") : t("modeSwing")}
           </button>
+          {intradayStale && (
+            <span title={L("Intraday: žádné čerstvé zprávy (<24 h) – zobrazeno poslední dostupné skóre",
+                            "Intraday: no fresh news (<24h) – showing last available scores",
+                            "Intradía: sin noticias recientes (<24h) – mostrando últimas puntuaciones")}
+              style={{ fontSize: 10, fontWeight: 700, color: C.yellow, border: `1px solid ${C.yellow}66`,
+                background: `${C.yellow}14`, padding: "2px 7px", borderRadius: 7, whiteSpace: "nowrap" }}>
+              ⚠ {L("stará data", "stale data", "datos antiguos")}
+            </span>
+          )}
           <button onClick={() => { const i = LANGS.indexOf(lang); const next = LANGS[(i + 1) % LANGS.length]; setLang(next); localStorage.setItem("mp_lang", next); }} style={{
             background: "none", border: `1px solid ${C.border}`,
             padding: "3px 8px", cursor: "pointer", borderRadius: 7, lineHeight: 1, display: "flex", alignItems: "center", gap: 5,
