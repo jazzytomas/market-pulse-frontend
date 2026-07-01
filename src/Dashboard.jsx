@@ -145,6 +145,13 @@ const CURRENCY_SUM_SCALE = 250;
 const DECAY_FULL_DAYS = 1.0;
 const DECAY_HALFLIFE_DAYS = 1.2;
 const DEMOTED_FACTOR = 0.7;   // mírné utlumení demotovaných (mimo aktivní set), zbytek řeší decay
+// Fix 2 – anti-stacking stejné měny v jedné seanci
+const STACK_WINDOW_H = 4;     // okno (h), kdy se stejnosměrné zprávy pro tutéž měnu považují za "stacking"
+const STACK_DAMPEN = 0.4;     // útlum 2. a dalšího stejnosměrného příspěvku v okně
+// Fix 1 – ropný/komoditní kanál pro petroměny
+const OIL_IMPULSE_K = 2.2;    // převod % pohybu WTI na body impulsu do CAD/NOK
+const OIL_IMPULSE_MAX = 45;   // strop |impulsu|
+const PETRO_CURRENCIES = ["CAD", "NOK"];
 const API = "https://market-pulse-fdgb.onrender.com";
 
 
@@ -187,27 +194,47 @@ function ageWeight(createdAt, mode = "swing") {
   return Math.pow(0.5, (ageDays - DECAY_FULL_DAYS) / DECAY_HALFLIFE_DAYS);
 }
 
+function _tsMs(createdAt) {
+  if (!createdAt) return null;
+  const iso = createdAt.includes("T") ? createdAt : createdAt.replace(" ", "T") + "Z";
+  const t = new Date(iso).getTime();
+  return isNaN(t) ? null : t;
+}
+
 function computeCurrencyTotals(list, mode = "swing") {
   const result = {};
   const demotedFactor = mode === "intraday" ? 0.2 : DEMOTED_FACTOR;
   CURRENCIES.forEach((c) => {
-    let weightedSum = 0;
+    // Sesbírej příspěvky pro měnu c (pro anti-stacking potřebujeme čas + znaménko)
+    const contribs = [];
     for (const s of (list || [])) {
       const ciRaw = s.currency_impact || s.currencyImpact;
       const ci = typeof ciRaw === 'string' ? JSON.parse(ciRaw) : (ciRaw || {});
-      if (ci && ci[c]) {
-        const score = ci[c].score || 0;
-        if (score !== 0) {
-          let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
-          if (s.demoted_at) baseW *= demotedFactor;
-          if (baseW > 0) {
-            weightedSum += score * baseW * ageWeight(s.created_at, mode);
-          }
-        }
-      }
+      const score = (ci && ci[c]) ? (ci[c].score || 0) : 0;
+      if (score === 0) continue;
+      let baseW = s.weight === "HIGH" ? 3 : s.weight === "MED" ? 1 : 0;
+      if (s.demoted_at) baseW *= demotedFactor;
+      const w = baseW * ageWeight(s.created_at, mode);
+      if (w <= 0) continue;
+      contribs.push({ value: score * w, sign: score > 0 ? 1 : -1, ts: _tsMs(s.created_at) });
     }
-    // Point 3: saturující SOUČET (tanh) místo váženého průměru. Víc čerstvých
-    // souhlasných zpráv bias zesílí; jedna stará/slabá ho nesatuje na plnou hodnotu.
+    // Fix 2 – anti-stacking: pokud pro TUTÉŽ měnu přijde v okně STACK_WINDOW_H víc
+    // stejnosměrných zpráv (Macklem + kanadské HDP), nech nejsilnější v plné váze a
+    // další stejnosměrné v tom okně utlum ×STACK_DAMPEN, ať se směr nekumuluje do extrému.
+    let weightedSum = 0;
+    for (const sign of [1, -1]) {
+      const group = contribs.filter(x => x.sign === sign)
+                            .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+      group.forEach((x, i) => {
+        if (i === 0) { weightedSum += x.value; return; }
+        const stacked = group.slice(0, i).some(prev => {
+          if (prev.ts == null || x.ts == null) return true;  // bez času raději utlum
+          return Math.abs(prev.ts - x.ts) <= STACK_WINDOW_H * 3600000;
+        });
+        weightedSum += x.value * (stacked ? STACK_DAMPEN : 1);
+      });
+    }
+    // Point 3: saturující SOUČET (tanh) místo váženého průměru.
     result[c] = Math.round(Math.tanh(weightedSum / CURRENCY_SUM_SCALE) * 100);
   });
   return result;
@@ -567,6 +594,24 @@ export default function Dashboard() {
   } else {
     currencyTotals = computeCurrencyTotals(scenarios, tradeMode);
   }
+
+  // Fix 1 – ROPNÝ/KOMODITNÍ KANÁL pro petroměny (CAD, NOK). Sentiment scénářů často
+  // ropný trend nezachytí → přičti reálný směr WTI z /api/momentum. Klesající ropa =
+  // záporný impuls pro CAD/NOK; rostoucí = kladný. + tvrdý strop: při klesající ropě
+  // nesmí být CAD silnější gainer než čistě riziková AUD.
+  (() => {
+    const wti = momentumData && momentumData.instruments && momentumData.instruments.WTI;
+    if (!wti || typeof wti.pct !== "number") return;
+    const impulse = Math.max(-OIL_IMPULSE_MAX, Math.min(OIL_IMPULSE_MAX, Math.round(wti.pct * OIL_IMPULSE_K)));
+    PETRO_CURRENCIES.forEach(petro => {
+      if (currencyTotals[petro] == null) return;
+      currencyTotals[petro] = Math.max(-100, Math.min(100, currencyTotals[petro] + impulse));
+    });
+    // Při klesající ropě CAD nesmí přebít AUD (petroměna ≤ čistě riziková proxy)
+    if (wti.pct < 0 && currencyTotals.CAD != null && currencyTotals.AUD != null && currencyTotals.CAD > currencyTotals.AUD) {
+      currencyTotals.CAD = currencyTotals.AUD;
+    }
+  })();
 
   // --- Point 1: cenové momentum per měna ---
   // Odvozeno z denní % změny USD párů (watchlist) + DXY. Kladné = měna dnes posiluje.
